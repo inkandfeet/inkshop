@@ -4,7 +4,7 @@ Simple stores and hosting for virtual products.
 
 Sell and unlock access to products you're hosting in other places, all from a single domain.
 
-Authenticated, encrypted storage for users to save data using your products, automatically included.
+One-click enable of authenticated, encrypted storage for users to save data using your products, automatically included.  (via [inkDB](https://github.com/inkandfeet/inkdb))
 
 Turn-key integration with Stripe.
 
