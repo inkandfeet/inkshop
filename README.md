@@ -4,7 +4,8 @@ Simple stores and hosting for digital products.
 
 Sell and provide access to digital products - both downloads and ones you're hosting, all from a single domain.
 
-Authentication and encrypted storage for users to save data using your products, automatically included. (via by [inkDB](https://github.com/inkandfeet/inkdb))
+(?) Authentication and encrypted storage for users to save data using your products, automatically included. (via by [inkDB](https://github.com/inkandfeet/inkdb))
+(Need to decide the best way to integrate this.)
 
 Turn-key integration with Stripe.
 
@@ -18,6 +19,7 @@ Tech:
 
 
 Inkshop - a digital shop for users you love.
+
     Auth
         - Simple user authentication.
         - username+pass -> jwt/keypair.
