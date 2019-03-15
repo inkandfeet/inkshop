@@ -33,7 +33,7 @@ Inkshop - a digital shop for users you love.
         - Simple reporting
         - Product
             info
-            purchase email
+            purchase receipt
 
     Integrate
         - Securely report purchases to letters/other systems (webhook).
