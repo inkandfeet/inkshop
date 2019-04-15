@@ -39,4 +39,4 @@ ADD manage.py /project/manage.py
 ADD tests.yml /inkshop/tests.yml
 
 EXPOSE 8120
-WORKDIR /project/inkshop
+WORKDIR /project
