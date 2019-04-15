@@ -1,3 +1,4 @@
+
 # Inkshop is about people.
 
 Inkshop is a human-centered framework for running your website, mailing list, and store all in one.
@@ -30,6 +31,8 @@ When it's at 1.0, this project will let you:
 - Share posts to social media via buffer
 
 ## Current status:
+
+[![CircleCI](https://circleci.com/gh/inkandfeet/inkshop.svg?style=svg)](https://circleci.com/gh/inkandfeet/inkshop)
 
 It just got started, on April 15 2019.   Mailing list is the first thing to build. Target for basic mailing list is April 21, 2019.
 
