@@ -1,0 +1,38 @@
+<html>
+<head>
+    <link href='https://fonts.googleapis.com/css?family=Fira+Sans:400,700' rel='stylesheet' type='text/css'>
+    <style type="text/css">
+        body {
+            font-family: 'Fira Sans',"Helvetica Neue", Helvetica, Arial, sans-serif;
+            text-align: center;
+            background-color: #3abcd3;
+            color: white;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        h1 {
+            text-align: center;
+            font-weight: bold;
+        }
+        div {
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+    {% if email_confirmed %}
+    <div>
+    <h1>Email Confirmed</h1>
+
+    <p>You're all set!  Thanks for making sure Ink & Feet stays just for students like you.</p>
+    {% else %}
+    <h1>Uh-oh</h1>
+
+    <p>We weren't able to confirm your email.  Please send the link to this page to help@inkandfeet.com, and we'll get you sorted!</p>
+    </div>
+
+
+    {% endif %}
+</body>
+</html>

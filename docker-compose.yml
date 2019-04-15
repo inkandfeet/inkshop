@@ -47,17 +47,17 @@ services:
     container_name: inkshop_redis
     restart: unless-stopped
 
-  rabbitmq:
-    image: rabbitmq
-    env_file:
-      - ".env"
-    environment:
-      RABBITMQ_DEFAULT_VHOST: "/"
-      RABBITMQ_LOGS: "/var/log/rabbitmq/rabbit.log"
-    ports:
-      - "5672:5672"
-    labels:
-      NAME: "rabbitmq"
+  # rabbitmq:
+  #   image: rabbitmq
+  #   env_file:
+  #     - ".env"
+  #   environment:
+  #     RABBITMQ_DEFAULT_VHOST: "/"
+  #     RABBITMQ_LOGS: "/var/log/rabbitmq/rabbit.log"
+  #   ports:
+  #     - "5672:5672"
+  #   labels:
+  #     NAME: "rabbitmq"
 
   inkshop:
     build: .
@@ -65,7 +65,7 @@ services:
     depends_on:
       - db
       - redis
-      - rabbitmq
+      # - rabbitmq
     volumes:
       - ./inkshop:/project/inkshop
     labels:

@@ -1,0 +1,13 @@
+Hey there,
+
+Someone (hopefully you) just requested a password reset for the email {{user.email}}.
+
+If it was you, and you'd like to reset your password, click on the link below.
+
+https://account.inkandfeet.com{% url 'person:set_password' user.reset_key %}
+
+If it wasn't you, don't worry - you can just delete this email, and your account will stay secure.
+
+Thanks,
+
+-Steven (Ink and Feet)

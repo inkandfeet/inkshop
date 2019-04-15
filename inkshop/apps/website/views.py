@@ -5,6 +5,6 @@ from django.views.decorators.csrf import csrf_exempt
 from annoying.decorators import render_to, ajax_request
 
 
-@render_to("home/home.html")
+@render_to("website/home.html")
 def home(request):
     return locals()

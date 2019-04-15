@@ -1,0 +1,12 @@
+Thanks for signing up for Ink & Feet!
+
+You're almost all set - just click the link below to confirm your email, and you'll be on your way.
+
+https://account.inkandfeet.com{% url 'people:confirm_email' user.email_confirm_key %}
+
+As a reminder, your email address is {{user.email}}.
+
+
+Thanks,
+
+-Steven

@@ -60,7 +60,11 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
 
-    'home',
+    'inkdots',
+    'inkmail',
+    'people',
+    'website',
+    'utils',
 
 ]
 
@@ -95,7 +99,6 @@ CACHES = {
 MIDDLEWARE = (
     'corsheaders.middleware.CorsMiddleware',
     'django_hosts.middleware.HostsRequestMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

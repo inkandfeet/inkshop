@@ -17,7 +17,7 @@ urlpatterns = [
         name='password_reset_confirm'
     ),
     url(r'^reset/done/$', auth_views.PasswordResetCompleteView, name='password_reset_complete'),
-    url(r'^$', include(('home.urls', 'home'), namespace="home")),
+    url(r'^$', include(('website.urls', 'website'), namespace="website")),
 ]
 
 
