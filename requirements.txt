@@ -16,7 +16,6 @@ django-redis-cache==2.0.0
 django-storages==1.7.1
 Django==2.2
 flake8==3.7.7
-faker
 freezegun==0.3.11
 gunicorn==19.9.0
 hashids==1.2.0
@@ -31,7 +30,6 @@ piprot==0.9.10
 polytester==1.2.0
 psycopg2==2.8.2
 pytz==2019.1
-pyyaml>=4.2b1
 simple-crypt==4.1.7
 slimit==0.8.1
 sorl-thumbnail==12.5.0
