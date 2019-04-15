@@ -28,8 +28,8 @@ services:
         published: 443
         protocol: tcp
     volumes:
-      - "./acme.json:/acme.json"
-      - "traefik:/traefik/acme/account"
+      - "./services/traefik/acme.json:/acme.json"
+      - "./services/traefik/data:/traefik/acme/account"
       - "/var/run/docker.sock:/var/run/docker.sock"
     restart: unless-stopped
 
@@ -47,17 +47,17 @@ services:
     container_name: inkshop_redis
     restart: unless-stopped
 
-  # rabbitmq:
-  #   image: inkshop_rabbitmq
-  #   env_file:
-  #     - ".env"
-  #   environment:
-  #     RABBITMQ_DEFAULT_VHOST: "/"
-  #     RABBITMQ_LOGS: "/var/log/rabbitmq/rabbit.log"
-  #   ports:
-  #     - "5672:5672"
-  #   labels:
-  #     NAME: "rabbitmq"
+  rabbitmq:
+    image: rabbitmq
+    env_file:
+      - ".env"
+    environment:
+      RABBITMQ_DEFAULT_VHOST: "/"
+      RABBITMQ_LOGS: "/var/log/rabbitmq/rabbit.log"
+    ports:
+      - "5672:5672"
+    labels:
+      NAME: "rabbitmq"
 
   inkshop:
     build: .
@@ -65,21 +65,18 @@ services:
     depends_on:
       - db
       - redis
+      - rabbitmq
     volumes:
-      - ./inkshop:/inkshop
+      - ./inkshop:/project/inkshop
     labels:
       - "traefik.enable=true"
       - "traefik.backend=inkshop"
       - "traefik.port=8120"
       - "traefik.frontend.rule=Host:${INKSHOP_DOMAIN}"
-      - "traefik.frontend.redirect.permanent=true"
-      - "traefik.frontend.redirect.regex=https://(.*)/.well-known/(card|cal)dav"
-      - "traefik.frontend.redirect.replacement=https://$$1/remote.php/dav/"
       - "traefik.docker.network=inkshop"
-      - "traefik.frontend.headers.STSSeconds=15552000"
     env_file:
       - ".env"
-    command: bash -c 'service nginx start; cd /app/api; PYTHONIOENCODING="utf-8" python3 manage.py collectstatic --noinput --settings=envs.dev; cd ..; honcho start -f Procfile.dev'
+    command: bash -c 'service nginx start; cd /project; PYTHONIOENCODING="utf-8" python3 manage.py collectstatic --noinput --settings=inkshop.envs.dev; honcho start -f Procfile.dev'
     tty: true
     stdin_open: true
     restart: unless-stopped

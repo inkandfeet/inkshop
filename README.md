@@ -43,6 +43,7 @@ docker-compose up
 
 ## Built on:
 - [Simple Crypt](https://pypi.org/project/simple-crypt/) (and [pycrypto](https://pypi.org/project/pycrypto/)) for encryption.
+- Cloudflare for DNS, Caching, and Development redirects
 - Mailgun for email sending.
 - AWS S3 for uploads and static file serving.
 - Postgres for database.
