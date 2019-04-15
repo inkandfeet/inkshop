@@ -1,6 +1,6 @@
 version: "3.2"
 
-services:
+services:  
   traefik:
     image: traefik:1.7-alpine
     container_name: inkshop_traefik
@@ -33,36 +33,31 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     restart: unless-stopped
 
-db:
+  db:
     image: postgres
     ports:
      - 5432:5432
     env_file:
       - ".env"
-    environment:
-     - POSTGRES_USER=postgres
-     - POSTGRES_PASSWORD=postgres
-    
-      
-    # volumes:
-    #  - ./postgres-data:/var/lib/postgresql/data
+    volumes:
+     - ./postgres-data:/var/lib/postgresql/data
 
   redis:
     image: redis:4.0-alpine
     container_name: inkshop_redis
     restart: unless-stopped
 
-  rabbitmq:
-    image: inkshop_rabbitmq
-    env_file:
-      - ".env"
-    environment:
-      RABBITMQ_DEFAULT_VHOST: "/"
-      RABBITMQ_LOGS: "/var/log/rabbitmq/rabbit.log"
-    ports:
-      - "5672:5672"
-    labels:
-      NAME: "rabbitmq"
+  # rabbitmq:
+  #   image: inkshop_rabbitmq
+  #   env_file:
+  #     - ".env"
+  #   environment:
+  #     RABBITMQ_DEFAULT_VHOST: "/"
+  #     RABBITMQ_LOGS: "/var/log/rabbitmq/rabbit.log"
+  #   ports:
+  #     - "5672:5672"
+  #   labels:
+  #     NAME: "rabbitmq"
 
   inkshop:
     build: .
@@ -70,7 +65,6 @@ db:
     depends_on:
       - db
       - redis
-      - memcached
     volumes:
       - ./inkshop:/inkshop
     labels:
@@ -94,3 +88,11 @@ networks:
   default:
     external:
       name: inkshop
+
+volumes:
+  traefik:
+    driver_opts:
+      type: none
+      device: /root/server-docker-images/data/traefik
+      o: bind
+  

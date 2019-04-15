@@ -35,6 +35,7 @@ git clone https://github.com/inkandfeet/inkshop.git
 cd inkshop
 cp env.sample .env
 # Edit .env with your values
+docker network create inkshop
 docker-compose up
 ```
 

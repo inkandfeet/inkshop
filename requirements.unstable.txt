@@ -19,6 +19,7 @@ flake8
 freezegun
 gunicorn
 hashids
+honcho
 html5lib
 ipython
 kombu>=3.0.30
