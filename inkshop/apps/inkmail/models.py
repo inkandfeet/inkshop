@@ -35,8 +35,14 @@ class MailingList(BaseModel):
     name = models.CharField(max_length=254, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
-    confirm_message = models.ForeignKey(Message, on_delete=models.SET_NULL)
-    welcome_message = models.ForeignKey(Message, on_delete=models.SET_NULL)
+    confirm_message = models.ForeignKey(
+        Message,
+        on_delete=models.SET_NULL, blank=True, null=True, related_name="list_for_confirm"
+    )
+    welcome_message = models.ForeignKey(
+        Message,
+        on_delete=models.SET_NULL, blank=True, null=True, related_name="list_for_welcome"
+    )
 
     unsubscribe_if_no_hearts_after_days = models.BooleanField(default=False)
     unsubscribe_if_no_hearts_after_days_num = models.IntegerField(blank=True, null=True, default=184)
@@ -84,7 +90,7 @@ class OutgoingMessage(BaseModel):
 
 class OutgoingMessageAttemptTombstone(BaseModel):
     send_time = models.DateTimeField()
-    outgoing_message = models.ForeignKey(OutgoingMessage, on_delete=models.SET_NULL)
+    outgoing_message = models.ForeignKey(OutgoingMessage, on_delete=models.SET_NULL, blank=True, null=True)
     encrypted_email = models.TextField(blank=True, null=True)
     encrypted_message_subject = models.TextField(blank=True, null=True)
     encrypted_message_body = models.TextField(blank=True, null=True)

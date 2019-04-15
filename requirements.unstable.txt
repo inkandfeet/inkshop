@@ -15,6 +15,7 @@ django-localflavor
 django-redis-cache
 django-storages
 Django
+faker
 flake8
 freezegun
 gunicorn
