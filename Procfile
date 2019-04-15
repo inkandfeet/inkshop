@@ -1,0 +1,3 @@
+web: bin/start-stunnel && echo $SERVICEACCOUNTKEY > /app/api/serviceAccountKey.json && echo $SERVICEACCOUNTKEY > /app/serviceAccountKey.json && gunicorn api.project.wsgi -b "0.0.0.0:$PORT" --workers=10
+beat: bin/start-stunnel && echo $SERVICEACCOUNTKEY > /app/api/serviceAccountKey.json && echo $SERVICEACCOUNTKEY > /app/serviceAccountKey.json && DJANGO_SETTINGS_MODULE=project.envs.live celery beat --app inkshop
+celery: bin/start-stunnel && echo $SERVICEACCOUNTKEY > /app/api/serviceAccountKey.json && echo $SERVICEACCOUNTKEY > /app/serviceAccountKey.json && DJANGO_SETTINGS_MODULE=project.envs.live celery worker -c 12 -Q celery --app inkshop

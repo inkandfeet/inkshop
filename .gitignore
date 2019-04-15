@@ -1,0 +1,52 @@
+*.pyc
+.env
+.DS_Store
+project.db
+__pycache__
+*.sqlite3
+*.sublime-workspace
+*.sublime-project
+collected_static
+node_modules
+source
+
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.dump
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Inkshop
+celerybeat-schedule*
+celerybeat*
+dump.rdb
+
+inkshop/project/db.sqlite3-journal
+inkshop/celerybeat.pid
+inkshop/celerybeat-schedule.db
+inkshop/media
+inkshop/project/project
+inkshop/project/media/*
+inkshop/data.json
+inkshop/npm-debug.log
+
+postgres-data/*
