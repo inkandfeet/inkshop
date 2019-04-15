@@ -36,7 +36,7 @@ ADD Procfile.dev /project/Procfile.dev
 ADD manage.py /project/manage.py
 
 # For polytester
-ADD tests.yml /inkshop/tests.yml
+ADD tests.yml /project/tests.yml
 
 EXPOSE 8120
 WORKDIR /project

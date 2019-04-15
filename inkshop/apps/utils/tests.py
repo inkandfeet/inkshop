@@ -14,4 +14,8 @@ from utils.test_helpers import MockRequestsTestCase
 import mock
 
 
+class TestTestHarness(MockRequestsTestCase):
+
+    def tests_run(self):
+        self.assertEquals(1+1, 2)
 

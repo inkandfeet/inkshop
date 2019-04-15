@@ -1,0 +1,4 @@
+inkshop:
+    command: python3 manage.py test
+    watch_glob: "*.py"
+    watch_dir: inkshop
