@@ -32,6 +32,7 @@ class MessageHeart(BaseModel):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     message = models.ForeignKey('inkmail.Message', blank=True, null=True, on_delete=models.SET_NULL)
 
+
 class Device(BaseModel):
     fingerprint = models.CharField(max_length=255, db_index=True)
     hardware_family = models.CharField(max_length=255, blank=True, null=True)
@@ -57,7 +58,6 @@ class PageView(BaseModel):
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
     page = models.ForeignKey('website.Page', blank=True, null=True, on_delete=models.SET_NULL)
     url = models.TextField(blank=True, null=True)
-
 
     @cached_property
     def opt_out_link(self):

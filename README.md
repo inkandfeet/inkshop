@@ -7,7 +7,7 @@ It doesn't track people, has strong privacy protection for both you and your cus
 Feedback, improvements, and contributions are welcome. :)
 
 
-## Current Status:
+## Project Overview:
 
 I'm bootstrapping this project on my own site, [Ink and Feet](https://inkandfeet.com). 
 
@@ -29,7 +29,7 @@ When it's at 1.0, this project will let you:
 - Create shortened URLs for sharing with social media
 - Share posts to social media via buffer
 
-Current status:
+## Current status:
 
 It just got started, on April 15 2019.   Mailing list is the first thing to build. Target for basic mailing list is April 21, 2019.
 
@@ -55,8 +55,25 @@ docker-compose up
 ```
 
 
+## Running tests
 
-## Built on:
+Tests are wrapped with [polytester](https://github.com/skoczen/polytester).
+
+One-offs:
+
+```bash
+docker-compose run inkshop pt
+```
+
+Development:
+
+```bash
+docker-compose run inkshop pt --autoreload
+```
+
+
+
+## Opinionated, and built on:
 - [Simple Crypt](https://pypi.org/project/simple-crypt/) (and [pycrypto](https://pypi.org/project/pycrypto/)) for encryption.
 - Cloudflare for DNS, Caching, and Development redirects
 - Mailgun for email sending.
@@ -65,3 +82,38 @@ docker-compose up
 - Redis for caching and queuing.
 - Docker for encapsulation and dev ease.
 - Heroku for deployment.
+
+
+
+## Current working list
+
+- [ ] get test harness in
+- [ ] basic tests passing including flake
+- [ ] create subscribe test
+- [ ] create functions
+- [ ] create message model tests
+- [ ] create message model functions, including rendering
+- [ ] create scheduledmessage model tests, including timing and tombstoning, and never double-sending.
+- [ ] create scheduledmessage model methods
+- [ ] create tombstoning model methods
+- [ ] create unsubscribe test
+- [ ] create functions
+- [ ] create love click tests for user and system (mark out unsub)
+- [ ] create love click methods
+- [ ] create tests that only emails to the right list send. (so when I import, it doesn't accdentally send)
+- [ ] create message editing UI
+- [ ] create message editing tests
+- [ ] message editing tests pass
+
+- [ ] deploy to production
+- [ ] make fake list of me
+- [ ] send test message to me on production
+- [ ] create import CSV support tests
+- [ ] create import CSV support method
+
+
+- [ ] export final list from op
+- [ ] import list into production
+- [ ] schedule letter for sunday
+
+

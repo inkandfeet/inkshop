@@ -1,3 +1,6 @@
+# Portions of initial implementation are based on the BuddyUp codebase:
+# https://github.com/buddyup/api
+
 from base64 import b64decode
 import datetime
 import json
@@ -13,6 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from annoying.decorators import render_to, ajax_request
 from utils.factory import Factory
+from people.models import Person
 
 
 CORRECT_PASSWORD_STRING = "!!CORRECT!!InkshopSalt"
@@ -32,17 +36,16 @@ def home(request):
 
 @render_to("people/email_confirmation.html")
 def confirm_email(request, email_key):
-    u = User.objects.get(email_confirm_key=email_key)
+    u = Person.objects.get(email_confirm_key=email_key)
     u.email_verified = True
     u.save()
     email_confirmed = True
-    firebase_put("users/%s/internal/email_verified" % u.inkid, {".value": True})
     return locals()
 
 
 @render_to("people/opt_out.html")
 def opt_out(request, reader_opt_out_key):
-    s = Reader.objects.get(opt_out_key=reader_opt_out_key)
+    s = Person.objects.get(opt_out_key=reader_opt_out_key)
     s.opted_out_of_email = True
     s.save()
     return locals()
@@ -67,16 +70,16 @@ def user_authenticate(request):
             resp = user.info
             resp["success"] = True
 
-    if resp["success"]:
-        password = CORRECT_PASSWORD_STRING
-    else:
-        password = data["password"]
-    log_access_attempt.delay(
-        data["email"],
-        password,
-        request.META["REMOTE_ADDR"],
-        resp["success"],
-    )
+    # if resp["success"]:
+    #     password = CORRECT_PASSWORD_STRING
+    # else:
+    #     password = data["password"]
+    # log_access_attempt.delay(
+    #     data["email"],
+    #     password,
+    #     request.META["REMOTE_ADDR"],
+    #     resp["success"],
+    # )
 
     return resp
 
@@ -117,7 +120,7 @@ def change_password(request):
         data = json.loads(request.body.decode('utf-8'))
 
     if data and "inkid" in data and "api_jwt" in data and "password" in data:
-        user = User.objects.get(inkid=data["inkid"])
+        user = Person.objects.get(inkid=data["inkid"])
         assert user.api_jwt == data["api_jwt"]
         user.set_password(data["password"])
         user.must_reset_password = False
@@ -128,11 +131,11 @@ def change_password(request):
         user.save()
         resp["success"] = True
 
-    log_password_attempt.delay(
-        data["inkid"],
-        request.META["REMOTE_ADDR"],
-        resp["success"],
-    )
+    # log_password_attempt.delay(
+    #     data["inkid"],
+    #     request.META["REMOTE_ADDR"],
+    #     resp["success"],
+    # )
 
     return resp
 
@@ -151,18 +154,18 @@ def reset_password(request):
 
     try:
         if data and "email" in data:
-            if User.objects.filter(email__iexact=data["email"]).count() != 1:
+            if Person.objects.filter(email__iexact=data["email"]).count() != 1:
                 resp["error"] = "No account with that email."
             else:
-                user = User.objects.get(email__iexact=data["email"])
+                user = Person.objects.get(email__iexact=data["email"])
                 user.send_reset_key()
                 resp["success"] = True
 
-        log_password_attempt.delay(
-            data["email"],
-            request.META["REMOTE_ADDR"],
-            resp["success"],
-        )
+        # log_password_attempt.delay(
+        #     data["email"],
+        #     request.META["REMOTE_ADDR"],
+        #     resp["success"],
+        # )
     except:
         import traceback
         traceback.print_exc()
@@ -175,7 +178,7 @@ def reset_password(request):
 def confirm_reset(request, email_key):
     saved = False
     try:
-        u = User.objects.get(reset_key=email_key)
+        u = Person.objects.get(reset_key=email_key)
         a = u
 
         if request.method == "POST":
@@ -208,14 +211,14 @@ def check_new_account(request):
         if data and "email" in data:
             resp["success"] = True
 
-            User.objects.get(email__iexact=data["email"])
+            Person.objects.get(email__iexact=data["email"])
             resp["newAccount"] = False
 
-            log_account_check_attempt.delay(
-                data["email"],
-                request.META["REMOTE_ADDR"],
-                resp["success"],
-            )
+            # log_account_check_attempt.delay(
+            #     data["email"],
+            #     request.META["REMOTE_ADDR"],
+            #     resp["success"],
+            # )
     except:
         import traceback
         traceback.print_exc()

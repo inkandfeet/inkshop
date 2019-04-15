@@ -12,6 +12,3 @@ from simplecrypt import encrypt, decrypt
 from utils.factory import Factory
 from utils.test_helpers import MockRequestsTestCase
 import mock
-
-
-

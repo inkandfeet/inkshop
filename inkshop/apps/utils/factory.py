@@ -456,6 +456,4 @@ class Factory(DjangoFunctionalFactory):
         p.set_password(password)
         p.save()
 
-        return u, password
-
-   
+        return p, password
