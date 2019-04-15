@@ -40,9 +40,9 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 ALLOWED_HOSTS = [
     INKSHOP_BASE_URL,
-    "mail.%s" % INKSHOP_BASE_URL,
-    "heart.%s" % INKSHOP_BASE_URL,
-    "dots.%s" % INKSHOP_BASE_URL,
+    INKSHOP_BASE_URL.replace("://", "://mail."),
+    INKSHOP_BASE_URL.replace("://", "://heart."),
+    INKSHOP_BASE_URL.replace("://", "://dots."),
 ]
 
 # Application definition
@@ -60,19 +60,9 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
 
-]
+    'home',
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-ROOT_URLCONF = 'inkshop.urls'
 
 TEMPLATES = [
     {
@@ -92,19 +82,73 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'inkshop.wsgi.application'
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-        'LOCATION': 'memcached:11211',
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': 'redis:6379',
+        'OPTIONS': {
+            'DB': 0,
+        }
     }
 }
+
+MIDDLEWARE = (
+    'corsheaders.middleware.CorsMiddleware',
+    'django_hosts.middleware.HostsRequestMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'htmlmin.middleware.HtmlMinifyMiddleware',
+    'htmlmin.middleware.MarkRequestMiddleware',
+    'django_hosts.middleware.HostsResponseMiddleware',
+)
+
+ROOT_URLCONF = 'inkshop.urls'
+ROOT_HOSTCONF = 'inkshop.hosts'
+DEFAULT_HOST = 'root'
+SITE_ID = 1
+
+# AUTH_USER_MODEL = 'people.User'
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+SESSION_SAVE_EVERY_REQUEST = True
+
+CORS_ORIGIN_WHITELIST = (
+    INKSHOP_BASE_URL,
+    'localhost',
+)
+CORS_ORIGIN_ALLOW_ALL = True
+
+
+# Database
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': POSTGRES_DB,
+        'USER': POSTGRES_USER,
+        'PASSWORD': POSTGRES_PASSWORD,
+        'HOST': 'db',
+        'PORT': 5432,
+    }
+}
+if 'CIRCLECI' in os.environ:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'circle_test',
+        'USER': 'ubuntu',
+    }
+TEST_MODE = False
+if 'test' in sys.argv:
+    TEST_MODE = True
+    logging.disable(logging.CRITICAL)
+    CELERY_ALWAYS_EAGER = True
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True
+    CACHES['default']['PREFIX'] = 'test'
 
 
 # Static
@@ -151,8 +195,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Background Workers
-CELERY_BROKER_URL = 'amqp://rabbitmq:rabbitmq@rabbitmq:5672'
-BROKER_URL = 'amqp://rabbitmq:rabbitmq@rabbitmq:5672'
+# CELERY_BROKER_URL = 'amqp://rabbitmq:rabbitmq@rabbitmq:5672'
+# BROKER_URL = 'amqp://rabbitmq:rabbitmq@rabbitmq:5672'
+
 CELERY_BROKER_URL = 'redis://redis:6379/0'
 BROKER_URL = 'redis://redis:6379/0'
 

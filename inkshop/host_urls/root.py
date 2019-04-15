@@ -7,7 +7,6 @@ from django.conf import settings
 from django.views.static import serve
 
 urlpatterns = [
-    url(r'^home/', include(('home.urls', 'home'), namespace="home")),
 
     url(r'^admin/password_reset/$', auth_views.PasswordResetView, name='admin_password_reset'),
     url(r'^admin/password_reset/done/$', auth_views.PasswordResetDoneView, name='password_reset_done'),
@@ -18,6 +17,7 @@ urlpatterns = [
         name='password_reset_confirm'
     ),
     url(r'^reset/done/$', auth_views.PasswordResetCompleteView, name='password_reset_complete'),
+    url(r'^$', include(('home.urls', 'home'), namespace="home")),
 ]
 
 

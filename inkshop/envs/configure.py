@@ -48,6 +48,11 @@ set_required_key("INKSHOP_FROM_EMAIL")
 set_required_key("MAILGUN_API_KEY")  # From https://app.mailgun.com/app/account/security/api_keys
 set_required_key("MAILGUN_SENDER_DOMAIN")  # i.e. mail.mydomain.com
 
-
+# AWS
 set_required_key("AWS_STORAGE_BUCKET_NAME")
 set_required_key("AWS_S3_HOST")
+
+# Database config
+set_required_key("POSTGRES_DB")
+set_required_key("POSTGRES_USER")
+set_required_key("POSTGRES_PASSWORD")

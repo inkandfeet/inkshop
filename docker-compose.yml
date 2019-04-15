@@ -70,9 +70,9 @@ services:
       - ./inkshop:/project/inkshop
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=inkshop"
       - "traefik.port=8120"
-      - "traefik.frontend.rule=Host:${INKSHOP_DOMAIN}"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.frontend.rule=Host: ${INKSHOP_DOMAIN}"
       - "traefik.docker.network=inkshop"
     env_file:
       - ".env"
