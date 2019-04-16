@@ -32,6 +32,7 @@ When it's at 1.0, this project will let you:
 
 ## Current status:
 
+Moving off of Circle.  I've been using Circle for 7 years, and after the v2 switch, nothing works.  I spent 4 hours trying to set up a new project, and couldn't get it working.  Tried Travis CI.  Up and running in 6 minutes.
 [![CircleCI](https://circleci.com/gh/inkandfeet/inkshop.svg?style=svg)](https://circleci.com/gh/inkandfeet/inkshop)
 
 It just got started, on April 15 2019.   Mailing list is the first thing to build. Target for basic mailing list is April 21, 2019.
