@@ -1,7 +1,5 @@
 import json
 import requests
-from binascii import hexlify
-from simplecrypt import encrypt
 
 from django.conf import settings
 from django.core.mail import send_mail

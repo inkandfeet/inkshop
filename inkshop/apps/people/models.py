@@ -9,8 +9,6 @@ from base64 import b64encode
 from io import BytesIO
 from PIL import Image, ImageOps
 from tempfile import NamedTemporaryFile
-from binascii import hexlify, unhexlify
-from simplecrypt import encrypt, decrypt
 
 from django.db import models
 from django.conf import settings
@@ -25,6 +23,7 @@ from django.utils.functional import cached_property
 from django.utils import timezone
 
 from utils.models import BaseModel
+from utils.encryption import encrypt, decrypt
 
 
 class UserManager(BaseUserManager):
@@ -85,12 +84,24 @@ class Person(HasJWTBaseModel):
 
     @property
     def email(self):
-        return decrypt(settings.ENCRYPTION_KEY, unhexlify(self.encrypted_email)).decode('utf-8')
+        return decrypt(self.encrypted_email)
+
+    @email.setter
+    def email(self, value):
+        self.encrypted_email = encrypt(value)
 
     @property
     def first_name(self):
-        return decrypt(settings.ENCRYPTION_KEY, unhexlify(self.encrypted_first_name)).decode('utf-8')
+        return decrypt(self.encrypted_first_name)
+
+    @first_name.setter
+    def first_name(self, value):
+        self.encrypted_first_name = encrypt(value)
 
     @property
     def last_name(self):
-        return decrypt(settings.ENCRYPTION_KEY, unhexlify(self.encrypted_last_name)).decode('utf-8')
+        return decrypt(self.encrypted_last_name)
+
+    @last_name.setter
+    def last_name(self, value):
+        self.encrypted_last_name = encrypt(value)

@@ -9,8 +9,6 @@ from django.core.mail import mail_admins
 from django.contrib.auth import authenticate, login
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from binascii import hexlify, unhexlify
-from simplecrypt import encrypt, decrypt
 
 from annoying.decorators import render_to, ajax_request
 

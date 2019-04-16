@@ -1,9 +1,11 @@
 
 # Inkshop is about people.
 
-Inkshop is a human-centered framework for running your website, mailing list, and store all in one.
+Inkshop is a human-centered framework for running your small business.  Website, mailing list, store, and reporting all in one.  It's also free.
 
-It doesn't track people, has strong privacy protection for both you and your customers baked in, and Just Works.
+Inkshop sticks out because it's people-focused.  It treats your customers and visitors like people, not data-points.
+
+That means no creepy tracking, no big-data segmentation, and encryption baked-in to provide strong privacy protection for both you and your customers. 
 
 Feedback, improvements, and contributions are welcome. :)
 
@@ -33,10 +35,6 @@ When it's at 1.0, this project will let you:
 ## Current status:
 
 [![TravisCI](https://travis-ci.org/inkandfeet/inkshop.svg?branch=master)](https://travis-ci.org/inkandfeet/inkshop)
-
-
-Moving off of Circle.  I've been using Circle for 7 years, and after the v2 switch, nothing works.  I spent 4 hours trying to set up a new project, and couldn't get it working.  Tried Travis CI.  Up and running in 6 minutes.
-[![CircleCI](https://circleci.com/gh/inkandfeet/inkshop.svg?style=svg)](https://circleci.com/gh/inkandfeet/inkshop)
 
 It just got started, on April 15 2019.   Mailing list is the first thing to build. Target for basic mailing list is April 21, 2019.
 
@@ -94,8 +92,8 @@ docker-compose run inkshop pt --autoreload
 
 ## Current working list
 
-- [ ] get test harness in
-- [ ] basic tests passing including flake
+- [x] get test harness in
+- [x] basic tests passing including flake
 - [ ] create subscribe test
 - [ ] create functions
 - [ ] create message model tests

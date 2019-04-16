@@ -31,8 +31,9 @@ class Message(BaseModel):
     body_html_unrendered = models.TextField(blank=True, null=True)
 
 
-class MailingList(BaseModel):
+class Newsletter(BaseModel):
     name = models.CharField(max_length=254, blank=True, null=True)
+    internal_name = models.CharField(max_length=254, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
     confirm_message = models.ForeignKey(
@@ -52,7 +53,7 @@ class MailingList(BaseModel):
 
 class Subscription(BaseModel):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    mailing_list = models.ForeignKey(MailingList, on_delete=models.CASCADE)
+    newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
     subscribed_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
     subscribed_from_url = models.TextField(blank=True, null=True)
     double_opted_in_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
@@ -64,7 +65,7 @@ class Subscription(BaseModel):
 
 class ScheduledMessage(BaseModel):
     message = models.ForeignKey(Message, blank=True, null=True, on_delete=models.SET_NULL)
-    mailing_list = models.ForeignKey(MailingList, on_delete=models.CASCADE)
+    newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False)
     complete = models.BooleanField(default=False)
 
@@ -78,7 +79,7 @@ class ScheduledMessage(BaseModel):
     num_sent = models.IntegerField(default=0)
 
     def recipients(self):
-        return self.mailing_list.subscribers
+        return self.newsletter.subscribers
 
 
 class OutgoingMessage(BaseModel):

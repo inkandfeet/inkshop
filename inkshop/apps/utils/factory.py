@@ -11,6 +11,7 @@ getcontext().prec = 7
 fake = Faker()
 
 from people.models import Person
+from inkmail.models import Newsletter
 
 
 class DjangoFunctionalFactory:
@@ -457,3 +458,16 @@ class Factory(DjangoFunctionalFactory):
         p.save()
 
         return p, password
+
+    @classmethod
+    def newsletter(cls, *args, **kwargs):
+        options = {
+            "name": cls.rand_tree(),
+            "internal_name": cls.rand_tree().lower(),
+            "description": cls.rand_text(),
+        }
+        options.update(kwargs)
+
+        n = Newsletter.objects.create(**options)
+
+        return n
