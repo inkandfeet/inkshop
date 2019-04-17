@@ -9,6 +9,8 @@ python:
   - "3.6"
   # - "3.6-dev"  # 3.6 development branch
 
+addons:
+  postgresql: "9.6"
 install:
   - pip install -r requirements.txt
 before_script:
@@ -19,4 +21,3 @@ script:
 services:
   - postgresql
   - memcached
-postgresql: "9.6"
