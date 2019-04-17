@@ -105,6 +105,7 @@ docker-compose run inkshop pt --autoreload
 - [ ] create functions
 - [ ] create love click tests for user and system (mark out unsub)
 - [ ] create love click methods
+- [ ] create love click templates
 - [ ] create tests that only emails to the right list send. (so when I import, it doesn't accdentally send)
 - [ ] create message editing UI
 - [ ] create message editing tests
