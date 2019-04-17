@@ -11,7 +11,7 @@ getcontext().prec = 7
 fake = Faker()
 
 from people.models import Person
-from inkmail.models import Newsletter, Subscription
+from inkmail.models import Newsletter, Subscription, Message
 
 
 class DjangoFunctionalFactory:
@@ -493,6 +493,6 @@ class Factory(DjangoFunctionalFactory):
         }
         options.update(kwargs)
 
-        n = Message.objects.create(**options)
+        m = Message.objects.create(**options)
 
-        return n
+        return m

@@ -1,0 +1,24 @@
+# The newsletters you send out.
+newsletters:
+  monthly:
+    name: My Monthly Newsletter
+    internal_name: monthly
+    description: Learn about the latest here at ExampleCo, and hear what we have coming up
+    from_email: "person@example.com"
+    from_name: "Jill ExampleCo"
+
+
+# These people can receive emails and buy things as normal,
+# but you won't ever see replies from them.
+troll_emails:
+  - troll@example.com
+  - hater@example.net
+
+
+# People using these emails will never be allowed in the system.  
+# It's a space for those terrible exes, abusive customers, or people you don't want to deal with.
+# People on this list cannot subscribe, buy products, or do anything in the system.
+# (If they try, they'll either get a silent failure, or for purchases, a "purchase failed" response)
+banned_emails:
+  - jerk@example.net
+  - whatiswrongwithyou@example.org

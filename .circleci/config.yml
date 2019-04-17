@@ -54,7 +54,7 @@ workflows:
             name: run tests
             command: |
               . venv/bin/activate
-              python3 manage.py test --settings=inkshop.envs.ci
+              python3 manage.py test --settings=inkshop.envs.ci --parallel
         - run:
             name: run tests
             command: |

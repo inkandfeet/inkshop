@@ -146,6 +146,7 @@ if 'CIRCLECI' in os.environ:
         'USER': 'ubuntu',
     }
 TEST_MODE = False
+DISABLE_ENCRYPTION_FOR_TESTS = False
 if 'test' in sys.argv:
     TEST_MODE = True
     logging.disable(logging.CRITICAL)
@@ -154,6 +155,9 @@ if 'test' in sys.argv:
     CELERY_TASK_EAGER_PROPAGATES = True
     CACHES['default']['PREFIX'] = 'test'
     EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+    if "DISABLE_ENCRYPTION_FOR_TESTS" in os.environ and os.environ["DISABLE_ENCRYPTION_FOR_TESTS"] == "True":
+        DISABLE_ENCRYPTION_FOR_TESTS = True
 
 
 # Static

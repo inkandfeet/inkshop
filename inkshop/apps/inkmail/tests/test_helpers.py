@@ -21,7 +21,7 @@ class MailTestCase(MockRequestsTestCase):
         self.subscription = Factory.subscription()
         self.person = self.subscription.person
         self.newsletter = self.subscription.newsletter
-        super(TestSendMail, self).setUp(*args, **kwargs)
+        super(MailTestCase, self).setUp(*args, **kwargs)
 
     def send_test_mail(self):
         self.subject = Factory.rand_text()
@@ -52,15 +52,21 @@ class TestSendMail(MailTestCase):
         self.send_test_mail()
         self.assertEquals(len(mail.outbox), 0)
 
-    def test_send_mail_does_not_send_to_trolllist(self):
+    def test_send_mail_still_sends_to_trolls(self):
         self.subscription.double_opt_in()
         self.person.mark_troll()
         self.send_test_mail()
-        self.assertEquals(len(mail.outbox), 0)
 
-    def test_send_mail_does_not_send_to_blacklist(self):
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, self.subject)
+        self.assertEquals(mail.outbox[0].body, self.body)
+        self.assertEquals(len(mail.outbox[0].to), 1)
+        self.assertEquals(mail.outbox[0].to[0], self.person.email)
+        self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
+
+    def test_send_mail_does_not_send_to_banned_people(self):
         self.subscription.double_opt_in()
-        self.person.blacklist()
+        self.person.ban()
         self.send_test_mail()
         self.assertEquals(len(mail.outbox), 0)
 
@@ -78,11 +84,7 @@ class TestSendMail(MailTestCase):
         self.assertEquals(len(mail.outbox), 0)
 
 
-class TestSendEvenIfNotDoubleOptedInMail(MockRequestsTestCase):
-
-    def setUp(self, *args, **kwargs):
-        self.subscription = Factory.subscription()
-        super(TestSendMail, self).setUp(*args, **kwargs)
+class TestSendEvenIfNotDoubleOptedInMail(MailTestCase):
 
     def test_send_mail_sends_to_valid_subscriber(self):
         self.assertEquals(False, "Test written")
@@ -94,18 +96,14 @@ class TestSendEvenIfNotDoubleOptedInMail(MockRequestsTestCase):
     def test_send_mail_does_not_send_to_not_double_opted_in(self):
         self.assertEquals(False, "Test written")
 
-    def test_send_mail_does_not_send_to_trolllist(self):
+    def test_send_mail_does_not_send_to_trolls(self):
         self.assertEquals(False, "Test written")
 
-    def test_send_mail_does_not_send_to_blacklist(self):
+    def test_send_mail_does_not_send_to_banned_people(self):
         self.assertEquals(False, "Test written")
 
 
-class TestTransactionalMail(MockRequestsTestCase):
-
-    def setUp(self, *args, **kwargs):
-        self.subscription = Factory.subscription()
-        super(TestSendMail, self).setUp(*args, **kwargs)
+class TestTransactionalMail(MailTestCase):
 
     def test_send_mail_sends_to_valid_subscriber(self):
         self.assertEquals(False, "Test written")
@@ -117,8 +115,8 @@ class TestTransactionalMail(MockRequestsTestCase):
     def test_send_mail_does_not_send_to_not_double_opted_in(self):
         self.assertEquals(False, "Test written")
 
-    def test_send_mail_does_not_send_to_trolllist(self):
+    def test_send_mail_does_not_send_to_trolls(self):
         self.assertEquals(False, "Test written")
 
-    def test_send_mail_does_not_send_to_blacklist(self):
+    def test_send_mail_does_not_send_to_banned_people(self):
         self.assertEquals(False, "Test written")

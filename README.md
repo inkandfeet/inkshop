@@ -31,6 +31,7 @@ When it's at 1.0, this project will let you:
 - Understand what pages are generating the most traffic
 - Create shortened URLs for sharing with social media
 - Share posts to social media via buffer
+- Protect your sanity against trolls and abusive people
 
 ## Current status:
 
@@ -52,11 +53,20 @@ This will include:
 ```bash
 git clone https://github.com/inkandfeet/inkshop.git
 cd inkshop
+
 cp env.sample .env
 # Edit .env with your values
+
+cp initial_data.yml.sample initial_data.yml
+# Edit initial_data.yml with your basic information.
+
 docker network create inkshop
 docker-compose run db createdb inkshop -h db -U $POSTGRES_USER
 docker-compose up
+
+# Load your initial data
+docker-compose run inkshop python3 manage.py load_initial_data
+
 ```
 
 

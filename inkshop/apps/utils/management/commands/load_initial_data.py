@@ -4,7 +4,7 @@ import yaml
 
 from django.core.management.base import BaseCommand
 from inkmail.models import Newsletter
-from people.models import BlacklistedEmail
+from people.models import Person
 
 
 class Command(BaseCommand):
@@ -17,9 +17,16 @@ class Command(BaseCommand):
 
             if "newsletters" in data:
                 for name, info in data["newsletters"].items():
-                    n = Newsletter.objects.get_or_create(
+                    Newsletter.objects.get_or_create(
                         **info
                     )
-            if "blacklist_emails" in data:
-                for e in data["blacklisted_emails"]:
-                    BlacklistedEmail.objects.get_or_create(email=e)
+
+            if "troll_emails" in data:
+                for e in data["troll_emails"]:
+                    p = Person.objects.get_or_create(email=e)
+                    p.mark_troll()
+
+            if "banned_emails" in data:
+                for e in data["banned_emails"]:
+                    p = Person.objects.get_or_create(email=e)
+                    p.ban()

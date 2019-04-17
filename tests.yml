@@ -1,5 +1,5 @@
 python:
-    command: python3 manage.py test --noinput
+    command: DISABLE_ENCRYPTION_FOR_TESTS=True python3 manage.py test --noinput --parallel
     watch_glob: "*.py"
     watch_dir: .
 flake:

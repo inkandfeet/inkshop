@@ -30,10 +30,14 @@ def unpad(s):
 
 
 def encrypt(s):
+    if settings.DISABLE_ENCRYPTION_FOR_TESTS:
+        return s
     return hexlify(simple_encrypt(settings.INKSHOP_ENCRYPTION_KEY, s.encode('utf8'))).decode()
 
 
 def decrypt(s):
+    if settings.DISABLE_ENCRYPTION_FOR_TESTS:
+        return s
     return simple_decrypt(settings.INKSHOP_ENCRYPTION_KEY, unhexlify(s)).decode('utf-8')
 
 
@@ -70,5 +74,5 @@ def normalize_and_encrypt(s):
 #     except (KeyboardInterrupt, SystemExit):
 #         pass
 #     except:
-#         logging.warn("Error decrypting. ")
+#         logging.critical("Error decrypting. ")
 #         return binascii.a2b_base64(raw_enc)

@@ -18,11 +18,16 @@ def hello():
 
 @task
 def send_mail(subscriber_pk, subject, body):
-    # Avoid circular imports
-    from inkmail.models import Subscription
-    s = Subscription.objects.get(pk=subscriber_pk)
+    from inkmail.models import Subscription  # Avoid circular imports
 
-    if s.double_opted_in and not s.unsubscribed:
+    s = Subscription.objects.select_related('person').get(pk=subscriber_pk)
+
+    if (
+        s.double_opted_in and
+        not s.unsubscribed and
+        not s.person.banned and
+        not s.person.hard_bounced
+    ):
         # Safe to send email.
         django_send_mail(subject, body, s.newsletter.full_from_email, [s.person.email, ], fail_silently=False)
 

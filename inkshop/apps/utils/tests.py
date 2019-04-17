@@ -18,10 +18,14 @@ class TestTestHarness(MockRequestsTestCase):
         self.assertEquals(1 + 1, 2)
 
 
+@override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
 class TestEncryptionHarness(MockRequestsTestCase):
 
     def test_basic_encryption(self):
         e = Factory.rand_str()
+        self.assertEquals(e, decrypt(encrypt(e)))
+
+        e = "😀💌❤️"
         self.assertEquals(e, decrypt(encrypt(e)))
 
         e = Factory.rand_text()

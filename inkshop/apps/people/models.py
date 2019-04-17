@@ -82,9 +82,19 @@ class Person(HasJWTBaseModel):
     email_verified = models.BooleanField(default=False)
     time_zone = models.CharField(max_length=254, blank=True, null=True,)
 
+    marked_troll = models.BooleanField(default=False)
+    marked_troll_at = models.DateTimeField(blank=True, null=True)
+    banned = models.BooleanField(default=False)
+    banned_at = models.DateTimeField(blank=True, null=True)
+    hard_bounced = models.BooleanField(default=False)
+    hard_bounced_at = models.DateTimeField(blank=True, null=True)
+    hard_bounced_message = models.ForeignKey('inkmail.Message', blank=True, null=True, on_delete=models.SET_NULL)
+
     @property
     def email(self):
-        return decrypt(self.encrypted_email)
+        if not hasattr(self, "_decrypted_email"):
+            self._decrypted_email = decrypt(self.encrypted_email)
+        return self._decrypted_email
 
     @email.setter
     def email(self, value):
@@ -92,7 +102,9 @@ class Person(HasJWTBaseModel):
 
     @property
     def first_name(self):
-        return decrypt(self.encrypted_first_name)
+        if not hasattr(self, "_decrypted_first_name"):
+            self._decrypted_first_name = decrypt(self.encrypted_first_name)
+        return self._decrypted_first_name
 
     @first_name.setter
     def first_name(self, value):
@@ -100,20 +112,30 @@ class Person(HasJWTBaseModel):
 
     @property
     def last_name(self):
-        return decrypt(self.encrypted_last_name)
+        if not hasattr(self, "_decrypted_last_name"):
+            self._decrypted_last_name = decrypt(self.encrypted_last_name)
+        return self._decrypted_last_name
 
     @last_name.setter
     def last_name(self, value):
         self.encrypted_last_name = encrypt(value)
 
+    def ban(self):
+        if not self.banned:
+            self.banned = True
+            self.banned_at = timezone.now()
+            self.save()
 
-class BlacklistedEmail(BaseModel):
-    encrypted_email = models.CharField(max_length=1024)
+    def mark_troll(self):
+        if not self.marked_troll:
+            self.marked_troll = True
+            self.marked_troll_at = timezone.now()
+            self.save()
 
-    @property
-    def email(self):
-        return decrypt(self.encrypted_email)
-
-    @email.setter
-    def email(self, value):
-        self.encrypted_email = encrypt(value)
+    def hard_bounce(self, message=None):
+        if not self.hard_bounced:
+            self.hard_bounced = True
+            self.hard_bounced_at = timezone.now()
+            if message:
+                self.hard_bounced
+            self.save()

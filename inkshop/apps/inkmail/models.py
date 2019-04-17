@@ -52,10 +52,6 @@ class Newsletter(BaseModel):
     unsubscribe_if_no_hearts_after_messages = models.BooleanField(default=True)
     unsubscribe_if_no_hearts_after_messages_num = models.IntegerField(blank=True, null=True, default=26)
 
-    hard_bounced = models.BooleanField(default=False)
-    hard_bounced_at = models.DateTimeField(blank=True, null=True)
-    hard_bounced_message = models.ForeignKey(Message, blank=True, null=True, on_delete=models.SET_NULL)
-
     @property
     def full_from_email(self):
         return '%s <%s>' % (self.from_name, self.from_email)
@@ -81,7 +77,7 @@ class Subscription(BaseModel):
 
     last_action = models.DateTimeField(blank=True, null=True, default=timezone.now)
 
-    def unusbscribe(self):
+    def unsubscribe(self):
         if not self.unsubscribed:
             self.unsubscribed = True
             self.unsubscribed_at = timezone.now()
