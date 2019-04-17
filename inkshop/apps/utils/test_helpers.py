@@ -1,5 +1,6 @@
 import mock
 from django.test import TestCase
+from django.utils import timezone
 
 
 class MockRequests(object):
@@ -37,3 +38,6 @@ class MockRequestsTestCase(TestCase):
     def tearDown(self):
         for patch in self.applied_patches:
             patch.stop()
+
+    def now(self):
+        return timezone.now()

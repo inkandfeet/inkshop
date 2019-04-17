@@ -50,3 +50,4 @@ inkshop/data.json
 inkshop/npm-debug.log
 
 postgres-data/*
+initial_data.yml

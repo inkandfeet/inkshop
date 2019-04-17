@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'anymail',
+    'corsheaders',
     'compressor',
     'django_celery_beat',
     'django_celery_results',
@@ -152,6 +153,7 @@ if 'test' in sys.argv:
     CELERY_TASK_ALWAYS_EAGER = True
     CELERY_TASK_EAGER_PROPAGATES = True
     CACHES['default']['PREFIX'] = 'test'
+    EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
 
 # Static

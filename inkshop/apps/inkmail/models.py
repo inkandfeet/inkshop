@@ -13,7 +13,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.files.base import ContentFile
-from django.core.mail import send_mail
+from inkmail.helpers import send_mail
 from django.template.loader import render_to_string
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.signals import user_logged_in
@@ -35,6 +35,8 @@ class Newsletter(BaseModel):
     name = models.CharField(max_length=254, blank=True, null=True)
     internal_name = models.CharField(max_length=254, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    from_email = models.TextField(max_length=254)
+    from_name = models.TextField(max_length=254)
 
     confirm_message = models.ForeignKey(
         Message,
@@ -50,17 +52,46 @@ class Newsletter(BaseModel):
     unsubscribe_if_no_hearts_after_messages = models.BooleanField(default=True)
     unsubscribe_if_no_hearts_after_messages_num = models.IntegerField(blank=True, null=True, default=26)
 
+    hard_bounced = models.BooleanField(default=False)
+    hard_bounced_at = models.DateTimeField(blank=True, null=True)
+    hard_bounced_message = models.ForeignKey(Message, blank=True, null=True, on_delete=models.SET_NULL)
+
+    @property
+    def full_from_email(self):
+        return '%s <%s>' % (self.from_name, self.from_email)
+
+    def hard_bounce(self, message=None):
+        if not self.hard_bounced:
+            self.hard_bounced = True
+            self.hard_bounced_at = timezone.now()
+            self.hard_bounced_message = message
+            self.save()
+
 
 class Subscription(BaseModel):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
     subscribed_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
     subscribed_from_url = models.TextField(blank=True, null=True)
-    double_opted_in_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
+    double_opted_in = models.BooleanField(default=False)
+    double_opted_in_at = models.DateTimeField(blank=True, null=True)
     has_set_never_unsubscribe = models.BooleanField(default=False)
+    unsubscribed = models.BooleanField(default=False)
     unsubscribed_at = models.DateTimeField(blank=True, null=True)
 
     last_action = models.DateTimeField(blank=True, null=True, default=timezone.now)
+
+    def unusbscribe(self):
+        if not self.unsubscribed:
+            self.unsubscribed = True
+            self.unsubscribed_at = timezone.now()
+            self.save()
+
+    def double_opt_in(self):
+        if not self.double_opted_in:
+            self.double_opted_in = True
+            self.double_opted_in_at = timezone.now()
+            self.save()
 
 
 class ScheduledMessage(BaseModel):

@@ -23,36 +23,71 @@ def home(request):
     return locals()
 
 
+@csrf_exempt
 @render_to("inkmail/subscribe.html")
 def subscribe(request):
     s = None
-    if request.method == "POST":
-        if "email" in request.POST and "newsletter" in request.POST:
-            encrypted_email = normalize_lower_and_encrypt(request.POST['email'])
-            if Newsletter.objects.filter(internal_name=request.POST["newsletter"]).count():
-                n = Newsletter.objects.get(internal_name=request.POST["newsletter"])
-                encrypted_first_name = None
-                if "first_name" in request.POST:
-                    encrypted_first_name = normalize_and_encrypt(request.POST["first_name"])
-                if Person.objects.filter(encrypted_email=encrypted_email):
-                    p = Person.objects.get(encrypted_email=encrypted_email)
-                else:
-                    p = Person.objects.create(
-                        encrypted_email=encrypted_email,
-                        encrypted_first_name=encrypted_first_name,
+    if request.is_ajax():
+        ajax_response = {
+            "success": False
+        }
+        if request.method == "POST":
+            data = json.loads(request.body)
+            if "email" in data and "newsletter" in data:
+                encrypted_email = normalize_lower_and_encrypt(data['email'])
+                if Newsletter.objects.filter(internal_name=data["newsletter"]).count():
+                    n = Newsletter.objects.get(internal_name=data["newsletter"])
+                    encrypted_first_name = None
+                    if "first_name" in data:
+                        encrypted_first_name = normalize_and_encrypt(data["first_name"])
+                    if Person.objects.filter(encrypted_email=encrypted_email):
+                        p = Person.objects.get(encrypted_email=encrypted_email)
+                    else:
+                        p = Person.objects.create(
+                            encrypted_email=encrypted_email,
+                            encrypted_first_name=encrypted_first_name,
+                        )
+
+                    s, created = Subscription.objects.get_or_create(
+                        person=p,
+                        newsletter=n,
                     )
+                    ajax_response["success"] = True
 
-                s, created = Subscription.objects.get_or_create(
-                    person=p,
-                    newsletter=n,
-                )
-    if s:
-        # for JSON response
-        pass
     else:
-        return HttpResponse(status=422)
+        if request.method == "POST":
+            if "email" in request.POST and "newsletter" in request.POST:
+                encrypted_email = normalize_lower_and_encrypt(request.POST['email'])
+                if Newsletter.objects.filter(internal_name=request.POST["newsletter"]).count():
+                    n = Newsletter.objects.get(internal_name=request.POST["newsletter"])
+                    encrypted_first_name = None
+                    if "first_name" in request.POST:
+                        encrypted_first_name = normalize_and_encrypt(request.POST["first_name"])
+                    if Person.objects.filter(encrypted_email=encrypted_email):
+                        p = Person.objects.get(encrypted_email=encrypted_email)
+                    else:
+                        p = Person.objects.create(
+                            encrypted_email=encrypted_email,
+                            encrypted_first_name=encrypted_first_name,
+                        )
 
-    return locals()
+                    s, created = Subscription.objects.get_or_create(
+                        person=p,
+                        newsletter=n,
+                    )
+    if not s:
+        # Did not create subscription
+        if request.is_ajax():
+            return HttpResponse(json.dumps(ajax_response), content_type="application/json", status=422)
+        else:
+            return HttpResponse(status=422)
+    else:
+        confirm_subscription.delay(s.pk)
+
+    if request.is_ajax():
+        return HttpResponse(json.dumps(ajax_response), content_type="application/json", status=200)
+    else:
+        return locals()
 
 
 @render_to("inkmail/email_confirmation.html")

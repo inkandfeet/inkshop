@@ -14,7 +14,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.files.base import ContentFile
-from django.core.mail import send_mail
+from inkmail.helpers import send_mail
 from django.template.loader import render_to_string
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.signals import user_logged_in
@@ -78,7 +78,7 @@ class HasJWTBaseModel(BaseModel):
 class Person(HasJWTBaseModel):
     encrypted_first_name = models.CharField(max_length=254, blank=True, null=True)
     encrypted_last_name = models.CharField(max_length=254, blank=True, null=True)
-    encrypted_email = models.CharField(max_length=254, blank=True, null=True,)
+    encrypted_email = models.CharField(max_length=1024, blank=True, null=True,)
     email_verified = models.BooleanField(default=False)
     time_zone = models.CharField(max_length=254, blank=True, null=True,)
 
@@ -105,3 +105,15 @@ class Person(HasJWTBaseModel):
     @last_name.setter
     def last_name(self, value):
         self.encrypted_last_name = encrypt(value)
+
+
+class BlacklistedEmail(BaseModel):
+    encrypted_email = models.CharField(max_length=1024)
+
+    @property
+    def email(self):
+        return decrypt(self.encrypted_email)
+
+    @email.setter
+    def email(self, value):
+        self.encrypted_email = encrypt(value)

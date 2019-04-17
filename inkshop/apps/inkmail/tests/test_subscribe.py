@@ -123,97 +123,132 @@ class TestPostSubscribes(MockRequestsTestCase):
 
 
 class TestAjaxSubscribes(MockRequestsTestCase):
+    def setUp(self, *args, **kwargs):
+        self.newsletter = Factory.newsletter()
+        super(TestAjaxSubscribes, self).setUp(*args, **kwargs)
 
     def test_post_subscribe_200(self):
-        pass
-    #     email = Factory.rand_email()
-    #     name = Factory.rand_name()
-    #     response = self.client.post(
-    #         reverse(
-    #             'inkmail:subscribe',
-    #         ),
-    #         {
-    #             'first_name': name,
-    #             'email': email,
-    #             'newsletter': self.newsletter.internal_name,
-    #         },
-    #     )
+        email = Factory.rand_email()
+        name = Factory.rand_name()
+        response = self.client.post(
+            reverse(
+                'inkmail:subscribe',
+            ),
+            json.dumps({
+                'first_name': name,
+                'email': email,
+                'newsletter': self.newsletter.internal_name,
+            }),
+            'json',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
 
-    #     self.assertEquals(response.status_code, 200)
+        json_string = response.content.decode('utf-8')
+        response_data = json.loads(json_string)
+        self.assertEquals(response_data["success"], True)
+        self.assertEquals(response.status_code, 200)
 
-    # def test_post_subscribe_adds_person_and_subscription(self):
-    #     email = Factory.rand_email()
-    #     name = Factory.rand_name()
-    #     response = self.client.post(
-    #         reverse(
-    #             'inkmail:subscribe',
-    #         ),
-    #         {
-    #             'first_name': name,
-    #             'email': email,
-    #             'newsletter': self.newsletter.internal_name,
-    #         },
-    #     )
+    def test_post_subscribe_adds_person_and_subscription(self):
+        email = Factory.rand_email()
+        name = Factory.rand_name()
+        response = self.client.post(
+            reverse(
+                'inkmail:subscribe',
+            ),
+            json.dumps({
+                'first_name': name,
+                'email': email,
+                'newsletter': self.newsletter.internal_name,
+            }),
+            'json',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
 
-    #     self.assertEquals(response.status_code, 200)
+        json_string = response.content.decode('utf-8')
+        response_data = json.loads(json_string)
+        self.assertEquals(response_data["success"], True)
+        self.assertEquals(response.status_code, 200)
 
-    #     self.assertEquals(Person.objects.count(), 1)
-    #     p = Person.objects.all()[0]
-    #     self.assertEquals(p.first_name, name)
-    #     self.assertEquals(p.email, email)
+        self.assertEquals(Person.objects.count(), 1)
+        p = Person.objects.all()[0]
+        self.assertEquals(p.first_name, name)
+        self.assertEquals(p.email, email)
 
-    #     self.assertEquals(Subscription.objects.count(), 1)
-    #     s = Subscription.objects.all()[0]
-    #     self.assertEquals(s.person, p)
-    #     self.assertEquals(s.newsletter.name, "letter")
+        self.assertEquals(Subscription.objects.count(), 1)
+        s = Subscription.objects.all()[0]
+        self.assertEquals(s.person, p)
+        self.assertEquals(s.newsletter.name, self.newsletter.name)
 
-    # def test_no_first_name_subscribe_adds_person_and_subscription(self):
-    #     email = Factory.rand_email()
-    #     name = Factory.rand_name()
-    #     response = self.client.post(
-    #         reverse(
-    #             'inkmail:subscribe',
-    #         ),
-    #         {
-    #             'first_name': name,
-    #             'email': email,
-    #             'newsletter': self.newsletter.internal_name,
-    #         },
-    #     )
+    def test_no_first_name_subscribe_adds_person_and_subscription(self):
+        email = Factory.rand_email()
+        response = self.client.post(
+            reverse(
+                'inkmail:subscribe',
+            ),
+            json.dumps({
+                'email': email,
+                'newsletter': self.newsletter.internal_name,
+            }),
+            'json',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
 
-    #     self.assertEquals(response.status_code, 200)
+        json_string = response.content.decode('utf-8')
+        response_data = json.loads(json_string)
+        self.assertEquals(response_data["success"], True)
+        self.assertEquals(response.status_code, 200)
 
-    #     self.assertEquals(Person.objects.count(), 1)
-    #     p = Person.objects.all()[0]
-    #     self.assertEquals(p.first_name, name)
-    #     self.assertEquals(p.email, email)
+        self.assertEquals(Person.objects.count(), 1)
+        p = Person.objects.all()[0]
+        self.assertEquals(p.email, email)
 
-    #     self.assertEquals(Subscription.objects.count(), 1)
-    #     s = Subscription.objects.all()[0]
-    #     self.assertEquals(s.person, p)
-    #     self.assertEquals(s.newsletter.name, "letter")
+        self.assertEquals(Subscription.objects.count(), 1)
+        s = Subscription.objects.all()[0]
+        self.assertEquals(s.person, p)
+        self.assertEquals(s.newsletter.name, self.newsletter.name)
 
-    # def test_newsletter_required(self):
-    #     email = Factory.rand_email()
-    #     name = Factory.rand_name()
-    #     response = self.client.post(
-    #         reverse(
-    #             'inkmail:subscribe',
-    #         ),
-    #         {
-    #             'first_name': name,
-    #             'email': email,
-    #         },
-    #     )
+    def test_newsletter_required(self):
+        email = Factory.rand_email()
+        name = Factory.rand_name()
+        response = self.client.post(
+            reverse(
+                'inkmail:subscribe',
+            ),
+            json.dumps({
+                'first_name': name,
+                'email': email,
+            }),
+            'json',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
 
-    #     self.assertEquals(response.status_code, 200)
+        json_string = response.content.decode('utf-8')
+        response_data = json.loads(json_string)
+        self.assertEquals(response_data["success"], False)
+        self.assertEquals(response.status_code, 422)
 
-    #     self.assertEquals(Person.objects.count(), 1)
-    #     p = Person.objects.all()[0]
-    #     self.assertEquals(p.first_name, name)
-    #     self.assertEquals(p.email, email)
+        self.assertEquals(Person.objects.count(), 0)
+        self.assertEquals(Subscription.objects.count(), 0)
 
-    #     self.assertEquals(Subscription.objects.count(), 1)
-    #     s = Subscription.objects.all()[0]
-    #     self.assertEquals(s.person, p)
-    #     self.assertEquals(s.newsletter.name, "letter")
+    def test_email_required(self):
+        name = Factory.rand_name()
+        response = self.client.post(
+            reverse(
+                'inkmail:subscribe',
+            ),
+            json.dumps({
+                'first_name': name,
+                # 'email': email,
+                'newsletter': self.newsletter.internal_name,
+            }),
+            'json',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+
+        json_string = response.content.decode('utf-8')
+        response_data = json.loads(json_string)
+        self.assertEquals(response_data["success"], False)
+        self.assertEquals(response.status_code, 422)
+
+        self.assertEquals(Person.objects.count(), 0)
+        self.assertEquals(Subscription.objects.count(), 0)

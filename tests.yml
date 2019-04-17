@@ -1,5 +1,5 @@
 python:
-    command: python3 manage.py test
+    command: python3 manage.py test --noinput
     watch_glob: "*.py"
     watch_dir: .
 flake:
