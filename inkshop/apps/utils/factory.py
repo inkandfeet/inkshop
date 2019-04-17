@@ -1,3 +1,4 @@
+
 import base64
 import datetime
 import random
@@ -25,7 +26,10 @@ class DjangoFunctionalFactory:
         if not length:
             length = cls.rand_int(end=20)
         return ''.join(random.SystemRandom().choice(
-            string.ascii_uppercase + string.ascii_lowercase + string.digits
+            string.ascii_uppercase + string.ascii_lowercase + string.digits + [
+                "😀", "💌", "❤️", "🤯", "🧐", "🤓", "🤦🏽‍♂️", "🤷🏿‍♀️", "🦄", "🐙",
+                "🐟", "🌱", "🌼", "🌻", "🥗", "🍻", "🚴🏼‍♀️", "🎧", "🇯🇵", "💯", "🎁", "🎉",
+            ]
         ) for i in range(length))
 
     @classmethod

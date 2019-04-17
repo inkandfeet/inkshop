@@ -27,11 +27,20 @@ When it's at 1.0, this project will let you:
 - Manage an email list, using best practices for deliverability
 - Host a website, with pages and blog posts
 - Sell downloadable digital products
-- Sell online digital products, including customer authentication and secure data storage
+- Sell hosted digital products, including customer authentication and secure data storage
 - Understand what pages are generating the most traffic
 - Create shortened URLs for sharing with social media
-- Share posts to social media via buffer
+- Show up on Google and other search engines with good visibility
+- Share posts to social media
 - Protect your sanity against trolls and abusive people
+- Export and backup every bit of data to in the system.
+
+It won't ever let you:
+- Spam people who haven't fully consented to receive your mailings
+- Personally identify a single site visitor
+- Include creepy tracking software like the Facebook pixel.
+- Break GDPR or similar laws
+
 
 ## Current status:
 

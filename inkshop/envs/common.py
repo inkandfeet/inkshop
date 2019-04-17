@@ -40,6 +40,7 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 ALLOWED_HOSTS = [
     INKSHOP_BASE_URL,
+    INKSHOP_BASE_URL.replace("://", "://draft."),
     INKSHOP_BASE_URL.replace("://", "://mail."),
     INKSHOP_BASE_URL.replace("://", "://heart."),
     INKSHOP_BASE_URL.replace("://", "://dots."),
