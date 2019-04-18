@@ -14,28 +14,17 @@ from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt,
 import mock
 
 
-class TestDoubleOptIn(MockRequestsTestCase):
+class TestUnsubscribeBasics(MockRequestsTestCase):
 
     def setUp(self, *args, **kwargs):
         self.newsletter = Factory.newsletter()
-        super(TestPostSubscribes, self).setUp(*args, **kwargs)
+        super(TestUnsubscribeBasics, self).setUp(*args, **kwargs)
 
-    def test_valid_opt_in_click(self):
-        email = Factory.rand_email()
-        name = Factory.rand_name()
+    def test_unsubscribe_link_included_in_message_send(self):
         self.assertEquals(False, "Test written")
 
-    def test_invalid_opt_in_click(self):
-        email = Factory.rand_email()
-        name = Factory.rand_name()
+    def test_clicking_unsubscribe_marks_unsubscribe(self):
         self.assertEquals(False, "Test written")
 
-    def test_clicked_confirm_a_second_time(self):
-        email = Factory.rand_email()
-        name = Factory.rand_name()
-        self.assertEquals(False, "Test written")
-
-    def test_clicked_confirm_over_a_week_later(self):
-        email = Factory.rand_email()
-        name = Factory.rand_name()
+    def test_clicking_unsubscribe_prevents_future_mailings(self):
         self.assertEquals(False, "Test written")

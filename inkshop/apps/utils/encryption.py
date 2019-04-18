@@ -49,6 +49,12 @@ def normalize_and_encrypt(s):
     return encrypt(s.strip())
 
 
+def lookup_hash(s):
+    h = hashlib.new('SHA512')
+    h.update(str("%s%s" % (settings.HASHID_SALT, s)).encode('utf-8'))
+    return h.hexdigest()
+
+
 # From Will:
 # https://github.com/skoczen/will/blob/master/will/backends/encryption/aes.py
 # def encrypt(raw):

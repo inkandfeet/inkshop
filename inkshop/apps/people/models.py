@@ -23,7 +23,7 @@ from django.utils.functional import cached_property
 from django.utils import timezone
 
 from utils.models import BaseModel
-from utils.encryption import encrypt, decrypt
+from utils.encryption import encrypt, decrypt, lookup_hash
 
 
 class UserManager(BaseUserManager):
@@ -79,6 +79,9 @@ class Person(HasJWTBaseModel):
     encrypted_first_name = models.CharField(max_length=254, blank=True, null=True)
     encrypted_last_name = models.CharField(max_length=254, blank=True, null=True)
     encrypted_email = models.CharField(max_length=1024, blank=True, null=True,)
+    hashed_first_name = models.CharField(max_length=254, blank=True, null=True)
+    hashed_last_name = models.CharField(max_length=254, blank=True, null=True)
+    hashed_email = models.CharField(max_length=1024, blank=True, null=True,)
     email_verified = models.BooleanField(default=False)
     time_zone = models.CharField(max_length=254, blank=True, null=True,)
 
@@ -104,6 +107,7 @@ class Person(HasJWTBaseModel):
     @email.setter
     def email(self, value):
         self.encrypted_email = encrypt(value)
+        self.hashed_email = lookup_hash(value)
 
     @property
     def first_name(self):
@@ -114,6 +118,7 @@ class Person(HasJWTBaseModel):
     @first_name.setter
     def first_name(self, value):
         self.encrypted_first_name = encrypt(value)
+        self.hashed_first_name = lookup_hash(value)
 
     @property
     def last_name(self):
@@ -124,6 +129,7 @@ class Person(HasJWTBaseModel):
     @last_name.setter
     def last_name(self, value):
         self.encrypted_last_name = encrypt(value)
+        self.hashed_last_name = lookup_hash(value)
 
     def ban(self):
         if not self.banned:
