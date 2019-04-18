@@ -38,22 +38,22 @@ EMAIL_SUBJECT_PREFIX = "%s " % INKSHOP_FRIENDLY_NAME
 DEFAULT_FROM_EMAIL = '%s <%s>' % (INKSHOP_FRIENDLY_NAME, INKSHOP_FROM_EMAIL)
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
+CONFIRM_BASE_URL = INKSHOP_BASE_URL.replace("://", "://confirm.")
+DRAFT_BASE_URL = INKSHOP_BASE_URL.replace("://", "://draft.")
 ALLOWED_HOSTS = [
     INKSHOP_BASE_URL,
-    INKSHOP_BASE_URL.replace("://", "://draft."),
+    DRAFT_BASE_URL,
+    CONFIRM_BASE_URL,
     INKSHOP_BASE_URL.replace("://", "://mail."),
     INKSHOP_BASE_URL.replace("://", "://heart."),
     INKSHOP_BASE_URL.replace("://", "://dots."),
 ]
 
 # Application definition
-
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
     'django.contrib.staticfiles',
 
     'anymail',
@@ -67,7 +67,6 @@ INSTALLED_APPS = [
     'people',
     'website',
     'utils',
-
 ]
 
 TEMPLATES = [

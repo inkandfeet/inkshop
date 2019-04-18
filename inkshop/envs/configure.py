@@ -6,14 +6,20 @@ KEY_MAPPING = {
 }
 
 
-def set_required_key(key):
-    if (key not in globals() or globals()[key] is None) and key in environ:
-        if key in KEY_MAPPING:
-            globals()[KEY_MAPPING[key]] = environ[key]
+def set_required_key(key, fallback=None):
+    if (key not in globals() or globals()[key] is None) and key in environ or fallback:
+        if key in environ:
+            if key in KEY_MAPPING:
+                globals()[KEY_MAPPING[key]] = environ[key]
+            else:
+                globals()[key] = environ[key]
+            return
         else:
-            globals()[key] = environ[key]
-    else:
-        raise KeyError("Missing %s variable.  Please set in .env file, and try again." % key)
+            if fallback:
+                globals()[key] = fallback
+                return
+
+    raise KeyError("Missing %s variable.  Please set in .env file, and try again." % key)
 
 
 # Django configuration
@@ -56,3 +62,5 @@ set_required_key("AWS_S3_HOST")
 set_required_key("POSTGRES_DB")
 set_required_key("POSTGRES_USER")
 set_required_key("POSTGRES_PASSWORD")
+
+set_required_key("HASHID_SALT", fallback="ULfX^Jm")

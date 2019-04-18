@@ -90,6 +90,11 @@ class Person(HasJWTBaseModel):
     hard_bounced_at = models.DateTimeField(blank=True, null=True)
     hard_bounced_message = models.ForeignKey('inkmail.Message', blank=True, null=True, on_delete=models.SET_NULL)
 
+    never_contact_set = models.BooleanField(default=False)
+    never_contact_set_at = models.DateTimeField(blank=True, null=True)
+
+    personal_contact = models.BooleanField(default=False)
+
     @property
     def email(self):
         if not hasattr(self, "_decrypted_email"):
@@ -130,12 +135,4 @@ class Person(HasJWTBaseModel):
         if not self.marked_troll:
             self.marked_troll = True
             self.marked_troll_at = timezone.now()
-            self.save()
-
-    def hard_bounce(self, message=None):
-        if not self.hard_bounced:
-            self.hard_bounced = True
-            self.hard_bounced_at = timezone.now()
-            if message:
-                self.hard_bounced
             self.save()

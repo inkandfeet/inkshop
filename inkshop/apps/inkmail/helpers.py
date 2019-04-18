@@ -10,17 +10,50 @@ from celery.task import task, periodic_task
 from django.utils import timezone
 
 
-@periodic_task(run_every=datetime.timedelta(seconds=5), expires=10)
-def hello():
-    message = "Hi at %s" % timezone.now()
-    print(message)
+@task
+def send_message(message_id, subscription_pk):
+    """Sends a message to a particular subscriber"""
+    from inkmail.models import Subscription, Message  # Avoid circular imports
+
+    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
+    message = Message.objects.get(pk=message_id)
+
+    subject, body = message.render_subject_and_body(subscription=s)
+
+    send_mail.delay(subscription_pk, subject, body)
 
 
 @task
-def send_mail(subscriber_pk, subject, body):
+def send_opt_in_message(message_id, subscription_pk):
+    """Sends a message to a particular subscriber"""
+    from inkmail.models import Subscription, Message  # Avoid circular imports
+
+    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
+    message = Message.objects.get(pk=message_id)
+
+    subject, body = message.render_subject_and_body(subscription=s)
+
+    send_transactional_email(subscription_pk, subject, body)
+
+
+@task
+def send_transactional_message(message_id, subscription_pk):
+    """Sends a message to a particular person, even if they're not a subscriber"""
+    from inkmail.models import Subscription, Message  # Avoid circular imports
+
+    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
+    message = Message.objects.get(pk=message_id)
+
+    subject, body = message.render_subject_and_body(subscription=s)
+
+    send_transactional_email(subscription_pk, subject, body)
+
+
+@task
+def send_mail(subscription_pk, subject, body):
     from inkmail.models import Subscription  # Avoid circular imports
 
-    s = Subscription.objects.select_related('person').get(pk=subscriber_pk)
+    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
 
     if (
         s.double_opted_in and
@@ -33,22 +66,30 @@ def send_mail(subscriber_pk, subject, body):
 
 
 @task
-def send_even_if_not_double_opted_in(subscriber_pk, subject, body):
+def send_even_if_not_double_opted_in(subscription_pk, subject, body):
     # Avoid circular imports
     from inkmail.models import Subscription
-    s = Subscription.objects.get(pk=subscriber_pk)
+    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
 
-    if not s.unsubscribed:
+    if (
+        not s.unsubscribed and
+        not s.person.banned and
+        not s.person.hard_bounced
+    ):
         # Safe to send email.
-        pass
+        django_send_mail(subject, body, s.newsletter.full_from_email, [s.person.email, ], fail_silently=False)
 
 
 @task
-def send_transactional_email(subscriber_pk, subject, body):
+def send_transactional_email(subscription_pk, subject, body):
     # Avoid circular imports
     from inkmail.models import Subscription
-    s = Subscription.objects.get(pk=subscriber_pk)
+    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
 
-    if not s.unsubscribed:
+    if (
+        not s.unsubscribed and  # TODO: Decide on this.
+        not s.person.banned and
+        not s.person.hard_bounced
+    ):
         # Safe to send email.
-        pass
+        django_send_mail(subject, body, s.newsletter.full_from_email, [s.person.email, ], fail_silently=False)

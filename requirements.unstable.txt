@@ -25,6 +25,7 @@ html5lib
 ipython
 kombu>=3.0.30
 jwt
+mistune
 mock
 Pillow
 piprot

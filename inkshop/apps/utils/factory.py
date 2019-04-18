@@ -21,15 +21,18 @@ class DjangoFunctionalFactory:
         return random.randint(start, end)
 
     @classmethod
-    def rand_str(cls, length=None):
+    def rand_str(cls, length=None, include_emoji=True):
         # from http://stackoverflow.com/questions/785058/random-strings-in-python-2-6-is-this-ok
+        choices = string.ascii_uppercase + string.ascii_lowercase + string.digits
+        if include_emoji:
+            choices += "".join([
+                "😀", "💌", "❤️", "🤯", "🧐", "🤓", "🤦🏽‍♂️", "🤷🏿‍♀️", "🦄", "🐙",
+                "🐟", "🌱", "🌼", "🌻", "🥗", "🍻", "🚴🏼‍♀️", "🎧", "🇯🇵", "💯", "🎁", "🎉",
+            ])
         if not length:
             length = cls.rand_int(end=20)
         return ''.join(random.SystemRandom().choice(
-            string.ascii_uppercase + string.ascii_lowercase + string.digits + [
-                "😀", "💌", "❤️", "🤯", "🧐", "🤓", "🤦🏽‍♂️", "🤷🏿‍♀️", "🦄", "🐙",
-                "🐟", "🌱", "🌼", "🌻", "🥗", "🍻", "🚴🏼‍♀️", "🎧", "🇯🇵", "💯", "🎁", "🎉",
-            ]
+            choices
         ) for i in range(length))
 
     @classmethod
@@ -469,6 +472,8 @@ class Factory(DjangoFunctionalFactory):
             "description": cls.rand_text(),
             "from_name": "%s %s" % (cls.rand_name(), cls.rand_name()),
             "from_email": cls.rand_email(),
+            "confirm_message": cls.message(),
+            "welcome_message": cls.message(),
         }
         options.update(kwargs)
 

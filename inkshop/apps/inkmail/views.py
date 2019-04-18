@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from annoying.decorators import render_to, ajax_request
 
 from inkmail.models import Newsletter, Subscription
+from inkmail.tasks import send_subscription_confirmation
 from people.models import Person
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt
 
@@ -82,7 +83,7 @@ def subscribe(request):
         else:
             return HttpResponse(status=422)
     else:
-        confirm_subscription.delay(s.pk)
+        send_subscription_confirmation.delay(s.pk)
 
     if request.is_ajax():
         return HttpResponse(json.dumps(ajax_response), content_type="application/json", status=200)
@@ -91,8 +92,13 @@ def subscribe(request):
 
 
 @render_to("inkmail/email_confirmation.html")
-def confirm_email(request, email_key):
-    p = Person.objects.get(email_confirm_key=email_key)
+def confirm_subscription(request, opt_in_key):
+    s = Subscription.objects.get(opt_in_key=opt_in_key)
+    s.double_opted_in = True
+    s.double_opted_in_at = timezone.now()
+    s.save()
+
+    p = s.person
     p.email_verified = True
     p.save()
     email_confirmed = True
