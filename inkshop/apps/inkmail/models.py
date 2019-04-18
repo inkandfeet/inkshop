@@ -16,11 +16,10 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.files.base import ContentFile
 from inkmail.helpers import send_mail
-from django.template.loader import render_to_string
-from django.template import Template, Context
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.signals import user_logged_in
 from django.template.loader import render_to_string
+from django.template import Template, Context
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
@@ -56,16 +55,19 @@ class Message(BaseModel):
         parsed_source = t.render(c).encode("utf-8").decode()
         # print(parsed_source)
         subject = markdown(parsed_source)
-        subject = subject.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;').replace(u"”", '&rdquo;').replace(u"’", "&rsquo;").replace("\n", "");
+        subject = subject.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
+        subject = subject.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;").replace("\n", "")
 
         t = Template(self.body_text_unrendered)
         parsed_source = t.render(c).encode("utf-8").decode()
         # print(parsed_source)
 
         body = markdown(parsed_source)
-        body = body.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;').replace(u"”", '&rdquo;').replace(u"’", "&rsquo;");
+        body = body.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
+        body = body.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
 
         return subject, body
+
 
 class Newsletter(BaseModel):
     name = models.CharField(max_length=254, blank=True, null=True)
@@ -93,13 +95,6 @@ class Newsletter(BaseModel):
     @property
     def full_from_email(self):
         return '%s <%s>' % (self.from_name, self.from_email)
-
-    def hard_bounce(self, message=None):
-        if not self.hard_bounced:
-            self.hard_bounced = True
-            self.hard_bounced_at = timezone.now()
-            self.hard_bounced_message = message
-            self.save()
 
 
 class Subscription(BaseModel):

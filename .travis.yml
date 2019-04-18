@@ -16,7 +16,7 @@ install:
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
 script:
-  - flake8 --exclude=migrations --ignore=F401,F402,F403,F405,E722,E741,E402,E721 --max-line-length=130
+  - flake8 --exclude=migrations --ignore=F401,F402,F403,F405,E722,E741,E402,E721,W503 --max-line-length=130
   - python3 manage.py test --settings=inkshop.envs.ci --parallel
 services:
   - postgresql

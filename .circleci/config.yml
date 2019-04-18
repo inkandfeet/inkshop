@@ -59,7 +59,7 @@ workflows:
             name: run tests
             command: |
               . venv/bin/activate
-              flake8 --exclude=migrations --ignore=F401,F402,F403,F405,E722,E741,E402,E721 --max-line-length=130
+              flake8 --exclude=migrations --ignore=F401,F402,F403,F405,E722,E741,E402,E721,W503 --max-line-length=130
         
 
         - store_artifacts:

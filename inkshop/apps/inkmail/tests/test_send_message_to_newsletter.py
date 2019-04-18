@@ -12,8 +12,10 @@ from utils.factory import Factory
 from utils.test_helpers import MockRequestsTestCase
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, encrypt, decrypt
 import mock
+import unittest
 
 
+@unittest.skip("For Friday")
 class TestSendToNewsletterGroup(MockRequestsTestCase):
 
     def setUp(self, *args, **kwargs):
@@ -23,7 +25,7 @@ class TestSendToNewsletterGroup(MockRequestsTestCase):
 
         # Create 5-15 people not subscribed to either
 
-        super(TestPostSubscribes, self).setUp(*args, **kwargs)
+        super(TestSendToNewsletterGroup, self).setUp(*args, **kwargs)
 
     def test_sends_to_everyone_in_list(self):
         self.assertEquals(False, "Test written")

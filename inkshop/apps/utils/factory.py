@@ -494,7 +494,7 @@ class Factory(DjangoFunctionalFactory):
         return s
 
     @classmethod
-    def message(cls, *args, **kwargs):
+    def message(cls, newsletter=None, *args, **kwargs):
         options = {
             "subject": cls.rand_text(),
             "body_text_unrendered": cls.rand_text(),

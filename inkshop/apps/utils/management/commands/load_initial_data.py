@@ -25,7 +25,6 @@ class Command(BaseCommand):
 
             if "newsletters" in data:
                 for name, info in data["newsletters"].items():
-                    kwargs = {}
                     n, _ = Newsletter.objects.get_or_create(
                         internal_name=info["internal_name"]
                     )

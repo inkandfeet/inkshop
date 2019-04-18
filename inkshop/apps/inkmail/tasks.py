@@ -21,9 +21,9 @@ def hello():
 def send_subscription_confirmation(subscription_pk):
     s = Subscription.objects.select_related('person').get(pk=subscription_pk)
     if (
-        not s.double_opted_in and
-        not s.unsubscribed and
-        not s.person.banned and
-        not s.person.hard_bounced
+        not s.double_opted_in
+        and not s.unsubscribed
+        and not s.person.banned
+        and not s.person.hard_bounced
     ):
         send_transactional_message(s.newsletter.confirm_message.pk, subscription_pk)

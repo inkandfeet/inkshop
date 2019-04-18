@@ -148,7 +148,7 @@ docker-compose run inkshop pt --autoreload
 - [ ] deploy to production
 - [ ] make fake list of me
 - [ ] send test message to me on production
-- [ ] create import CSV support tests
+- [ ] create import CSV support tests (both subcribers, and bounce, unsubscribes, bans)
 - [ ] create import CSV support method
 
 

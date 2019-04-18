@@ -142,3 +142,10 @@ class Person(HasJWTBaseModel):
             self.marked_troll = True
             self.marked_troll_at = timezone.now()
             self.save()
+
+    def hard_bounce(self, message=None):
+        if not self.hard_bounced:
+            self.hard_bounced = True
+            self.hard_bounced_at = timezone.now()
+            self.hard_bounced_message = message
+            self.save()
