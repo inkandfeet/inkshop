@@ -1,6 +1,10 @@
 
 # Inkshop is about people.
 
+An all-in-one system for businesses that do things the right way.
+
+Manage your website, mailing list, store, and reporting all in one.  It's free.
+
 Inkshop is a human-centered framework for running your small business.  Website, mailing list, store, and reporting all in one.  It's also free.
 
 Inkshop sticks out because it's people-focused.  It treats your customers and visitors like people, not data-points.
@@ -27,10 +31,31 @@ When it's at 1.0, this project will let you:
 - Manage an email list, using best practices for deliverability
 - Host a website, with pages and blog posts
 - Sell downloadable digital products
-- Sell online digital products, including customer authentication and secure data storage
+- Sell hosted digital products, including customer authentication and secure data storage
 - Understand what pages are generating the most traffic
 - Create shortened URLs for sharing with social media
-- Share posts to social media via buffer
+- Show up on Google and other search engines with good visibility
+- Share posts to social media
+- Protect your sanity against trolls and abusive people
+- Export and backup every bit of data to in the system.
+
+It won't ever let you:
+- Spam people who haven't fully consented to receive your mailings
+- Personally identify a single site visitor
+- Include creepy tracking software like the Facebook pixel.
+- Track whether people have opened the messages you've sent.
+- Break GDPR or similar laws
+
+
+Some features and principles that set it apart:
+
+Email:
+Active, positive consent.  Auto-unsubscribing.
+
+Get amazing deliverability and response by sending emails only to people who have shown you that they're interested and want to keep hearing from you.
+
+Fast.
+Without all the bulk of tracking software, your site renders _fast_.  On mobile and desktop.
 
 ## Current status:
 
@@ -52,11 +77,20 @@ This will include:
 ```bash
 git clone https://github.com/inkandfeet/inkshop.git
 cd inkshop
+
 cp env.sample .env
 # Edit .env with your values
+
+cp initial_data.yml.sample initial_data.yml
+# Edit initial_data.yml with your basic information.
+
 docker network create inkshop
 docker-compose run db createdb inkshop -h db -U $POSTGRES_USER
 docker-compose up
+
+# Load your initial data
+docker-compose run inkshop python3 manage.py load_initial_data
+
 ```
 
 
@@ -94,15 +128,15 @@ docker-compose run inkshop pt --autoreload
 
 - [x] get test harness in
 - [x] basic tests passing including flake
-- [ ] create subscribe test
-- [ ] create functions
+- [x] create subscribe test
+- [-] create functions
 - [ ] create message model tests
-- [ ] create message model functions, including rendering
+- [-] create message model functions, including rendering
 - [ ] create scheduledmessage model tests, including timing and tombstoning, and never double-sending.
 - [ ] create scheduledmessage model methods
 - [ ] create tombstoning model methods
 - [ ] create unsubscribe test
-- [ ] create functions
+- [-] create functions
 - [ ] create love click tests for user and system (mark out unsub)
 - [ ] create love click methods
 - [ ] create love click templates
@@ -114,7 +148,7 @@ docker-compose run inkshop pt --autoreload
 - [ ] deploy to production
 - [ ] make fake list of me
 - [ ] send test message to me on production
-- [ ] create import CSV support tests
+- [ ] create import CSV support tests (both subcribers, and bounce, unsubscribes, bans)
 - [ ] create import CSV support method
 
 
@@ -122,4 +156,16 @@ docker-compose run inkshop pt --autoreload
 - [ ] import list into production
 - [ ] schedule letter for sunday
 
+-- Next Week
 
+- Auto-delete any un-clicked confirmations after 7 days.
+- Handle if people click them later, make sure we never delete people who were already subscribed, etc.
+
+
+
+
+## Open threads the architecture isn't decided on yet.
+- Handle opt-in separately from transactional?
+- Transactional emails - how out is opted out?   (Everything vs subsciption is the most common pattern, but what's the simpler solution?)
+- Resubscribe flow.  If you unsubscribe, then sign up again, can I send you an email to get you back on my list?  (Probably add confirmation to the signup flow).
+- Capitalizing first names - better to do it in the template, or the source data?

@@ -1,8 +1,8 @@
 python:
-    command: python3 manage.py test
+    command: DISABLE_ENCRYPTION_FOR_TESTS=True python3 manage.py test --noinput --parallel
     watch_glob: "*.py"
     watch_dir: .
 flake:
-    command: flake8 --exclude=migrations --ignore=F401,F402,F403,F405,E722,E741,E402,E721 --max-line-length=130
+    command: flake8 --exclude=migrations --ignore=F401,F402,F403,F405,E722,E741,E402,E721,W503 --max-line-length=130
     watch_glob: "*.py"
     watch_dir: .

@@ -1,13 +1,14 @@
 <html>
 <head> 
-    <style type="text/css">
-        h1 {
-            text-align: center;
-        }
-    </style>
 </head>
 <body>
+    {% if s %}
+    <h1>Confirming</h1>
+    <p>Please check your email to confirm your subscription.</p>
+
+    {% else %}
     <h1>Subscribe</h1>
     <p>Join the conversation.</p>
+    {% endif %}
 </body>
 </html>

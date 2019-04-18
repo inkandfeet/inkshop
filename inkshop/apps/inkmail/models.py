@@ -1,11 +1,13 @@
 import datetime
 import hashlib
+import mistune
 import logging
 import random
 import time
 import uuid
 from base64 import b64encode
 from io import BytesIO
+from hashids import Hashids
 from PIL import Image, ImageOps
 from tempfile import NamedTemporaryFile
 
@@ -13,10 +15,11 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.files.base import ContentFile
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
+from inkmail.helpers import send_mail
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.signals import user_logged_in
+from django.template.loader import render_to_string
+from django.template import Template, Context
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
@@ -24,17 +27,56 @@ from django.utils import timezone
 from people.models import Person
 from utils.models import BaseModel
 
+markdown = mistune.Markdown()
+OPT_IN_LINK_EXPIRE_TIME = datetime.timedelta(days=7)
+
 
 class Message(BaseModel):
+    name = models.CharField(max_length=254, blank=True, null=True)
     subject = models.CharField(max_length=254, blank=True, null=True)
     body_text_unrendered = models.TextField(blank=True, null=True)
     body_html_unrendered = models.TextField(blank=True, null=True)
+
+    def render_subject_and_body(self, subscription):
+        context = {
+            "first_name": subscription.person.first_name,
+            "last_name": subscription.person.last_name,
+            "email": subscription.person.email,
+            "subscribed_at": subscription.subscribed_at,
+            "subscribed_from_url": subscription.subscribed_from_url,
+            "subscribed_from_ip": subscription.subscribed_from_ip,
+            "has_set_never_unsubscribe": subscription.has_set_never_unsubscribe,
+            "opt_in_link": subscription.opt_in_link,
+        }
+
+        c = Context(context)
+        t = Template(self.subject)
+
+        parsed_source = t.render(c).encode("utf-8").decode()
+        # print(parsed_source)
+        subject = markdown(parsed_source)
+        subject = subject.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
+        subject = subject.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;").replace("\n", "")
+
+        t = Template(self.body_text_unrendered)
+        parsed_source = t.render(c).encode("utf-8").decode()
+        # print(parsed_source)
+
+        body = markdown(parsed_source)
+        body = body.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
+        body = body.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
+
+        return subject, body
 
 
 class Newsletter(BaseModel):
     name = models.CharField(max_length=254, blank=True, null=True)
     internal_name = models.CharField(max_length=254, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    from_email = models.TextField(max_length=254)
+    from_name = models.TextField(max_length=254)
+    unsubscribe_footer = models.TextField(max_length=254)
+    transactional_footer = models.TextField(max_length=254)
 
     confirm_message = models.ForeignKey(
         Message,
@@ -50,17 +92,53 @@ class Newsletter(BaseModel):
     unsubscribe_if_no_hearts_after_messages = models.BooleanField(default=True)
     unsubscribe_if_no_hearts_after_messages_num = models.IntegerField(blank=True, null=True, default=26)
 
+    @property
+    def full_from_email(self):
+        return '%s <%s>' % (self.from_name, self.from_email)
+
 
 class Subscription(BaseModel):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
     subscribed_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
     subscribed_from_url = models.TextField(blank=True, null=True)
-    double_opted_in_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
+    subscribed_from_ip = models.CharField(max_length=254, blank=True, null=True)
+    double_opted_in = models.BooleanField(default=False)
+    double_opted_in_at = models.DateTimeField(blank=True, null=True)
     has_set_never_unsubscribe = models.BooleanField(default=False)
+    unsubscribed = models.BooleanField(default=False)
     unsubscribed_at = models.DateTimeField(blank=True, null=True)
 
+    opt_in_key = models.CharField(max_length=254, blank=True, null=True, db_index=True)
+    opt_in_key_created_at = models.DateTimeField(blank=True, null=True)
+
     last_action = models.DateTimeField(blank=True, null=True, default=timezone.now)
+
+    def unsubscribe(self):
+        if not self.unsubscribed:
+            self.unsubscribed = True
+            self.unsubscribed_at = timezone.now()
+            self.save()
+
+    def double_opt_in(self):
+        if not self.double_opted_in:
+            self.double_opted_in = True
+            self.double_opted_in_at = timezone.now()
+            self.save()
+
+    def generate_opt_in_link(self):
+        from utils.factory import Factory
+        hashids = Hashids(salt=Factory.rand_str(length=6, include_emoji=False))
+        self.opt_in_key = hashids.encode(self.pk)
+        self.opt_in_key_created_at = timezone.now()
+        self.save()
+
+    @property
+    def opt_in_link(self):
+        if not self.opt_in_key or self.opt_in_key_created_at < timezone.now() - OPT_IN_LINK_EXPIRE_TIME:
+            self.generate_opt_in_link()
+
+        return "%s/%s" % (settings.CONFIRM_BASE_URL, reverse("inkmail:confirm_subscription", args=(self.opt_in_key,)))
 
 
 class ScheduledMessage(BaseModel):
@@ -97,6 +175,8 @@ class OutgoingMessageAttemptTombstone(BaseModel):
     encrypted_message_body = models.TextField(blank=True, null=True)
     send_success = models.NullBooleanField()
     send_error = models.TextField(blank=True, null=True)
+    attempt_made = models.NullBooleanField()
+    reason = models.CharField(max_length=254, blank=True, null=True)   # Hard_bounce, banned, etc.
 
 
 # class Sequence(BaseModel):

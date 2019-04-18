@@ -18,10 +18,14 @@ class TestTestHarness(MockRequestsTestCase):
         self.assertEquals(1 + 1, 2)
 
 
-class TestEncryptionHarness(MockRequestsTestCase):
+@override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
+class TestBasicEncryptionHarness(MockRequestsTestCase):
 
     def test_basic_encryption(self):
         e = Factory.rand_str()
+        self.assertEquals(e, decrypt(encrypt(e)))
+
+        e = "😀💌❤️"
         self.assertEquals(e, decrypt(encrypt(e)))
 
         e = Factory.rand_text()
@@ -30,6 +34,11 @@ class TestEncryptionHarness(MockRequestsTestCase):
         e = Factory.rand_email()
         self.assertEquals(e, decrypt(encrypt(e)))
 
+
+@override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
+class TestEncryptionHarnessForOddTypes(MockRequestsTestCase):
+
+    def test_extended_types_encryption(self):
         e = Factory.rand_phone()
         self.assertEquals(e, decrypt(encrypt(e)))
 
@@ -42,6 +51,9 @@ class TestEncryptionHarness(MockRequestsTestCase):
         e = Factory.rand_url()
         self.assertEquals(e, decrypt(encrypt(e)))
 
+
+@override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
+class TestNormalizeAndLowerEncryptionHarness(MockRequestsTestCase):
     def test_normalize_lower_and_encrypt(self):
         s = "Here's a test of thing!! "
         self.assertEquals(
@@ -62,6 +74,9 @@ class TestEncryptionHarness(MockRequestsTestCase):
             decrypt(normalize_lower_and_encrypt(s))
         )
 
+
+@override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
+class TestNormalizeAndEncryptionHarness(MockRequestsTestCase):
     def test_normalize_and_encrypt(self):
         s = "Here's a test of thing!! "
         self.assertEquals(

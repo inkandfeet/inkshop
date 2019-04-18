@@ -1,3 +1,4 @@
+
 import base64
 import datetime
 import random
@@ -11,7 +12,7 @@ getcontext().prec = 7
 fake = Faker()
 
 from people.models import Person
-from inkmail.models import Newsletter
+from inkmail.models import Newsletter, Subscription, Message
 
 
 class DjangoFunctionalFactory:
@@ -20,12 +21,18 @@ class DjangoFunctionalFactory:
         return random.randint(start, end)
 
     @classmethod
-    def rand_str(cls, length=None):
+    def rand_str(cls, length=None, include_emoji=True):
         # from http://stackoverflow.com/questions/785058/random-strings-in-python-2-6-is-this-ok
+        choices = string.ascii_uppercase + string.ascii_lowercase + string.digits
+        if include_emoji:
+            choices += "".join([
+                "😀", "💌", "❤️", "🤯", "🧐", "🤓", "🤦🏽‍♂️", "🤷🏿‍♀️", "🦄", "🐙",
+                "🐟", "🌱", "🌼", "🌻", "🥗", "🍻", "🚴🏼‍♀️", "🎧", "🇯🇵", "💯", "🎁", "🎉",
+            ])
         if not length:
             length = cls.rand_int(end=20)
         return ''.join(random.SystemRandom().choice(
-            string.ascii_uppercase + string.ascii_lowercase + string.digits
+            choices
         ) for i in range(length))
 
     @classmethod
@@ -443,21 +450,19 @@ class Factory(DjangoFunctionalFactory):
 
     @classmethod
     def person(cls, *args, **kwargs):
-        password = kwargs.get("password", cls.rand_str())
+        # password = kwargs.get("password", cls.rand_str())
         options = {
             "email": cls.rand_email(),
-            "must_reset_password": cls.rand_bool(),
-            "inkid": cls.rand_str(),
             "first_name": cls.rand_name(),
             "last_name": cls.rand_name(),
         }
         options.update(kwargs)
 
         p = Person.objects.create(**options)
-        p.set_password(password)
-        p.save()
-
-        return p, password
+        return p
+        # p.set_password(password)
+        # p.save()
+        # return p, password
 
     @classmethod
     def newsletter(cls, *args, **kwargs):
@@ -465,9 +470,38 @@ class Factory(DjangoFunctionalFactory):
             "name": cls.rand_tree(),
             "internal_name": cls.rand_tree().lower(),
             "description": cls.rand_text(),
+            "from_name": "%s %s" % (cls.rand_name(), cls.rand_name()),
+            "from_email": cls.rand_email(),
+            "confirm_message": cls.message(),
+            "welcome_message": cls.message(),
         }
         options.update(kwargs)
 
         n = Newsletter.objects.create(**options)
 
         return n
+
+    @classmethod
+    def subscription(cls, *args, **kwargs):
+        options = {
+            "person": cls.person(),
+            "newsletter": cls.newsletter(),
+        }
+        options.update(kwargs)
+
+        s = Subscription.objects.create(**options)
+
+        return s
+
+    @classmethod
+    def message(cls, newsletter=None, *args, **kwargs):
+        options = {
+            "subject": cls.rand_text(),
+            "body_text_unrendered": cls.rand_text(),
+            "body_html_unrendered": cls.rand_text(),
+        }
+        options.update(kwargs)
+
+        m = Message.objects.create(**options)
+
+        return m

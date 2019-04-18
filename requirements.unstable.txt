@@ -25,6 +25,7 @@ html5lib
 ipython
 kombu>=3.0.30
 jwt
+mistune
 mock
 Pillow
 piprot
@@ -35,4 +36,5 @@ PyYAML>=4.2b1
 simple-crypt
 slimit
 sorl-thumbnail
+tblib
 user_agents

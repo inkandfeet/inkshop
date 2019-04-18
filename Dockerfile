@@ -38,5 +38,8 @@ ADD manage.py /project/manage.py
 # For polytester
 ADD tests.yml /project/tests.yml
 
+# For initial data
+ADD initial_data.yml /project/initial_data.yml
+
 EXPOSE 8120
 WORKDIR /project
