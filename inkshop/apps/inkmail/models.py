@@ -73,6 +73,8 @@ class Message(BaseModel):
         body = body.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
         body = body.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
         body = bleach.clean(body, strip=True)
+        if body[-1] == "\n":
+            body = body[:-1]
 
         return subject, body
 
