@@ -1,6 +1,7 @@
 
 import base64
 import datetime
+import pytz
 import random
 import string
 from decimal import getcontext, Decimal
@@ -86,6 +87,18 @@ class DjangoFunctionalFactory:
         )
 
     @classmethod
+    def rand_datetime(cls, start_year=1900, end_year=2011):
+        return datetime.datetime(
+            year=cls.rand_int(start_year, end_year),
+            month=cls.rand_int(1, 12),
+            day=cls.rand_int(1, 28),
+            hour=cls.rand_int(0, 23),
+            minute=cls.rand_int(0, 59),
+            second=cls.rand_int(0, 59),
+            tzinfo=pytz.timezone(cls.rand_timezone()),
+        )
+
+    @classmethod
     def rand_currency(cls, start=0, end=100):
         return Decimal(cls.rand_int(
             start=start * 100,
@@ -137,6 +150,10 @@ class DjangoFunctionalFactory:
     @classmethod
     def rand_us_state(cls):
         return STATE_CHOICES[cls.rand_int(0, len(STATE_CHOICES) - 1)][0]
+
+    @classmethod
+    def rand_timezone(cls):
+        return random.choice(pytz.all_timezones)
 
     @classmethod
     def valid_test_cc_number(cls):

@@ -1,3 +1,4 @@
+
 import mock
 import unittest
 from django.test import TestCase
@@ -25,6 +26,7 @@ def mock_requests(url, data):
 class MockRequestsTestCase(TestCase):
 
     def setUp(self):
+        self.start_time = self.now()
         self.maxDiff = None
         self.patches = {
             "requests.patch": mock_requests,
@@ -43,6 +45,11 @@ class MockRequestsTestCase(TestCase):
 
     def now(self):
         return timezone.now()
+
+    def assertBasicallyEqualTimes(self, t1, t2):  # noqa
+        # self.assertEquals(t1.tzinfo, t2.tzinfo)
+        diff = abs((t2 - t1).total_seconds())
+        self.assertTrue(diff < 1)
 
     def post(self, *args, **kwargs):
         self._source_ip = Factory.rand_ip()

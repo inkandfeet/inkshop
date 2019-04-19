@@ -26,6 +26,7 @@ from django.utils import timezone
 
 from people.models import Person
 from utils.models import BaseModel
+from utils.encryption import lookup_hash
 
 markdown = mistune.Markdown()
 OPT_IN_LINK_EXPIRE_TIME = datetime.timedelta(days=7)
@@ -106,6 +107,69 @@ class Newsletter(BaseModel):
     def full_from_email(self):
         return '%s <%s>' % (self.from_name, self.from_email)
 
+    @classmethod
+    def import_subscriber(
+        cls,
+        import_source,
+        email,
+        subscribed_at,
+        subscription_url,
+        double_opted_in,
+        double_opted_in_at,
+        first_name=None,
+        last_name=None,
+        subscription_ip=None,
+        time_zone=None,
+        newsletter_name=None,
+        overwrite=False,
+    ):
+        newsletter = False
+        if newsletter_name:
+            newsletter = Newsletter.objects.get(internal_name=newsletter_name)
+
+        hashed_email = lookup_hash(email)
+        if Person.objects.filter(hashed_email=hashed_email):
+            if not overwrite:
+                return
+            p = Person.objects.get(hashed_email=hashed_email)
+        else:
+            p = Person.objects.create(
+                hashed_email=hashed_email
+            )
+
+        p.first_name = first_name
+        p.last_name = last_name
+        p.email = email
+        p.email_verified = double_opted_in
+        p.time_zone = time_zone
+        p.was_imported = True
+        p.was_imported_at = datetime.datetime.now(timezone.utc)
+        p.import_source = import_source
+        p.save()
+
+        if newsletter:
+            if Subscription.objects.filter(person=p, newsletter=newsletter):
+                if not overwrite:
+                    return
+                s = Subscription.objects.get(person=p, newsletter=newsletter)
+            else:
+                s = Subscription.objects.create(
+                    person=p,
+                    newsletter=newsletter
+                )
+
+            s.subscribed_at = p.was_imported_at
+            s.subscription_url = subscription_url
+            s.subscribed_from_ip = subscription_ip
+            s.was_imported = True
+            s.was_imported_at = p.was_imported_at
+            s.import_source = import_source
+            s.double_opted_in = double_opted_in
+            s.double_opted_in_at = double_opted_in_at
+            s.save()
+
+        return s
+
 
 class Subscription(BaseModel):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -113,6 +177,9 @@ class Subscription(BaseModel):
     subscribed_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
     subscription_url = models.TextField(blank=True, null=True)
     subscribed_from_ip = models.CharField(max_length=254, blank=True, null=True)
+    was_imported = models.BooleanField(default=False)
+    was_imported_at = models.DateTimeField(blank=True, null=True)
+    import_source = models.CharField(max_length=254, blank=True, null=True)
     double_opted_in = models.BooleanField(default=False)
     double_opted_in_at = models.DateTimeField(blank=True, null=True)
     has_set_never_unsubscribe = models.BooleanField(default=False)

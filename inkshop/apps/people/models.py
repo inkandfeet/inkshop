@@ -84,6 +84,10 @@ class Person(HasJWTBaseModel):
     email_verified = models.BooleanField(default=False)
     time_zone = models.CharField(max_length=254, blank=True, null=True,)
 
+    was_imported = models.BooleanField(default=False)
+    was_imported_at = models.DateTimeField(blank=True, null=True)
+    import_source = models.CharField(max_length=254, blank=True, null=True)
+
     marked_troll = models.BooleanField(default=False)
     marked_troll_at = models.DateTimeField(blank=True, null=True)
     banned = models.BooleanField(default=False)

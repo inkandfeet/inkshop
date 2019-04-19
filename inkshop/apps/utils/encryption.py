@@ -54,7 +54,7 @@ def normalize_and_encrypt(s):
 
 def lookup_hash(s):
     h = hashlib.new('SHA512')
-    h.update(str("%s%s" % (settings.HASHID_SALT, s)).encode('utf-8'))
+    h.update(str("%s%s" % (settings.HASHID_SALT, s.strip().lower())).encode('utf-8'))
     return h.hexdigest()
 
 
