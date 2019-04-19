@@ -24,6 +24,8 @@ RUN pip3 install --upgrade pip
 ADD requirements.unstable.txt /project/requirements.unstable.txt
 ADD requirements.txt /project/requirements.txt
 RUN pip3 install -r /project/requirements.unstable.txt  #  && pip uninstall pycrypto && pip install pycryptodome
+# pip3 freeze -r requirements.unstable.txt > requirements.txt
+# Remove pygobject
 
 # Add less and NPM packages.
 # ADD package.json /project/package.json
