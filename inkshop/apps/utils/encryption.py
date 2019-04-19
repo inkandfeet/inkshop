@@ -15,7 +15,7 @@ from django.conf import settings
 
 # Cryptography
 # https://cryptography.io/en/latest/fernet/#using-passwords-with-fernet
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, MultiFernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -28,20 +28,23 @@ kdf = PBKDF2HMAC(
     iterations=100000,
     backend=default_backend()
 )
-key = base64.urlsafe_b64encode(kdf.derive(password))
-f = Fernet(key)
+key = Fernet(base64.urlsafe_b64encode(kdf.derive(password)))
+
+# Future support for key rotation
+# https://cryptography.io/en/latest/fernet/#cryptography.fernet.MultiFernet
+f = MultiFernet([key, ])
 
 
 def encrypt(s):
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
-    return hexlify(f.encrypt(settings.INKSHOP_ENCRYPTION_KEY, s.encode('utf8'))).decode()
+    return f.encrypt(s.encode('utf8'))
 
 
 def decrypt(s):
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
-    return f.decrypt(settings.INKSHOP_ENCRYPTION_KEY, unhexlify(s)).decode('utf-8')
+    return f.decrypt(s).decode('utf-8')
 
 
 def normalize_lower_and_encrypt(s):
