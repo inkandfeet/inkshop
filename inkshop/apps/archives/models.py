@@ -41,11 +41,11 @@ class HistoricalEvent(models.Model):
             if k == "person" and isinstance(v, Person):
                 instance_data["event_creator_type"] = "person"
                 instance_data["event_creator_pk"] = kwargs["person"].pk
-                instance_data["person"] = kwargs["person"].get_instance_data_dict()
+                event_data["person"] = kwargs["person"].get_data_dict()
             elif k == "message" and isinstance(v, Message):
-                instance_data["message"] = kwargs["message"].get_instance_data_dict()
+                event_data["message"] = kwargs["message"].get_data_dict()
             elif k == "event_type":
-                instance_data["v"]
+                instance_data["event_type"] = v
             else:
                 event_data[k] = v
 

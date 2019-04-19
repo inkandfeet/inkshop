@@ -115,7 +115,7 @@ class Newsletter(BaseModel):
         subscribed_at,
         subscription_url,
         double_opted_in,
-        double_opted_in_at,
+        double_opted_in_at=None,
         first_name=None,
         last_name=None,
         subscription_ip=None,
@@ -132,6 +132,8 @@ class Newsletter(BaseModel):
             if not overwrite:
                 return
             p = Person.objects.get(hashed_email=hashed_email)
+            if p.banned:
+                return
         else:
             p = Person.objects.create(
                 hashed_email=hashed_email
@@ -167,8 +169,6 @@ class Newsletter(BaseModel):
             s.double_opted_in = double_opted_in
             s.double_opted_in_at = double_opted_in_at
             s.save()
-
-        return s
 
 
 class Subscription(BaseModel):

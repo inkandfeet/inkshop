@@ -169,6 +169,7 @@ docker-compose run inkshop pt --autoreload
 ## Open threads the architecture isn't decided on yet.
 - Structure for GDPR dump.  JSON?  Zip?
 - Handle opt-in separately from transactional?
+- Import flow for people who don't have double-opt-in records.  
 - Transactional emails - how out is opted out?   (Everything vs subsciption is the most common pattern, but what's the simpler solution?)
 - Resubscribe flow.  If you unsubscribe, then sign up again, can I send you an email to get you back on my list?  (Probably add confirmation to the signup flow).
 - Capitalizing first names - better to do it in the template, or the source data?
