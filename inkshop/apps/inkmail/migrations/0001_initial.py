@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(blank=True, db_index=True, default=django.utils.timezone.now, null=True)),
                 ('modified_at', models.DateTimeField(auto_now=True, null=True)),
                 ('subscribed_at', models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True)),
-                ('subscribed_from_url', models.TextField(blank=True, null=True)),
+                ('subscription_url', models.TextField(blank=True, null=True)),
                 ('double_opted_in_at', models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True)),
                 ('has_set_never_unsubscribe', models.BooleanField(default=False)),
                 ('unsubscribed_at', models.DateTimeField(blank=True, null=True)),

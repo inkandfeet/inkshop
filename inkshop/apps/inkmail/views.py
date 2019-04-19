@@ -34,7 +34,7 @@ def subscribe(request):
         }
         if request.method == "POST":
             data = json.loads(request.body)
-            if "email" in data and "newsletter" in data:
+            if "email" in data and "newsletter" in data and "subscription_url" in data:
                 encrypted_email = normalize_lower_and_encrypt(data['email'])
                 if Newsletter.objects.filter(internal_name=data["newsletter"]).count():
                     n = Newsletter.objects.get(internal_name=data["newsletter"])
@@ -52,12 +52,13 @@ def subscribe(request):
                     s, created = Subscription.objects.get_or_create(
                         person=p,
                         newsletter=n,
+                        subscription_url=data["subscription_url"],
                     )
                     ajax_response["success"] = True
 
     else:
         if request.method == "POST":
-            if "email" in request.POST and "newsletter" in request.POST:
+            if "email" in request.POST and "newsletter" in request.POST and "subscription_url" in data:
                 encrypted_email = normalize_lower_and_encrypt(request.POST['email'])
                 if Newsletter.objects.filter(internal_name=request.POST["newsletter"]).count():
                     n = Newsletter.objects.get(internal_name=request.POST["newsletter"])
@@ -75,6 +76,7 @@ def subscribe(request):
                     s, created = Subscription.objects.get_or_create(
                         person=p,
                         newsletter=n,
+                        subscription_url=data["subscription_url"],
                     )
     if not s:
         # Did not create subscription

@@ -16,20 +16,11 @@ import unittest
 
 
 @unittest.skip("For Friday")
-class TestLoveBasics(MockRequestsTestCase):
+class TestReplyBasics(MockRequestsTestCase):
 
     def setUp(self, *args, **kwargs):
         self.newsletter = Factory.newsletter()
-        super(TestLoveBasics, self).setUp(*args, **kwargs)
+        super(TestReplyBasics, self).setUp(*args, **kwargs)
 
-    def test_love_link_included_in_message_send(self):
-        self.assertEquals(False, "Test written")
-
-    def test_clicking_love_marks_as_loved(self):
-        self.assertEquals(False, "Test written")
-
-    def test_clicking_love_shows_correct_page(self):
-        self.assertEquals(False, "Test written")
-
-    def test_clicking_love_shows_adorable_gif(self):
+    def test_reply_address_is_correct(self):
         self.assertEquals(False, "Test written")

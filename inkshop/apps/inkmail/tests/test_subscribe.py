@@ -15,7 +15,6 @@ import mock
 import unittest
 
 
-@unittest.skip("For Friday")
 class TestPostSubscribes(MockRequestsTestCase):
 
     def setUp(self, *args, **kwargs):
@@ -25,6 +24,7 @@ class TestPostSubscribes(MockRequestsTestCase):
     def test_post_subscribe_200(self):
         email = Factory.rand_email()
         name = Factory.rand_name()
+        subscribed_from_url = Factory.rand_url()
         response = self.client.post(
             reverse(
                 'inkmail:subscribe',
@@ -33,6 +33,7 @@ class TestPostSubscribes(MockRequestsTestCase):
                 'first_name': name,
                 'email': email,
                 'newsletter': self.newsletter.internal_name,
+                'subscribed_from_url': subscribed_from_url,
             },
         )
 
@@ -41,6 +42,7 @@ class TestPostSubscribes(MockRequestsTestCase):
     def test_post_subscribe_adds_person_and_subscription(self):
         email = Factory.rand_email()
         name = Factory.rand_name()
+        subscribed_from_url = Factory.rand_url()
         response = self.client.post(
             reverse(
                 'inkmail:subscribe',
@@ -49,6 +51,7 @@ class TestPostSubscribes(MockRequestsTestCase):
                 'first_name': name,
                 'email': email,
                 'newsletter': self.newsletter.internal_name,
+                'subscribed_from_url': subscribed_from_url,
             },
         )
 
@@ -63,11 +66,12 @@ class TestPostSubscribes(MockRequestsTestCase):
         s = Subscription.objects.all()[0]
         self.assertEquals(s.person, p)
         self.assertEquals(s.newsletter.name, self.newsletter.name)
-        self.assertEquals(s.subscribed_from_url, "http://localhost/mail/subscribe")
+        self.assertEquals(s.subscription_url, "http://localhost/mail/subscribe")
         self.assertEquals(s.subscribed_from_ip, "127.0.0.1")
 
     def test_no_first_name_subscribe_adds_person_and_subscription(self):
         email = Factory.rand_email()
+        subscribed_from_url = Factory.rand_url()
         response = self.client.post(
             reverse(
                 'inkmail:subscribe',
@@ -75,6 +79,7 @@ class TestPostSubscribes(MockRequestsTestCase):
             {
                 'email': email,
                 'newsletter': self.newsletter.internal_name,
+                'subscribed_from_url': subscribed_from_url,
             },
         )
 
@@ -88,12 +93,13 @@ class TestPostSubscribes(MockRequestsTestCase):
         s = Subscription.objects.all()[0]
         self.assertEquals(s.person, p)
         self.assertEquals(s.newsletter.name, self.newsletter.name)
-        self.assertEquals(s.subscribed_from_url, "http://localhost/mail/subscribe")
+        self.assertEquals(s.subscription_url, "http://localhost/mail/subscribe")
         self.assertEquals(s.subscribed_from_ip, "127.0.0.1")
 
     def test_newsletter_required(self):
         email = Factory.rand_email()
         name = Factory.rand_name()
+        subscribed_from_url = Factory.rand_url()
         response = self.client.post(
             reverse(
                 'inkmail:subscribe',
@@ -101,6 +107,7 @@ class TestPostSubscribes(MockRequestsTestCase):
             {
                 'first_name': name,
                 'email': email,
+                'subscribed_from_url': subscribed_from_url,
             },
         )
 
@@ -111,6 +118,7 @@ class TestPostSubscribes(MockRequestsTestCase):
 
     def test_email_required(self):
         name = Factory.rand_name()
+        subscribed_from_url = Factory.rand_url()
         response = self.client.post(
             reverse(
                 'inkmail:subscribe',
@@ -119,6 +127,27 @@ class TestPostSubscribes(MockRequestsTestCase):
                 'first_name': name,
                 # 'email': email,
                 'newsletter': self.newsletter.internal_name,
+                'subscribed_from_url': subscribed_from_url,
+            },
+        )
+
+        self.assertEquals(response.status_code, 422)
+
+        self.assertEquals(Person.objects.count(), 0)
+        self.assertEquals(Subscription.objects.count(), 0)
+
+    def test_subscribed_from_url_required(self):
+        name = Factory.rand_name()
+        email = Factory.rand_email()
+        response = self.client.post(
+            reverse(
+                'inkmail:subscribe',
+            ),
+            {
+                'first_name': name,
+                'email': email,
+                'newsletter': self.newsletter.internal_name,
+                # 'subscribed_from_url': subscribed_from_url,
             },
         )
 
@@ -128,7 +157,6 @@ class TestPostSubscribes(MockRequestsTestCase):
         self.assertEquals(Subscription.objects.count(), 0)
 
 
-@unittest.skip("For Friday")
 class TestAjaxSubscribes(MockRequestsTestCase):
     def setUp(self, *args, **kwargs):
         self.newsletter = Factory.newsletter()
@@ -137,6 +165,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
     def test_post_subscribe_200(self):
         email = Factory.rand_email()
         name = Factory.rand_name()
+        subscribed_from_url = Factory.rand_url()
         response = self.client.post(
             reverse(
                 'inkmail:subscribe',
@@ -145,6 +174,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
                 'first_name': name,
                 'email': email,
                 'newsletter': self.newsletter.internal_name,
+                'subscribed_from_url': subscribed_from_url,
             }),
             'json',
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -158,6 +188,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
     def test_post_subscribe_adds_person_and_subscription(self):
         email = Factory.rand_email()
         name = Factory.rand_name()
+        subscribed_from_url = Factory.rand_url()
         response = self.client.post(
             reverse(
                 'inkmail:subscribe',
@@ -166,6 +197,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
                 'first_name': name,
                 'email': email,
                 'newsletter': self.newsletter.internal_name,
+                'subscribed_from_url': subscribed_from_url,
             }),
             'json',
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -185,11 +217,12 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         s = Subscription.objects.all()[0]
         self.assertEquals(s.person, p)
         self.assertEquals(s.newsletter.name, self.newsletter.name)
-        self.assertEquals(s.subscribed_from_url, "http://localhost/mail/subscribe")
+        self.assertEquals(s.subscription_url, "http://localhost/mail/subscribe")
         self.assertEquals(s.subscribed_from_ip, "127.0.0.1")
 
     def test_no_first_name_subscribe_adds_person_and_subscription(self):
         email = Factory.rand_email()
+        subscribed_from_url = Factory.rand_url()
         response = self.client.post(
             reverse(
                 'inkmail:subscribe',
@@ -197,6 +230,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
             json.dumps({
                 'email': email,
                 'newsletter': self.newsletter.internal_name,
+                'subscribed_from_url': subscribed_from_url,
             }),
             'json',
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -215,12 +249,13 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         s = Subscription.objects.all()[0]
         self.assertEquals(s.person, p)
         self.assertEquals(s.newsletter.name, self.newsletter.name)
-        self.assertEquals(s.subscribed_from_url, "http://localhost/mail/subscribe")
+        self.assertEquals(s.subscription_url, "http://localhost/mail/subscribe")
         self.assertEquals(s.subscribed_from_ip, "127.0.0.1")
 
     def test_newsletter_required(self):
         email = Factory.rand_email()
         name = Factory.rand_name()
+        subscribed_from_url = Factory.rand_url()
         response = self.client.post(
             reverse(
                 'inkmail:subscribe',
@@ -228,6 +263,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
             json.dumps({
                 'first_name': name,
                 'email': email,
+                'subscribed_from_url': subscribed_from_url,
             }),
             'json',
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -243,6 +279,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
 
     def test_email_required(self):
         name = Factory.rand_name()
+        subscribed_from_url = Factory.rand_url()
         response = self.client.post(
             reverse(
                 'inkmail:subscribe',
@@ -251,6 +288,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
                 'first_name': name,
                 # 'email': email,
                 'newsletter': self.newsletter.internal_name,
+                'subscribed_from_url': subscribed_from_url,
             }),
             'json',
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -265,7 +303,6 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         self.assertEquals(Subscription.objects.count(), 0)
 
 
-@unittest.skip("For Friday")
 class TestConfirmEmail(MockRequestsTestCase):
 
     def setUp(self, *args, **kwargs):
@@ -275,6 +312,7 @@ class TestConfirmEmail(MockRequestsTestCase):
     def test_post_subscribe_200(self):
         email = Factory.rand_email()
         name = Factory.rand_name()
+        subscribed_from_url = Factory.rand_url()
         response = self.client.post(
             reverse(
                 'inkmail:subscribe',
@@ -283,6 +321,7 @@ class TestConfirmEmail(MockRequestsTestCase):
                 'first_name': name,
                 'email': email,
                 'newsletter': self.newsletter.internal_name,
+                'subscribed_from_url': subscribed_from_url,
             },
         )
         self.assertEquals(response.status_code, 200)

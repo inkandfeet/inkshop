@@ -16,7 +16,6 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.files.base import ContentFile
 from inkmail.helpers import send_mail
-from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.signals import user_logged_in
 from django.template.loader import render_to_string
 from django.template import Template, Context
@@ -36,6 +35,12 @@ class Message(BaseModel):
     subject = models.CharField(max_length=254, blank=True, null=True)
     body_text_unrendered = models.TextField(blank=True, null=True)
     body_html_unrendered = models.TextField(blank=True, null=True)
+    reward_image = models.ImageField(
+        verbose_name="Reward Image",
+        upload_to='awesome',
+        blank=True,
+        null=True,
+    )
 
     def render_subject_and_body(self, subscription):
         context = {
@@ -43,7 +48,7 @@ class Message(BaseModel):
             "last_name": subscription.person.last_name,
             "email": subscription.person.email,
             "subscribed_at": subscription.subscribed_at,
-            "subscribed_from_url": subscription.subscribed_from_url,
+            "subscription_url": subscription.subscription_url,
             "subscribed_from_ip": subscription.subscribed_from_ip,
             "has_set_never_unsubscribe": subscription.has_set_never_unsubscribe,
             "opt_in_link": subscription.opt_in_link,
@@ -101,7 +106,7 @@ class Subscription(BaseModel):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
     subscribed_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
-    subscribed_from_url = models.TextField(blank=True, null=True)
+    subscription_url = models.TextField(blank=True, null=True)
     subscribed_from_ip = models.CharField(max_length=254, blank=True, null=True)
     double_opted_in = models.BooleanField(default=False)
     double_opted_in_at = models.DateTimeField(blank=True, null=True)

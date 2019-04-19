@@ -107,61 +107,6 @@ class TestSendMail(MailTestCase):
         self.assertEquals(len(mail.outbox), 0)
 
 
-# class TestSendEvenIfNotDoubleOptedInMail(MailTestCase):
-
-#     def test_send_even_if_not_double_mail_sends_to_valid_subscriber(self):
-#         self.subscription.double_opt_in()
-#         self.send_test_even_if_not_double_opted_in()
-
-#         self.assertEquals(len(mail.outbox), 1)
-#         self.assertEquals(mail.outbox[0].subject, self.subject)
-#         self.assertEquals(mail.outbox[0].body, self.body)
-#         self.assertEquals(len(mail.outbox[0].to), 1)
-#         self.assertEquals(mail.outbox[0].to[0], self.person.email)
-#         self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
-
-#     def test_send_even_if_not_double_mail_does_not_send_to_unsubscribed(self):
-#         self.subscription.double_opt_in()
-#         self.subscription.unsubscribe()
-#         self.send_test_even_if_not_double_opted_in()
-#         self.assertEquals(len(mail.outbox), 0)
-
-#     def test_send_even_if_not_double_mail_does_not_send_to_not_double_opted_in(self):
-#         self.send_test_even_if_not_double_opted_in()
-#         self.assertEquals(len(mail.outbox), 0)
-
-#     def test_send_even_if_not_double_mail_still_sends_to_trolls(self):
-#         self.subscription.double_opt_in()
-#         self.person.mark_troll()
-#         self.send_test_even_if_not_double_opted_in()
-
-#         self.assertEquals(len(mail.outbox), 1)
-#         self.assertEquals(mail.outbox[0].subject, self.subject)
-#         self.assertEquals(mail.outbox[0].body, self.body)
-#         self.assertEquals(len(mail.outbox[0].to), 1)
-#         self.assertEquals(mail.outbox[0].to[0], self.person.email)
-#         self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
-
-#     def test_send_even_if_not_double_mail_does_not_send_to_banned_people(self):
-#         self.subscription.double_opt_in()
-#         self.person.ban()
-#         self.send_test_even_if_not_double_opted_in()
-#         self.assertEquals(len(mail.outbox), 0)
-
-#     def test_send_even_if_not_double_mail_does_not_send_to_hard_bounce(self):
-#         self.subscription.double_opt_in()
-#         m = Factory.message()
-#         self.person.hard_bounce(message=m)
-#         self.send_test_even_if_not_double_opted_in()
-#         self.assertEquals(len(mail.outbox), 0)
-
-#     def test_send_even_if_not_double_mail_does_not_send_to_hard_bounce_even_if_message_missing(self):
-#         self.subscription.double_opt_in()
-#         self.person.hard_bounce()
-#         self.send_test_even_if_not_double_opted_in()
-#         self.assertEquals(len(mail.outbox), 0)
-
-
 class TestTransactionalMail(MailTestCase):
 
     def test_send_transactional_mail_sends_to_valid_subscriber(self):
@@ -228,15 +173,170 @@ class TestTransactionalMail(MailTestCase):
         self.assertEquals(len(mail.outbox), 0)
 
 
-@unittest.skip("For Friday")
 class TestSendMessageMail(MailTestCase):
 
-    def test_send_message_sends_to_valid_subscriber(self):
-        self.assertEquals(True, "Tests written")
+    def test_send_messsage_sends_to_valid_subscriber(self):
+        self.subscription.double_opt_in()
+        self.send_test_messsage()
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, self.subject)
+        self.assertEquals(mail.outbox[0].body, self.body)
+        self.assertEquals(len(mail.outbox[0].to), 1)
+        self.assertEquals(mail.outbox[0].to[0], self.person.email)
+        self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
+
+    def test_send_messsage_does_not_send_to_unsubscribed(self):
+        self.subscription.double_opt_in()
+        self.subscription.unsubscribe()
+        self.send_test_messsage()
+        self.assertEquals(len(mail.outbox), 0)
+
+    def test_send_messsage_does_not_send_to_not_double_opted_in(self):
+        self.send_test_messsage()
+        self.assertEquals(len(mail.outbox), 0)
+
+    def test_send_messsage_still_sends_to_trolls(self):
+        self.subscription.double_opt_in()
+        self.person.mark_troll()
+        self.send_test_messsage()
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, self.subject)
+        self.assertEquals(mail.outbox[0].body, self.body)
+        self.assertEquals(len(mail.outbox[0].to), 1)
+        self.assertEquals(mail.outbox[0].to[0], self.person.email)
+        self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
+
+    def test_send_messsage_does_not_send_to_banned_people(self):
+        self.subscription.double_opt_in()
+        self.person.ban()
+        self.send_test_messsage()
+        self.assertEquals(len(mail.outbox), 0)
+
+    def test_send_messsage_does_not_send_to_hard_bounce(self):
+        self.subscription.double_opt_in()
+        m = Factory.message()
+        self.person.hard_bounce(message=m)
+        self.send_test_messsage()
+        self.assertEquals(len(mail.outbox), 0)
+
+    def test_send_messsage_does_not_send_to_hard_bounce_even_if_message_missing(self):
+        self.subscription.double_opt_in()
+        self.person.hard_bounce()
+        self.send_test_messsage()
+        self.assertEquals(len(mail.outbox), 0)   def test_send_messsage_sends_to_valid_subscriber(self):
+        self.subscription.double_opt_in()
+        self.send_test_messsage()
+
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, self.subject)
+        self.assertEquals(mail.outbox[0].body, self.body)
+        self.assertEquals(len(mail.outbox[0].to), 1)
+        self.assertEquals(mail.outbox[0].to[0], self.person.email)
+        self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
+
+    def test_send_messsage_does_not_send_to_unsubscribed(self):
+        self.subscription.double_opt_in()
+        self.subscription.unsubscribe()
+        self.send_test_messsage()
+        self.assertEquals(len(mail.outbox), 0)
+
+    def test_send_messsage_does_not_send_to_not_double_opted_in(self):
+        self.send_test_messsage()
+        self.assertEquals(len(mail.outbox), 0)
+
+    def test_send_messsage_still_sends_to_trolls(self):
+        self.subscription.double_opt_in()
+        self.person.mark_troll()
+        self.send_test_messsage()
+
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, self.subject)
+        self.assertEquals(mail.outbox[0].body, self.body)
+        self.assertEquals(len(mail.outbox[0].to), 1)
+        self.assertEquals(mail.outbox[0].to[0], self.person.email)
+        self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
+
+    def test_send_messsage_does_not_send_to_banned_people(self):
+        self.subscription.double_opt_in()
+        self.person.ban()
+        self.send_test_messsage()
+        self.assertEquals(len(mail.outbox), 0)
+
+    def test_send_messsage_does_not_send_to_hard_bounce(self):
+        self.subscription.double_opt_in()
+        m = Factory.message()
+        self.person.hard_bounce(message=m)
+        self.send_test_messsage()
+        self.assertEquals(len(mail.outbox), 0)
+
+    def test_send_messsage_does_not_send_to_hard_bounce_even_if_message_missing(self):
+        self.subscription.double_opt_in()
+        self.person.hard_bounce()
+        self.send_test_messsage()
+        self.assertEquals(len(mail.outbox), 0)
 
 
-@unittest.skip("For Friday")
 class TestSendTransactionalMessageMail(MailTestCase):
 
-    def test_send_message_sends_to_valid_subscriber(self):
-        self.assertEquals(True, "Tests written")
+       def test_send_transactional_message_sends_to_valid_subscriber(self):
+        self.subscription.double_opt_in()
+        self.send_test_transactional_message()
+
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, self.subject)
+        self.assertEquals(mail.outbox[0].body, self.body)
+        self.assertEquals(len(mail.outbox[0].to), 1)
+        self.assertEquals(mail.outbox[0].to[0], self.person.email)
+        self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
+
+    def test_send_transactional_message_sends_to_unsubscribed(self):
+        self.subscription.double_opt_in()
+        self.subscription.unsubscribe()
+        self.send_test_transactional_message()
+
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, self.subject)
+        self.assertEquals(mail.outbox[0].body, self.body)
+        self.assertEquals(len(mail.outbox[0].to), 1)
+        self.assertEquals(mail.outbox[0].to[0], self.person.email)
+        self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
+
+    def test_send_transactional_message_sends_to_not_double_opted_in(self):
+        self.send_test_transactional_message()
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, self.subject)
+        self.assertEquals(mail.outbox[0].body, self.body)
+        self.assertEquals(len(mail.outbox[0].to), 1)
+        self.assertEquals(mail.outbox[0].to[0], self.person.email)
+        self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
+
+    def test_send_transactional_message_sends_to_trolls(self):
+        self.subscription.double_opt_in()
+        self.person.mark_troll()
+        self.send_test_transactional_message()
+
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].subject, self.subject)
+        self.assertEquals(mail.outbox[0].body, self.body)
+        self.assertEquals(len(mail.outbox[0].to), 1)
+        self.assertEquals(mail.outbox[0].to[0], self.person.email)
+        self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
+
+    def test_send_transactional_message_does_not_send_to_banned_people(self):
+        self.subscription.double_opt_in()
+        self.person.ban()
+        self.send_test_transactional_message()
+        self.assertEquals(len(mail.outbox), 0)
+
+    def test_send_transactional_message_does_not_send_to_hard_bounce(self):
+        self.subscription.double_opt_in()
+        m = Factory.message()
+        self.person.hard_bounce(message=m)
+        self.send_test_transactional_message()
+        self.assertEquals(len(mail.outbox), 0)
+
+    def test_send_transactional_message_does_not_send_to_hard_bounce_even_if_message_missing(self):
+        self.subscription.double_opt_in()
+        self.person.hard_bounce()
+        self.send_test_transactional_message()
+        self.assertEquals(len(mail.outbox), 0)

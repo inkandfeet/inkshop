@@ -39,7 +39,7 @@
                           
                           Here are the signup details, if you're curious.
                           
-                          We received a signup request from this page {{ subscribed_from_url }} at {{ subscribed_at }} from this IP address {{ subscribed_from_ip }}.
+                          We received a signup request from this page {{ subscription_url }} at {{ subscribed_at }} from this IP address {{ subscribed_from_ip }}.
 
 
     welcome_subject: "Welcome to our Newsletter!"
