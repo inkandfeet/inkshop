@@ -159,6 +159,7 @@ docker-compose run inkshop pt --autoreload
 
 -- Next Week
 
+- Move inkmail helpers to tasks?  Think about abstraction this.
 - `django-admin squashmigrations app_label`
 - Handle simle
 - Auto-delete any un-clicked confirmations after 7 days.

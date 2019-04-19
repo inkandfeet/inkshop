@@ -30,6 +30,7 @@ from utils.encryption import lookup_hash
 
 markdown = mistune.Markdown()
 OPT_IN_LINK_EXPIRE_TIME = datetime.timedelta(days=7)
+RETRY_IN_TIME = datetime.timedelta(minutes=2)
 
 
 class Message(BaseModel):
@@ -218,7 +219,7 @@ class Subscription(BaseModel):
         return "%s/%s" % (settings.CONFIRM_BASE_URL, reverse("inkmail:confirm_subscription", args=(self.opt_in_key,)))
 
 
-class ScheduledMessage(BaseModel):
+class ScheduledNewsletterMessage(BaseModel):
     message = models.ForeignKey(Message, blank=True, null=True, on_delete=models.SET_NULL)
     newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False)
@@ -238,10 +239,56 @@ class ScheduledMessage(BaseModel):
 
 
 class OutgoingMessage(BaseModel):
-    scheduled_message = models.ForeignKey(ScheduledMessage, on_delete=models.CASCADE)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    message = models.ForeignKey(Message, on_delete=models.CASCADE)
+    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
+    scheduled_newsletter_message = models.ForeignKey(ScheduledNewsletterMessage, on_delete=models.CASCADE, blank=True, null=True)
+    transactional = models.BooleanField(default=False)
+
     send_at = models.DateTimeField()
+    unsubscribe_hash = models.CharField(max_length=254, blank=True, null=True)
+
+    attempt_started = models.BooleanField(default=False)
+    retry_if_not_complete_by = models.DateTimeField()
     attempt_complete = models.BooleanField(default=False)
+    send_success = models.NullBooleanField(default=None)
+
+    hard_bounced = models.BooleanField(default=False)
+    hard_bounce_reason = models.CharField(max_length=254, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        from utils.factory import Factory
+        generate_hash = False
+        if not self.unsubscribe_hash:
+            generate_hash = True
+
+        if not self.retry_if_not_complete_by and self.send_at:
+            self.retry_if_not_complete_by = self.send_at + RETRY_IN_TIME
+
+        super(OutgoingMessage, self).save(*args, **kwargs)
+        if generate_hash:
+            hashids = Hashids(salt=Factory.rand_str(length=6, include_emoji=False))
+            self.unsubscribe_hash = hashids.encode(self.pk)
+            self.save()
+
+    @property
+    def unsubscribe_url(self):
+        return "%s%s" % (
+            settings.CONFIRM_BASE_URL,
+            reverse("inkmail:unsubscribe", args=(self.unsubscribe_hash)),
+        )
+
+    def send(self):
+        s = Subscription.objects.select_related('person').get(pk=subscription_pk)
+        if (
+            s.double_opted_in
+            and not s.unsubscribed
+            and not self.person.banned
+            and not self.person.hard_bounced
+        ):
+        message = Message.objects.get(pk=message_id)
+
+        subject, body = message.render_subject_and_body(subscription=s)
 
 
 class OutgoingMessageAttemptTombstone(BaseModel):

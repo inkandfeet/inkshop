@@ -512,6 +512,7 @@ class Factory(DjangoFunctionalFactory):
         options = {
             "person": cls.person(),
             "newsletter": cls.newsletter(),
+            "double_opted_in": True,
         }
         options.update(kwargs)
 
