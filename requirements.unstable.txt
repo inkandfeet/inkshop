@@ -1,4 +1,5 @@
 boto3
+cryptography
 csscompressor
 django-annoying
 django-anymail[mailgun]
@@ -32,9 +33,7 @@ piprot
 polytester>=1.2.0
 psycopg2
 pytz
-pycryptodome
 PyYAML>=4.2b1
-simple-crypt
 slimit
 sorl-thumbnail
 tblib

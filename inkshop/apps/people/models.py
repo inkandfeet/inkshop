@@ -21,7 +21,6 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
 
-from archives.models import HistoricalEvent
 from utils.models import BaseModel
 from utils.encryption import encrypt, decrypt, lookup_hash
 
@@ -133,6 +132,7 @@ class Person(HasJWTBaseModel):
         self.hashed_last_name = lookup_hash(value)
 
     def ban(self):
+        from archives.models import HistoricalEvent
         if not self.banned:
             self.banned = True
             self.banned_at = timezone.now()
@@ -140,20 +140,22 @@ class Person(HasJWTBaseModel):
             HistoricalEvent.log(person=self, event_type="ban")
 
     def mark_troll(self):
+        from archives.models import HistoricalEvent
         if not self.marked_troll:
             self.marked_troll = True
             self.marked_troll_at = timezone.now()
             self.save()
             HistoricalEvent.log(person=self, event_type="mark_troll")
 
-    def hard_bounce(self, reason=None, bouncing_message=NOne):
+    def hard_bounce(self, reason=None, bouncing_message=None):
+        from archives.models import HistoricalEvent
         if not self.hard_bounced:
             self.hard_bounced = True
             self.hard_bounced_at = timezone.now()
             self.hard_bounced_reason = reason
             self.hard_bounced_message = bouncing_message
             self.save()
-            HistoricalEvent.log(person=self, event_type="mark_hard_bounce", reason=reason, message=message)
+            HistoricalEvent.log(person=self, event_type="mark_hard_bounce", reason=reason, message=bouncing_message)
 
     def gdpr_dump(self):
-        raise NotImplemented("Haven't implemented GPDR dump yet")
+        raise NotImplementedError("Haven't implemented GPDR dump yet")

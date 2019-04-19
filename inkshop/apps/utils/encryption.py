@@ -9,36 +9,39 @@ import os
 import traceback
 
 from binascii import hexlify, unhexlify
-from simplecrypt import encrypt as simple_encrypt
-from simplecrypt import decrypt as simple_decrypt
+# from simplecrypt import encrypt as simple_encrypt
+# from simplecrypt import decrypt as simple_decrypt
 from django.conf import settings
 
-
-BS = 16
-key = hashlib.sha256(settings.INKSHOP_ENCRYPTION_KEY.encode("utf-8")).digest()
-
-
-def pad(s):
-    s = "%s%s" % (s.decode("utf-8"), ((BS - len(s) % BS) * "~"))
-    return s
-
-
-def unpad(s):
-    while s.endswith(str.encode("~")):
-        s = s[:-1]
-    return s
+# Cryptography
+# https://cryptography.io/en/latest/fernet/#using-passwords-with-fernet
+from cryptography.fernet import Fernet
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+password = settings.INKSHOP_ENCRYPTION_KEY.encode("utf-8")
+salt = os.urandom(16)
+kdf = PBKDF2HMAC(
+    algorithm=hashes.SHA256(),
+    length=32,
+    salt=salt,
+    iterations=100000,
+    backend=default_backend()
+)
+key = base64.urlsafe_b64encode(kdf.derive(password))
+f = Fernet(key)
 
 
 def encrypt(s):
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
-    return hexlify(simple_encrypt(settings.INKSHOP_ENCRYPTION_KEY, s.encode('utf8'))).decode()
+    return hexlify(f.encrypt(settings.INKSHOP_ENCRYPTION_KEY, s.encode('utf8'))).decode()
 
 
 def decrypt(s):
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
-    return simple_decrypt(settings.INKSHOP_ENCRYPTION_KEY, unhexlify(s)).decode('utf-8')
+    return f.decrypt(settings.INKSHOP_ENCRYPTION_KEY, unhexlify(s)).decode('utf-8')
 
 
 def normalize_lower_and_encrypt(s):

@@ -8,7 +8,7 @@ from django.test.utils import override_settings
 
 from people.models import Person
 from inkmail.models import Subscription
-from archive.models import HistoricalEvent
+from archives.models import HistoricalEvent
 from utils.factory import Factory
 from utils.test_helpers import MockRequestsTestCase
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, encrypt, decrypt
