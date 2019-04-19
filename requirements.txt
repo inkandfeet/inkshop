@@ -1,5 +1,5 @@
 boto3==1.9.133
-cryptography==2.1.4
+cryptography>=2.3
 csscompressor==0.9.5
 django-annoying==0.10.4
 django-anymail==6.0
@@ -75,7 +75,6 @@ ply==3.11
 prompt-toolkit==2.0.9
 ptyprocess==0.6.0
 pycodestyle==2.5.0
-pycrypto==2.6.1
 pyflakes==2.1.1
 Pygments==2.3.1
 python-crontab==2.3.6
