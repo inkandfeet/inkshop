@@ -2,6 +2,7 @@ import mock
 import unittest
 from django.test import TestCase
 from django.utils import timezone
+from utils.factory import Factory
 
 
 class MockRequests(object):
@@ -42,3 +43,11 @@ class MockRequestsTestCase(TestCase):
 
     def now(self):
         return timezone.now()
+
+    def post(self, *args, **kwargs):
+        self._source_ip = Factory.rand_ip()
+        return self.client.post(HTTP_X_FORWARDED_FOR=self._source_ip, *args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        self._source_ip = Factory.rand_ip()
+        return self.client.post(HTTP_X_FORWARDED_FOR=self._source_ip, *args, **kwargs)

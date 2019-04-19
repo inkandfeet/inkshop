@@ -97,21 +97,30 @@ class DjangoFunctionalFactory:
         return RANDOM_EMAIL_DOMAINS[cls.rand_int(0, len(RANDOM_EMAIL_DOMAINS) - 1)]
 
     @classmethod
+    def rand_ip(cls):
+        return "%s.%s.%s.%s" % (
+            cls.rand_int(start=0, end=255),
+            cls.rand_int(start=0, end=255),
+            cls.rand_int(start=0, end=255),
+            cls.rand_int(start=0, end=255),
+        )
+
+    @classmethod
     def rand_email(cls, first_name=None):
         if not first_name:
             first_name = cls.rand_name().lower()
         return "%s@%s" % (first_name, cls.rand_domain())
 
     @classmethod
-    def rand_url(cls, domain=None):
+    def rand_url(cls, domain=None, include_query_parms=True):
         protocol = "http://"
         if cls.rand_bool:
             protocol = "https://"
 
-        page_name = cls.rand_str(length=20)
+        page_name = cls.rand_str(length=20, include_emoji=False)
         query_params = ""
-        if cls.rand_bool:
-            query_params = "?%s=%s" % (cls.rand_str(), cls.rand_str())
+        if include_query_parms and cls.rand_bool:
+            query_params = "?%s=%s" % (cls.rand_str(include_emoji=False), cls.rand_str(include_emoji=False))
         if not domain:
             domain = cls.rand_domain()
         return "%s%s/%s%s" % (protocol, domain, page_name, query_params)

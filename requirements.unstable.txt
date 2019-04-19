@@ -1,3 +1,4 @@
+bleach
 boto3
 cryptography
 csscompressor
@@ -12,6 +13,7 @@ django-extensions
 django-heroku-postgresify
 django-hosts
 django-htmlmin
+django-ipware
 django-localflavor
 django-redis-cache
 django-storages

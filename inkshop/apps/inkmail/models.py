@@ -1,3 +1,4 @@
+import bleach
 import datetime
 import hashlib
 import mistune
@@ -61,7 +62,8 @@ class Message(BaseModel):
         # print(parsed_source)
         subject = markdown(parsed_source)
         subject = subject.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
-        subject = subject.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;").replace("\n", "")
+        subject = subject.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
+        subject = bleach.clean(subject, strip=True).replace("\n", "")
 
         t = Template(self.body_text_unrendered)
         parsed_source = t.render(c).encode("utf-8").decode()
@@ -70,6 +72,7 @@ class Message(BaseModel):
         body = markdown(parsed_source)
         body = body.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
         body = body.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
+        body = bleach.clean(body, strip=True)
 
         return subject, body
 
