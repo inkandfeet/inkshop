@@ -32,19 +32,40 @@ key = Fernet(base64.urlsafe_b64encode(kdf.derive(password)))
 
 # Future support for key rotation
 # https://cryptography.io/en/latest/fernet/#cryptography.fernet.MultiFernet
-f = MultiFernet([key, ])
+# f = MultiFernet([key, ])
+f = key
 
 
 def encrypt(s):
+    if not s:
+        return None
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
-    return f.encrypt(s.encode('utf8'))
+    return f.encrypt(s.encode('utf-8')).decode()
 
 
 def decrypt(s):
+    if not s:
+        return None
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
-    return f.decrypt(s).decode('utf-8')
+    return f.decrypt(s.encode('utf-8')).decode('utf-8')
+
+
+def encrypt_bytes(s):
+    if not s:
+        return None
+    if settings.DISABLE_ENCRYPTION_FOR_TESTS:
+        return s
+    return f.encrypt(s)
+
+
+def decrypt_bytes(s):
+    if not s:
+        return None
+    if settings.DISABLE_ENCRYPTION_FOR_TESTS:
+        return s
+    return f.decrypt(s)
 
 
 def normalize_lower_and_encrypt(s):

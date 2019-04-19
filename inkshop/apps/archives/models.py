@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils.functional import cached_property
 from django.utils import timezone
 
-from utils.encryption import encrypt, decrypt
+from utils.encryption import encrypt_bytes, decrypt_bytes
 
 
 class HistoricalEvent(models.Model):
@@ -23,12 +23,12 @@ class HistoricalEvent(models.Model):
     @property
     def event_data(self):
         if not hasattr(self, "_decrypted_event_data"):
-            self._decrypted_encrypted_json_event_data = pickle.loads(decrypt(self.encrypted_encrypted_json_event_data))
+            self._decrypted_encrypted_json_event_data = pickle.loads(decrypt_bytes(self.encrypted_encrypted_json_event_data))
         return self._decrypted_encrypted_json_event_data
 
     @event_data.setter
     def event_data(self, value):
-        self.encrypted_encrypted_json_event_data = encrypt(pickle.dumps(value))
+        self.encrypted_encrypted_json_event_data = encrypt_bytes(pickle.dumps(value))
 
     @classmethod
     def log(cls, *args, **kwargs):
