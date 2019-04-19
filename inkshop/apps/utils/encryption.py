@@ -9,36 +9,63 @@ import os
 import traceback
 
 from binascii import hexlify, unhexlify
-from simplecrypt import encrypt as simple_encrypt
-from simplecrypt import decrypt as simple_decrypt
+# from simplecrypt import encrypt as simple_encrypt
+# from simplecrypt import decrypt as simple_decrypt
 from django.conf import settings
 
+# Cryptography
+# https://cryptography.io/en/latest/fernet/#using-passwords-with-fernet
+from cryptography.fernet import Fernet, MultiFernet
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+password = settings.INKSHOP_ENCRYPTION_KEY.encode("utf-8")
+salt = os.urandom(16)
+kdf = PBKDF2HMAC(
+    algorithm=hashes.SHA256(),
+    length=32,
+    salt=salt,
+    iterations=100000,
+    backend=default_backend()
+)
+key = Fernet(base64.urlsafe_b64encode(kdf.derive(password)))
 
-BS = 16
-key = hashlib.sha256(settings.INKSHOP_ENCRYPTION_KEY.encode("utf-8")).digest()
-
-
-def pad(s):
-    s = "%s%s" % (s.decode("utf-8"), ((BS - len(s) % BS) * "~"))
-    return s
-
-
-def unpad(s):
-    while s.endswith(str.encode("~")):
-        s = s[:-1]
-    return s
+# Future support for key rotation
+# https://cryptography.io/en/latest/fernet/#cryptography.fernet.MultiFernet
+# f = MultiFernet([key, ])
+f = key
 
 
 def encrypt(s):
+    if not s:
+        return None
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
-    return hexlify(simple_encrypt(settings.INKSHOP_ENCRYPTION_KEY, s.encode('utf8'))).decode()
+    return f.encrypt(s.encode('utf-8')).decode()
 
 
 def decrypt(s):
+    if not s:
+        return None
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
-    return simple_decrypt(settings.INKSHOP_ENCRYPTION_KEY, unhexlify(s)).decode('utf-8')
+    return f.decrypt(s.encode('utf-8')).decode('utf-8')
+
+
+def encrypt_bytes(s):
+    if not s:
+        return None
+    if settings.DISABLE_ENCRYPTION_FOR_TESTS:
+        return s
+    return f.encrypt(s)
+
+
+def decrypt_bytes(s):
+    if not s:
+        return None
+    if settings.DISABLE_ENCRYPTION_FOR_TESTS:
+        return s
+    return f.decrypt(s)
 
 
 def normalize_lower_and_encrypt(s):
@@ -51,7 +78,7 @@ def normalize_and_encrypt(s):
 
 def lookup_hash(s):
     h = hashlib.new('SHA512')
-    h.update(str("%s%s" % (settings.HASHID_SALT, s)).encode('utf-8'))
+    h.update(str("%s%s" % (settings.HASHID_SALT, str(s).strip().lower())).encode('utf-8'))
     return h.hexdigest()
 
 

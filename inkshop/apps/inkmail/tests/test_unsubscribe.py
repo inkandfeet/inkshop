@@ -22,11 +22,34 @@ class TestUnsubscribeBasics(MockRequestsTestCase):
         self.newsletter = Factory.newsletter()
         super(TestUnsubscribeBasics, self).setUp(*args, **kwargs)
 
-    def test_unsubscribe_link_included_in_message_send(self):
+    def test_unsubscribe_link_included_in_every_message_send(self):
+        self.assertEquals(False, "Test written")
+
+    def test_newsletter_footer_included_in_every_message_send(self):
+        self.assertEquals(False, "Test written")
+
+    def test_transactional_footer_included_in_every_transactional_send(self):
         self.assertEquals(False, "Test written")
 
     def test_clicking_unsubscribe_marks_unsubscribe(self):
         self.assertEquals(False, "Test written")
 
     def test_clicking_unsubscribe_prevents_future_mailings(self):
+        self.assertEquals(False, "Test written")
+
+
+@unittest.skip("For Friday")
+class TestUnsubscribeResubscribe(MockRequestsTestCase):
+
+    def setUp(self, *args, **kwargs):
+        self.newsletter = Factory.newsletter()
+        super(TestUnsubscribeBasics, self).setUp(*args, **kwargs)
+
+    def test_unsubscribe_resubscribe_allows_messages_sent(self):
+        self.assertEquals(False, "Test written")
+
+    def test_unsubscribe_resubscribe_updates_all_fields(self):
+        self.assertEquals(False, "Test written")
+
+    def test_unsubscribe_resubscribe_has_records_of_all_actions(self):
         self.assertEquals(False, "Test written")

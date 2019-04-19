@@ -1,3 +1,4 @@
+import bleach
 import datetime
 import hashlib
 import mistune
@@ -16,7 +17,6 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.files.base import ContentFile
 from inkmail.helpers import send_mail
-from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.signals import user_logged_in
 from django.template.loader import render_to_string
 from django.template import Template, Context
@@ -26,6 +26,7 @@ from django.utils import timezone
 
 from people.models import Person
 from utils.models import BaseModel
+from utils.encryption import lookup_hash
 
 markdown = mistune.Markdown()
 OPT_IN_LINK_EXPIRE_TIME = datetime.timedelta(days=7)
@@ -36,6 +37,12 @@ class Message(BaseModel):
     subject = models.CharField(max_length=254, blank=True, null=True)
     body_text_unrendered = models.TextField(blank=True, null=True)
     body_html_unrendered = models.TextField(blank=True, null=True)
+    reward_image = models.ImageField(
+        verbose_name="Reward Image",
+        upload_to='awesome',
+        blank=True,
+        null=True,
+    )
 
     def render_subject_and_body(self, subscription):
         context = {
@@ -43,7 +50,7 @@ class Message(BaseModel):
             "last_name": subscription.person.last_name,
             "email": subscription.person.email,
             "subscribed_at": subscription.subscribed_at,
-            "subscribed_from_url": subscription.subscribed_from_url,
+            "subscription_url": subscription.subscription_url,
             "subscribed_from_ip": subscription.subscribed_from_ip,
             "has_set_never_unsubscribe": subscription.has_set_never_unsubscribe,
             "opt_in_link": subscription.opt_in_link,
@@ -56,7 +63,8 @@ class Message(BaseModel):
         # print(parsed_source)
         subject = markdown(parsed_source)
         subject = subject.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
-        subject = subject.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;").replace("\n", "")
+        subject = subject.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
+        subject = bleach.clean(subject, strip=True).replace("\n", "")
 
         t = Template(self.body_text_unrendered)
         parsed_source = t.render(c).encode("utf-8").decode()
@@ -65,6 +73,9 @@ class Message(BaseModel):
         body = markdown(parsed_source)
         body = body.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
         body = body.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
+        body = bleach.clean(body, strip=True)
+        if body[-1] == "\n":
+            body = body[:-1]
 
         return subject, body
 
@@ -96,13 +107,79 @@ class Newsletter(BaseModel):
     def full_from_email(self):
         return '%s <%s>' % (self.from_name, self.from_email)
 
+    @classmethod
+    def import_subscriber(
+        cls,
+        import_source,
+        email,
+        subscribed_at,
+        subscription_url,
+        double_opted_in,
+        double_opted_in_at=None,
+        first_name=None,
+        last_name=None,
+        subscription_ip=None,
+        time_zone=None,
+        newsletter_name=None,
+        overwrite=False,
+    ):
+        newsletter = False
+        if newsletter_name:
+            newsletter = Newsletter.objects.get(internal_name=newsletter_name)
+
+        hashed_email = lookup_hash(email)
+        if Person.objects.filter(hashed_email=hashed_email):
+            if not overwrite:
+                return
+            p = Person.objects.get(hashed_email=hashed_email)
+            if p.banned:
+                return
+        else:
+            p = Person.objects.create(
+                hashed_email=hashed_email
+            )
+
+        p.first_name = first_name
+        p.last_name = last_name
+        p.email = email
+        p.email_verified = double_opted_in
+        p.time_zone = time_zone
+        p.was_imported = True
+        p.was_imported_at = datetime.datetime.now(timezone.utc)
+        p.import_source = import_source
+        p.save()
+
+        if newsletter:
+            if Subscription.objects.filter(person=p, newsletter=newsletter):
+                if not overwrite:
+                    return
+                s = Subscription.objects.get(person=p, newsletter=newsletter)
+            else:
+                s = Subscription.objects.create(
+                    person=p,
+                    newsletter=newsletter
+                )
+
+            s.subscribed_at = p.was_imported_at
+            s.subscription_url = subscription_url
+            s.subscribed_from_ip = subscription_ip
+            s.was_imported = True
+            s.was_imported_at = p.was_imported_at
+            s.import_source = import_source
+            s.double_opted_in = double_opted_in
+            s.double_opted_in_at = double_opted_in_at
+            s.save()
+
 
 class Subscription(BaseModel):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
     subscribed_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
-    subscribed_from_url = models.TextField(blank=True, null=True)
+    subscription_url = models.TextField(blank=True, null=True)
     subscribed_from_ip = models.CharField(max_length=254, blank=True, null=True)
+    was_imported = models.BooleanField(default=False)
+    was_imported_at = models.DateTimeField(blank=True, null=True)
+    import_source = models.CharField(max_length=254, blank=True, null=True)
     double_opted_in = models.BooleanField(default=False)
     double_opted_in_at = models.DateTimeField(blank=True, null=True)
     has_set_never_unsubscribe = models.BooleanField(default=False)

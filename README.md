@@ -85,8 +85,9 @@ cp initial_data.yml.sample initial_data.yml
 # Edit initial_data.yml with your basic information.
 
 docker network create inkshop
-docker-compose run db createdb inkshop -h db -U $POSTGRES_USER
 docker-compose up
+docker-compose run db bash
+$ createdb inkshop -h db -U $POSTGRES_USER
 
 # Load your initial data
 docker-compose run inkshop python3 manage.py load_initial_data
@@ -113,7 +114,7 @@ docker-compose run inkshop pt --autoreload
 
 
 ## Opinionated, and built on:
-- [Simple Crypt](https://pypi.org/project/simple-crypt/) (and [pycrypto](https://pypi.org/project/pycrypto/)) for encryption.
+- [Pyca Cryptograpy](https://github.com/pyca/cryptography) for encryption.
 - Cloudflare for DNS, Caching, and Development redirects
 - Mailgun for email sending.
 - AWS S3 for uploads and static file serving.
@@ -158,14 +159,17 @@ docker-compose run inkshop pt --autoreload
 
 -- Next Week
 
+- `django-admin squashmigrations app_label`
+- Handle simle
 - Auto-delete any un-clicked confirmations after 7 days.
 - Handle if people click them later, make sure we never delete people who were already subscribed, etc.
 
 
 
-
 ## Open threads the architecture isn't decided on yet.
+- Structure for GDPR dump.  JSON?  Zip?
 - Handle opt-in separately from transactional?
+- Import flow for people who don't have double-opt-in records.  
 - Transactional emails - how out is opted out?   (Everything vs subsciption is the most common pattern, but what's the simpler solution?)
 - Resubscribe flow.  If you unsubscribe, then sign up again, can I send you an email to get you back on my list?  (Probably add confirmation to the signup flow).
 - Capitalizing first names - better to do it in the template, or the source data?

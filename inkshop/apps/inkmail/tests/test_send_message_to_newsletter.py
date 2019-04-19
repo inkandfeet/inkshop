@@ -16,7 +16,7 @@ import unittest
 
 
 @unittest.skip("For Friday")
-class TestSendToNewsletterGroup(MockRequestsTestCase):
+class TestSendToNewsletter(MockRequestsTestCase):
 
     def setUp(self, *args, **kwargs):
         # Create 3 newsletters
@@ -25,7 +25,7 @@ class TestSendToNewsletterGroup(MockRequestsTestCase):
 
         # Create 5-15 people not subscribed to either
 
-        super(TestSendToNewsletterGroup, self).setUp(*args, **kwargs)
+        super(TestSendToNewsletter, self).setUp(*args, **kwargs)
 
     def test_sends_to_everyone_in_list(self):
         self.assertEquals(False, "Test written")
