@@ -1,6 +1,6 @@
 bleach
 boto3
-cryptography
+cryptography>=2.3
 csscompressor
 django-annoying
 django-anymail[mailgun]
