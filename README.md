@@ -37,7 +37,7 @@ When it's at 1.0, this project will let you:
 - Show up on Google and other search engines with good visibility
 - Share posts to social media
 - Protect your sanity against trolls and abusive people
-- Export and backup every bit of data to in the system.
+- Export and backup every bit of data in the system.  Import it back again
 
 It won't ever let you:
 - Spam people who haven't fully consented to receive your mailings
@@ -169,6 +169,7 @@ docker-compose run inkshop pt --autoreload
 
 ## Open threads the architecture isn't decided on yet.
 - Structure for GDPR dump.  JSON?  Zip?
+- Structure for full-system export/import.  JSON?  Zip?
 - Handle opt-in separately from transactional?
 - Import flow for people who don't have double-opt-in records.  
 - Transactional emails - how out is opted out?   (Everything vs subsciption is the most common pattern, but what's the simpler solution?)

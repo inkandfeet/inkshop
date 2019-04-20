@@ -300,6 +300,7 @@ class OutgoingMessageAttemptTombstone(BaseModel):
     send_success = models.NullBooleanField()
     send_error = models.TextField(blank=True, null=True)
     attempt_made = models.NullBooleanField()
+    num_retries = models.IntegerField(default=0)
     reason = models.CharField(max_length=254, blank=True, null=True)   # Hard_bounce, banned, etc.
 
 

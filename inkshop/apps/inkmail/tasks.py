@@ -37,7 +37,7 @@ def queue_next_messages():
     for om in OutgoingMessage.objects.filter(send_at__lte=window_starts_at, attempt_started=False):
         om.send()
 
-    # Queue retries
+    # TODO: Queue retries
 
 
 @task
