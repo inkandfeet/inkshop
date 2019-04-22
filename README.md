@@ -126,6 +126,11 @@ docker-compose run inkshop pt --autoreload
 
 ## Current working list
 
+
+Bonus
+- send marks sent (no double-sends even if I call it twice.)
+- subscribe works
+
 - [x] get test harness in
 - [x] basic tests passing including flake
 - [x] create subscribe test
