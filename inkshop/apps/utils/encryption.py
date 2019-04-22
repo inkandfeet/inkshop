@@ -2,10 +2,12 @@ import binascii
 import base64
 import codecs
 import hashlib
+from hashids import Hashids
 import logging
 # from Crypto.Cipher import AES
 import random
 import os
+import string
 import traceback
 
 from binascii import hexlify, unhexlify
@@ -34,6 +36,12 @@ key = Fernet(base64.urlsafe_b64encode(kdf.derive(password)))
 # https://cryptography.io/en/latest/fernet/#cryptography.fernet.MultiFernet
 # f = MultiFernet([key, ])
 f = key
+
+
+def rand_str(length=20):
+    # from Factory
+    choices = string.ascii_uppercase + string.ascii_lowercase + string.digits
+    return ''.join(random.SystemRandom().choice(choices) for i in range(length))
 
 
 def encrypt(s):
@@ -80,6 +88,19 @@ def lookup_hash(s):
     h = hashlib.new('SHA512')
     h.update(str("%s%s" % (settings.HASHID_SALT, str(s).strip().lower())).encode('utf-8'))
     return h.hexdigest()
+
+
+def create_unique_hashid(pk, cls, field, hash_length=12):
+    # from utils.factory import Factory
+    potential_hash = None
+    filters = {}
+
+    while potential_hash is None or cls.objects.filter(**filters).count() > 0:
+        hashids = Hashids(salt=rand_str())
+        potential_hash = hashids.encode(pk)
+        potential_hash += rand_str(length=hash_length - len(potential_hash))
+        filters[field] = potential_hash
+    return potential_hash
 
 
 # From Will:

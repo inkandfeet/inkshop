@@ -28,7 +28,16 @@ def queue_newsletter_message(scheduled_newsletter_message, at=None):
     from inkmail.models import OutgoingMessage  # Avoid circular imports
 
     if not at:
-        at = timezone.now()
+        if scheduled_newsletter_message.send_at_date:
+            at = scheduled_newsletter_message.send_at_date
+            # TODO: Use local time
+            # scheduled_newsletter_message.use_local_time
+            at = at.replace(
+                hour=scheduled_newsletter_message.send_at_hour,
+                minute=scheduled_newsletter_message.send_at_minute,
+            )
+        else:
+            at = timezone.now()
 
     for subscription in scheduled_newsletter_message.recipients:
         OutgoingMessage.objects.create(

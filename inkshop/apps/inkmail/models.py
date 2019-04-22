@@ -8,7 +8,6 @@ import time
 import uuid
 from base64 import b64encode
 from io import BytesIO
-from hashids import Hashids
 from PIL import Image, ImageOps
 from tempfile import NamedTemporaryFile
 
@@ -26,7 +25,7 @@ from django.utils import timezone
 
 from people.models import Person
 from utils.models import BaseModel
-from utils.encryption import lookup_hash, encrypt, decrypt
+from utils.encryption import lookup_hash, encrypt, decrypt, create_unique_hashid
 
 markdown = mistune.Markdown()
 OPT_IN_LINK_EXPIRE_TIME = datetime.timedelta(days=7)
@@ -191,9 +190,7 @@ class Subscription(BaseModel):
             self.save()
 
     def generate_opt_in_link(self):
-        from utils.factory import Factory
-        hashids = Hashids(salt=Factory.rand_str(length=6, include_emoji=False))
-        self.opt_in_key = hashids.encode(self.pk)
+        self.opt_in_key = create_unique_hashid(self.pk, Subscription, "opt_in_key")
         self.opt_in_key_created_at = timezone.now()
         self.save()
 
@@ -263,11 +260,9 @@ class OutgoingMessage(BaseModel):
 
         super(OutgoingMessage, self).save(*args, **kwargs)
         if generate_unsubscribe_hash:
-            hashids = Hashids(salt=Factory.rand_str(length=6, include_emoji=False))
-            self.unsubscribe_hash = hashids.encode(self.pk)
+            self.unsubscribe_hash = create_unique_hashid(self.pk, OutgoingMessage, "unsubscribe_hash")
         if generate_delete_hash:
-            hashids = Hashids(salt=Factory.rand_str(length=6, include_emoji=False))
-            self.delete_hash = hashids.encode(self.pk)
+            self.delete_hash = create_unique_hashid(self.pk, OutgoingMessage, "delete_hash")
         if generate_unsubscribe_hash or generate_delete_hash:
             self.save()
 
@@ -290,7 +285,6 @@ class OutgoingMessage(BaseModel):
         context = {
             "transactional": self.message.transactional,
             "organization_address": o.address,
-            "organization_name": o.name,
             "organization_name": o.name,
         }
         if self.person:
