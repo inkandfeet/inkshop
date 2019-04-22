@@ -15,7 +15,6 @@ import mock
 import unittest
 
 
-@unittest.skip("For Friday")
 class TestSendToNewsletter(MockRequestsTestCase):
 
     def setUp(self, *args, **kwargs):
@@ -40,4 +39,7 @@ class TestSendToNewsletter(MockRequestsTestCase):
         self.assertEquals(False, "Test written")
 
     def test_if_scheduled_for_past_sends_immediately(self):
+        self.assertEquals(False, "Test written")
+
+    def test_time_zones_sends_in_separate_batches(self):
         self.assertEquals(False, "Test written")

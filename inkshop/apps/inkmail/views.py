@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from annoying.decorators import render_to, ajax_request
 from ipware import get_client_ip
 
-from inkmail.models import Newsletter, Subscription
+from inkmail.models import Newsletter, Subscription, OutgoingMessage
 from inkmail.tasks import send_subscription_confirmation
 from people.models import Person
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt
@@ -112,6 +112,24 @@ def confirm_subscription(request, opt_in_key):
     p.email_verified = True
     p.save()
     email_confirmed = True
+    return locals()
+
+
+@render_to("inkmail/unsubscribed.html")
+def unsubscribe(request, unsubscribe_key):
+    om = OutgoingMessage.objects.get(unsubscribe_hash=unsubscribe_key)
+    if om.subscription:
+        om.subscription.unsubscribe()
+
+    return locals()
+
+
+@render_to("inkmail/delete_account_start.html")
+def delete_account(request, delete_key):
+    om = OutgoingMessage.objects.get(delete_hash=delete_key)
+    # if om.subscription:
+    #     om.subscription.unsubscribe()
+
     return locals()
 
 

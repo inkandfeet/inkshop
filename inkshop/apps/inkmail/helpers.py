@@ -9,21 +9,6 @@ from celery.task import task, periodic_task
 from django.utils import timezone
 
 
-def send_message(*args, **kwargs):
-    """Very light wrapper around queue_message in case we want to expose an immediate=True flag in the future."""
-    queue_message(*args, **kwargs)
-
-
-def send_newsletter_message(*args, **kwargs):
-    """Very light wrapper around queue_newsletter_message in case we want to expose an immediate=True flag in the future."""
-    queue_newsletter_message(*args, **kwargs)
-
-
-def send_transactional_message(message=None, person=None):
-    """ery light wrapper around queue_message in case we want to expose an immediate=True flag in the future."""
-    queue_transactional_message(message, person)
-
-
 def queue_message(message, subscription, at=None, scheduled_newsletter_message=None):
     """Sends a message to a particular subscriber"""
     from inkmail.models import OutgoingMessage  # Avoid circular imports
