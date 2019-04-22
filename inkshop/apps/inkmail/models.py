@@ -16,7 +16,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.files.base import ContentFile
-from inkmail.helpers import send_mail
+from django.core.mail import send_mail as django_send_mail
+from inkmail.helpers import send_message
 from django.contrib.auth.signals import user_logged_in
 from django.template.loader import render_to_string
 from django.template import Template, Context
@@ -26,7 +27,7 @@ from django.utils import timezone
 
 from people.models import Person
 from utils.models import BaseModel
-from utils.encryption import lookup_hash
+from utils.encryption import lookup_hash, encrypt, decrypt
 
 markdown = mistune.Markdown()
 OPT_IN_LINK_EXPIRE_TIME = datetime.timedelta(days=7)
@@ -44,18 +45,26 @@ class Message(BaseModel):
         blank=True,
         null=True,
     )
+    transactional = models.BooleanField(default=False)
 
-    def render_subject_and_body(self, subscription):
+    def render_subject_and_body(self, subscription=None, person=None):
         context = {
-            "first_name": subscription.person.first_name,
-            "last_name": subscription.person.last_name,
-            "email": subscription.person.email,
-            "subscribed_at": subscription.subscribed_at,
-            "subscription_url": subscription.subscription_url,
-            "subscribed_from_ip": subscription.subscribed_from_ip,
-            "has_set_never_unsubscribe": subscription.has_set_never_unsubscribe,
-            "opt_in_link": subscription.opt_in_link,
+            "transactional": self.transactional,
         }
+        if person:
+            context.update({
+                "first_name": person.first_name,
+                "last_name": person.last_name,
+                "email": person.email,
+            })
+        if subscription:
+            context.update({
+                "subscribed_at": subscription.subscribed_at,
+                "subscription_url": subscription.subscription_url,
+                "subscribed_from_ip": subscription.subscribed_from_ip,
+                "has_set_never_unsubscribe": subscription.has_set_never_unsubscribe,
+                "opt_in_link": subscription.opt_in_link,
+            })
 
         c = Context(context)
         t = Template(self.subject)
@@ -172,6 +181,10 @@ class Newsletter(BaseModel):
             s.double_opted_in_at = double_opted_in_at
             s.save()
 
+    @property
+    def subscriptions(self):
+        return self.subscription_set.filter(unsubscribed=False).select_related('person').all()
+
 
 class Subscription(BaseModel):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -235,16 +248,16 @@ class ScheduledNewsletterMessage(BaseModel):
     # num_queued = models.IntegerField(default=0) ?
     num_sent = models.IntegerField(default=0)
 
+    @property
     def recipients(self):
-        return self.newsletter.subscribers
+        return self.newsletter.subscriptions
 
 
 class OutgoingMessage(BaseModel):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
-    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
+    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE, blank=True, null=True)
     scheduled_newsletter_message = models.ForeignKey(ScheduledNewsletterMessage, on_delete=models.CASCADE, blank=True, null=True)
-    transactional = models.BooleanField(default=False)
 
     send_at = models.DateTimeField()
     unsubscribe_hash = models.CharField(max_length=254, blank=True, null=True)
@@ -252,6 +265,7 @@ class OutgoingMessage(BaseModel):
     attempt_started = models.BooleanField(default=False)
     retry_if_not_complete_by = models.DateTimeField()
     attempt_complete = models.BooleanField(default=False)
+    attempt_count = models.IntegerField(default=0)
     send_success = models.NullBooleanField(default=None)
 
     hard_bounced = models.BooleanField(default=False)
@@ -265,6 +279,9 @@ class OutgoingMessage(BaseModel):
 
         if not self.retry_if_not_complete_by and self.send_at:
             self.retry_if_not_complete_by = self.send_at + RETRY_IN_TIME
+
+        if self.subscription and not self.person:
+            self.person = self.subscription.person
 
         super(OutgoingMessage, self).save(*args, **kwargs)
         if generate_hash:
@@ -280,29 +297,107 @@ class OutgoingMessage(BaseModel):
         )
 
     def send(self):
-        s = Subscription.objects.select_related('person').get(pk=subscription_pk)
+        # print("om.send")
+        # print("not self.attempt_started: %s" % (not self.attempt_started))
+        # print("self.message.transactional is True: %s" % (self.message.transactional is True))
+        # print("self.subscription: %s" % (self.subscription))
+        # print("self.subscription.person is self.person.pk: %s" % (self.subscription.person.pk == self.person.pk))
+        # print("self.subscription.double_opted_in: %s" % (self.subscription.double_opted_in))
+        # print("not self.subscription.unsubscribed: %s" % (not self.subscription.unsubscribed))
+        # print("not self.person.banned: %s" % (not self.person.banned))
+        # print("not self.person.hard_bounced: %s" % (not self.person.hard_bounced))
         if (
-            s.double_opted_in
-            and not s.unsubscribed
+            # Don't dogpile.
+            not self.attempt_started
+            # We're allowed to send this.
+            and (
+                # Transactional always sends
+                self.message.transactional is True
+                # Or, you're subscribed.
+                or (
+                    self.subscription
+                    and self.subscription.person.pk is self.person.pk
+                    and self.subscription.double_opted_in
+                    and not self.subscription.unsubscribed
+                )
+            )
+            # Never send to someone who's banned or hard bounced.
             and not self.person.banned
             and not self.person.hard_bounced
         ):
-        message = Message.objects.get(pk=message_id)
+            try:
+                # Save about to send metadata
+                self.attempt_started = True
+                self.attempt_complete = False
+                self.retry_if_not_complete_by = timezone.now() + RETRY_IN_TIME
+                self.save()
 
-        subject, body = message.render_subject_and_body(subscription=s)
+                subject, body = self.message.render_subject_and_body(subscription=self.subscription)
+                tombstone, _ = OutgoingMessageAttemptTombstone.objects.get_or_create(
+                    send_time=timezone.now(),
+                    outgoing_message_pk=self.pk,
+                    encrypted_email=self.person.encrypted_email,
+                )
+
+                # Send the message.
+                from_email = settings.DEFAULT_FROM_EMAIL
+                if (
+                    self.subscription
+                    and self.subscription.newsletter
+                    and self.subscription.newsletter.full_from_email
+                ):
+                    from_email = self.subscription.newsletter.full_from_email
+
+                django_send_mail(subject, body, from_email, [self.person.email, ], fail_silently=False)
+                self.attempt_complete = True
+                self.attempt_count = self.attempt_count + 1
+                self.send_success = True
+                self.hard_bounced = False
+                self.save()
+                # print("success")
+
+            except Exception as e:
+                print(e)
+                self.attempt_complete = True
+                self.attempt_count = self.attempt_count + 1
+                self.send_success = False
+                self.save()
+
+                self.hard_bounced = False
+                self.send_success = False
+
+                tombstone.send_success = False
+                tombstone.send_error = str(e)
+                tombstone.reason = str(e)
+                tombstone.attempt_made = True
+                tombstone.retry_number = self.attempt_count
+
+            self.save()
+
+            if not tombstone:
+                tombstone, _ = OutgoingMessageAttemptTombstone.objects.get_or_create(
+                    send_time=timezone.now(),
+                    outgoing_message_pk=self.pk,
+                    encrypted_email=self.person.encrypted_email,
+                )
+
+            # Log attempt
+            tombstone.encrypted_message_subject = encrypt(subject)
+            tombstone.encrypted_message_body = encrypt(body)
+            tombstone.save()
 
 
 class OutgoingMessageAttemptTombstone(BaseModel):
     send_time = models.DateTimeField()
-    outgoing_message = models.ForeignKey(OutgoingMessage, on_delete=models.SET_NULL, blank=True, null=True)
+    outgoing_message_pk = models.IntegerField()
     encrypted_email = models.TextField(blank=True, null=True)
     encrypted_message_subject = models.TextField(blank=True, null=True)
     encrypted_message_body = models.TextField(blank=True, null=True)
     send_success = models.NullBooleanField()
     send_error = models.TextField(blank=True, null=True)
-    attempt_made = models.NullBooleanField()
-    num_retries = models.IntegerField(default=0)
     reason = models.CharField(max_length=254, blank=True, null=True)   # Hard_bounce, banned, etc.
+    attempt_made = models.NullBooleanField()
+    retry_number = models.IntegerField(default=0)
 
 
 # class Sequence(BaseModel):

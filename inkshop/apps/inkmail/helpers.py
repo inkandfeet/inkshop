@@ -9,69 +9,62 @@ from celery.task import task, periodic_task
 from django.utils import timezone
 
 
+def send_message(*args, **kwargs):
+    """Very light wrapper around queue_message in case we want to expose an immediate=True flag in the future."""
+    queue_message(*args, **kwargs)
+
+
+def send_newsletter_message(*args, **kwargs):
+    """Very light wrapper around queue_newsletter_message in case we want to expose an immediate=True flag in the future."""
+    queue_newsletter_message(*args, **kwargs)
+
+
+def send_transactional_message(message=None, person=None):
+    """ery light wrapper around queue_message in case we want to expose an immediate=True flag in the future."""
+    queue_transactional_message(message, person)
+
 
 def queue_message(message, subscription, at=None, scheduled_newsletter_message=None):
     """Sends a message to a particular subscriber"""
-    from inkmail.models import Subscription, Message, OutgoingMessage  # Avoid circular imports
+    from inkmail.models import OutgoingMessage  # Avoid circular imports
+    if not at:
+        at = timezone.now()
+
+    OutgoingMessage.objects.create(
+        subscription=subscription,
+        person=subscription.person,
+        message=message,
+        send_at=at,
+    )
+
+
+def queue_newsletter_message(scheduled_newsletter_message, at=None):
+    """Sends a message to a particular subscriber"""
+    from inkmail.models import OutgoingMessage  # Avoid circular imports
 
     if not at:
         at = timezone.now()
 
-    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
-    message = Message.objects.get(pk=message_id)
-
-    OutgoingMessage.objects.create(
-        person=s.person,
-        message=message,
-        scheduled_newsletter_message=scheduled_newsletter_message,
-        send_at=at,
-        transactional=False,
-    )
+    for subscription in scheduled_newsletter_message.recipients:
+        OutgoingMessage.objects.create(
+            scheduled_newsletter_message=scheduled_newsletter_message,
+            person=subscription.person,
+            subscription=subscription,
+            message=scheduled_newsletter_message.message,
+            send_at=at,
+        )
 
 
-def queue_transactional_message(message, subscription, at=None, scheduled_newsletter_message=None):
+def queue_transactional_message(message, person, at=None, scheduled_newsletter_message=None):
     """Sends a message to a particular subscriber"""
-    from inkmail.models import Subscription, Message, OutgoingMessage  # Avoid circular imports
+    from inkmail.models import OutgoingMessage  # Avoid circular imports
 
     if not at:
         at = timezone.now()
 
-    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
-    message = Message.objects.get(pk=message_id)
-
     OutgoingMessage.objects.create(
-        person=s.person,
-        subscription=s,
+        person=person,
         message=message,
         scheduled_newsletter_message=scheduled_newsletter_message,
         send_at=at,
-        transactional=True,
     )
-
-    # send_mail.delay(subscription_pk, subject, body)
-
-
-@task
-def send_opt_in_message(message_id, subscription_pk):
-    """Sends a message to a particular subscriber"""
-    from inkmail.models import Subscription, Message  # Avoid circular imports
-
-    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
-    message = Message.objects.get(pk=message_id)
-
-    subject, body = message.render_subject_and_body(subscription=s)
-
-    send_transactional_email(subscription_pk, subject, body)
-
-
-@task
-def send_transactional_message(message_id, subscription_pk):
-    """Sends a message to a particular person, even if they're not a subscriber"""
-    from inkmail.models import Subscription, Message  # Avoid circular imports
-
-    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
-    message = Message.objects.get(pk=message_id)
-
-    subject, body = message.render_subject_and_body(subscription=s)
-
-    send_transactional_email(subscription_pk, subject, body)

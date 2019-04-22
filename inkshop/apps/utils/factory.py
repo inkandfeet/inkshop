@@ -13,7 +13,7 @@ getcontext().prec = 7
 fake = Faker()
 
 from people.models import Person
-from inkmail.models import Newsletter, Subscription, Message
+from inkmail.models import Newsletter, Subscription, Message, ScheduledNewsletterMessage
 
 
 class DjangoFunctionalFactory:
@@ -512,7 +512,7 @@ class Factory(DjangoFunctionalFactory):
         options = {
             "person": cls.person(),
             "newsletter": cls.newsletter(),
-            "double_opted_in": True,
+            "double_opted_in": False,
         }
         options.update(kwargs)
 
@@ -526,9 +526,40 @@ class Factory(DjangoFunctionalFactory):
             "subject": cls.rand_text(),
             "body_text_unrendered": cls.rand_text(),
             "body_html_unrendered": cls.rand_text(),
+            "transactional": False,
         }
         options.update(kwargs)
 
         m = Message.objects.create(**options)
 
+        if newsletter:
+            ScheduledNewsletterMessage.objects.create(
+                message=m,
+                newsletter=newsletter,
+                enabled=True,
+                send_at_date=cls.rand_date(),
+                send_at_hour=cls.rand_int(end=23),
+                send_at_minute=cls.rand_int(end=59),
+                use_local_time=cls.rand_bool(),
+            )
+
         return m
+
+    @classmethod
+    def scheduled_newsletter_message(cls, *args, **kwargs):
+        if "newsletter" not in kwargs:
+            kwargs["newsletter"] = cls.newsletter()
+
+        options = {
+            "message": cls.message(),
+            "enabled": True,
+            "send_at_date": cls.rand_date(),
+            "send_at_hour": cls.rand_int(end=23),
+            "send_at_minute": cls.rand_int(end=59),
+            "use_local_time": cls.rand_bool(),
+        }
+        options.update(kwargs)
+
+        snm = ScheduledNewsletterMessage.objects.create(**options)
+
+        return snm

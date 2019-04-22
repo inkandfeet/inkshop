@@ -14,7 +14,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.files.base import ContentFile
-from inkmail.helpers import send_mail
+from inkmail.helpers import send_message
 from django.template.loader import render_to_string
 from django.contrib.auth.signals import user_logged_in
 from django.urls import reverse

@@ -13,12 +13,6 @@
                           ExampleCo, Inc is based at 123 1st St, Anytown, 87654, Country
 
 
-    transactional_footer: |
-                          You're receiving this email because {{ reason }}.   Normally, there's an unsubscribe link down here, but to be able to {{ able_to_reason }}, there isn't a way to unsubscribe.
-                          
-                          However, if you want to completely delete your account, you can do that by [clicking here]({{ delete_account_link }}).
-                          
-                          It was sent by me, Jill Example, of ExampleCo, Inc at 123 1st St, Anytown, 87654, Country
 
 
     confirm_subject: "You're almost subscribed."
@@ -81,6 +75,12 @@
                           
                           p.s. Did you love this email?  [Click here]({{ loved_link }}) to let us know, keep your subscription active, and get this month's coupons. :)
 
+transactional_footer: |
+                      You're receiving this email because {{ reason }}.   Normally, there's an unsubscribe link down here, but to be able to {{ able_to_reason }}, there isn't a way to unsubscribe.
+                      
+                      However, if you want to completely delete your account, you can do that by [clicking here]({{ delete_account_link }}).
+                      
+                      It was sent by me, Jill Example, of ExampleCo, Inc at 123 1st St, Anytown, 87654, Country
 
 # These people can receive emails and buy things as normal,
 # but you won't ever see replies from them.
