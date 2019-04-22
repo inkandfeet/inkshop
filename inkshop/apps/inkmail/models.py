@@ -142,6 +142,7 @@ class Newsletter(BaseModel):
         p.first_name = first_name
         p.last_name = last_name
         p.email = email
+        assert p.hashed_email == hashed_email
         p.email_verified = double_opted_in
         p.time_zone = time_zone
         p.was_imported = True
