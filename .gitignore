@@ -34,6 +34,7 @@ source
 .Trashes
 ehthumbs.db
 Thumbs.db
+.unison.*
 
 # Inkshop
 celerybeat-schedule*
@@ -51,3 +52,5 @@ inkshop/npm-debug.log
 
 postgres-data/*
 initial_data.yml
+import/*
+inkshop/import/*
