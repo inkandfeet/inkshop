@@ -30,10 +30,9 @@ class Command(BaseCommand):
         parser.add_argument('--subscribers', type=str)
         parser.add_argument('--newsletter', type=str)
 
-
     def handle(self, *args, **options):
         print(options)
-        newsletter = Newsletter.objects.get(internal_name=options["newsletter"])
+        Newsletter.objects.get(internal_name=options["newsletter"])
         if "hard_bounce" in options and options["hard_bounce"]:
             with open(options["hard_bounce"], encoding='utf-8') as hard_f:
                 reader = csv.reader(hard_f)
@@ -78,7 +77,7 @@ class Command(BaseCommand):
                             double_opted_in_at=subscribed_at,
                             first_name=first_name,
                             last_name=last_name,
-                            subscription_ip=subscription_ip,
+                            subscription_ip=subscribe_ip,
                             time_zone=time_zone,
                             newsletter_name=options["newsletter"],
                             overwrite=False,
