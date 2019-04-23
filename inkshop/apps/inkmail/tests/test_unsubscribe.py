@@ -156,13 +156,17 @@ class TestUnsubscribeResubscribe(MailTestCase):
         m = mail.outbox[0]
         self.assertEquals(OutgoingMessage.objects.count(), 1)
         om = OutgoingMessage.objects.all()[0]
+
+        # Unsubscribe
         self.assertIn(om.unsubscribe_link, m.body)
         self.get(om.unsubscribe_link)
-        # Fetch latest
+
+        # Fetch updated subscription
         self.subscription = Subscription.objects.get(pk=self.subscription.pk)
         self.assertEquals(self.subscription.unsubscribed, True)
         self.assertBasicallyEqualTimes(self.subscription.unsubscribed_at, self.now())
 
+        # Re-subscribe
         response = self.post(
             reverse(
                 'inkmail:subscribe',
@@ -175,9 +179,13 @@ class TestUnsubscribeResubscribe(MailTestCase):
             },
         )
         self.assertEquals(response.status_code, 200)
+        self.subscription = Subscription.objects.get(pk=self.subscription.pk)
+        self.assertEquals(self.subscription.unsubscribed, False)
+        self.assertEquals(self.subscription.unsubscribed_at, None)
 
         # Double-opt-in message
         self.assertEquals(len(mail.outbox), 2)
+        # TODO: Re-double-opt in.
 
         self.send_newsletter_message()
         self.assertEquals(len(mail.outbox), 3)
