@@ -158,6 +158,6 @@ class TestSendToNewsletter(MailTestCase):
         process_outgoing_message_queue()
         self.assertEquals(len(mail.outbox), num_subscribers)
 
-    @unittest.skip
+    @unittest.skip("For time zones")
     def test_time_zones_sends_in_separate_batches(self):
         self.assertEquals(False, "Test written")

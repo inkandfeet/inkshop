@@ -400,7 +400,6 @@ class TestNewsletterImport(MockRequestsTestCase):
         self.assertEquals(s.unsubscribed, False)
         self.assertEquals(s.unsubscribed_at, None)
 
-    @unittest.skip
     def test_import_gets_confirmation_if_people_are_not_double_opted_in(self):
         # TODO: Decide how to handle mport flow for people who don't have double-opt-in records.
         self.assertEquals(False, "Test written")

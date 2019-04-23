@@ -15,7 +15,6 @@ import mock
 import unittest
 
 
-@unittest.skip("For Friday")
 class TestDoubleOptIn(MockRequestsTestCase):
 
     def setUp(self, *args, **kwargs):
