@@ -83,7 +83,7 @@ workflows:
 
   deploy:
     jobs:
-      - build-job
+      - build-job:
           context: inkshop
       - deploy-job:
           context: inkshop
