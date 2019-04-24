@@ -1,5 +1,7 @@
 import logging
 import json
+import mock
+import unittest
 
 from django.urls import reverse
 from django.core import mail
@@ -13,8 +15,6 @@ from inkmail.models import Subscription, Newsletter
 from utils.factory import Factory
 from utils.test_helpers import MailTestCase
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, encrypt, decrypt
-import mock
-import unittest
 from utils.encryption import lookup_hash
 
 
@@ -400,8 +400,9 @@ class TestNewsletterImport(MailTestCase):
         self.assertEquals(s.unsubscribed, False)
         self.assertEquals(s.unsubscribed_at, None)
 
+    @unittest.skip("TODO: Decide how to handle import flow for people who don't have double-opt-in records.")
     def test_import_gets_confirmation_if_people_are_not_double_opted_in(self):
-        # TODO: Decide how to handle mport flow for people who don't have double-opt-in records.
+        # TODO: Decide how to handle import flow for people who don't have double-opt-in records.
         self.assertEquals(False, "Test written")
 
     def test_import_ignores_banned_people(self):

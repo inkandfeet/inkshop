@@ -26,7 +26,7 @@ class TestHistoricalEvents(MailTestCase):
 
 
 @override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
-class TestBasicEncryptionHarness(MailTestCase):
+class TestHistoricalBasicEncryptionHarness(MailTestCase):
 
     def test_basic_encryption(self):
         e = Factory.rand_str()
@@ -55,7 +55,7 @@ class TestBasicEncryptionHarness(MailTestCase):
 
 
 @override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
-class TestEncryptionHarnessForOddTypes(MailTestCase):
+class TestHistoricalEncryptionHarnessForOddTypes(MailTestCase):
 
     def test_extended_types_encryption(self):
         e = Factory.rand_phone()
@@ -84,7 +84,7 @@ class TestEncryptionHarnessForOddTypes(MailTestCase):
 
 
 @override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
-class TestEncryptionHarnessForObjects(MailTestCase):
+class TestHistoricalEncryptionHarnessForObjects(MailTestCase):
 
     def test_extended_types_encryption(self):
         e = {

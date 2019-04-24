@@ -45,7 +45,7 @@ def rand_str(length=20):
 
 
 def encrypt(s):
-    if not s:
+    if s is None:
         return None
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
@@ -53,7 +53,7 @@ def encrypt(s):
 
 
 def decrypt(s):
-    if not s:
+    if s is None:
         return None
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
@@ -61,7 +61,7 @@ def decrypt(s):
 
 
 def encrypt_bytes(s):
-    if not s:
+    if s is None:
         return None
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
@@ -69,7 +69,7 @@ def encrypt_bytes(s):
 
 
 def decrypt_bytes(s):
-    if not s:
+    if s is None:
         return None
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
