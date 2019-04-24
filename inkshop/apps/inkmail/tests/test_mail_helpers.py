@@ -89,7 +89,7 @@ class TestSendNewsletterMessageMail(MailTestCase):
         self.send_newsletter_message()
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, self.subject)
-        om = OutgoingMessage.objects.get(person=self.person, message=self.test_message,)
+        om = OutgoingMessage.objects.get(person=self.person, message=self.scheduled_newsletter_message.message,)
         self.assertIn(om.render_email_string(self.scheduled_newsletter_message.message.body_text_unrendered), mail.outbox[0].body)
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.person.email)
