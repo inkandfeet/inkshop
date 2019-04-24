@@ -94,10 +94,10 @@ class MailTestCase(MockRequestsTestCase):
             use_local_time=False,
         )
         self.subject = self.scheduled_newsletter_message.message.subject
-        self.body_unrendered = self.scheduled_newsletter_message.body_text_unrendered
+        self.body_unrendered = self.scheduled_newsletter_message.message.body_text_unrendered
         queue_newsletter_message(scheduled_newsletter_message=self.scheduled_newsletter_message)
-        om = OutgoingMessage.objects.get(person=self.person, message=self.scheduled_newsletter_message,)
-        self.body = om.render_email_string(self.scheduled_newsletter_message.body_text_unrendered)
+        om = OutgoingMessage.objects.get(person=self.person, message=self.scheduled_newsletter_message.message,)
+        self.body = om.render_email_string(self.scheduled_newsletter_message.message.body_text_unrendered)
         process_outgoing_message_queue()
 
     def send_test_transactional_message(self):
