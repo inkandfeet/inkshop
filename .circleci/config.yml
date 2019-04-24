@@ -5,7 +5,6 @@
 version: 2
 jobs:
   build-job:
-    context: inkshop
     docker:
       # specify the version you desire here
         - image: circleci/python:3.6.8-node
@@ -80,11 +79,14 @@ jobs:
 
 workflows:
   version: 2
+  context: inkshop
 
   deploy:
     jobs:
       - build-job
+          context: inkshop
       - deploy-job:
+          context: inkshop
           requires:
             - build-job
           filters:
