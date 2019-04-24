@@ -27,8 +27,8 @@ class TestSendMessageMail(MailTestCase):
         self.send_test_message()
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, self.test_message.subject)
-        om = OutgoingMessage.objects.get(person=self.person, message=self.transactional_message,)
-        self.assertIn(om.render_email_string(self.transactional_message.body_text_unrendered), mail.outbox[0].body)
+        om = OutgoingMessage.objects.get(person=self.person, message=self.test_message,)
+        self.assertIn(om.render_email_string(self.test_message.body_text_unrendered), mail.outbox[0].body)
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.person.email)
         self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
@@ -40,7 +40,9 @@ class TestSendMessageMail(MailTestCase):
         self.assertEquals(len(mail.outbox), 0)
 
     def test_send_messsage_does_not_send_to_not_double_opted_in(self):
-        self.assertEquals(len(mail.outbox), 0)
+        self.subscription.double_opted_in = False
+        self.subscription.double_opted_in_at = None
+        self.person()
         self.send_test_message()
         self.assertEquals(len(mail.outbox), 0)
 
@@ -50,8 +52,8 @@ class TestSendMessageMail(MailTestCase):
         self.send_test_message()
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, self.test_message.subject)
-        om = OutgoingMessage.objects.get(person=self.person, message=self.transactional_message,)
-        self.assertIn(om.render_email_string(self.transactional_message.body_text_unrendered), mail.outbox[0].body)
+        om = OutgoingMessage.objects.get(person=self.person, message=self.test_message,)
+        self.assertIn(om.render_email_string(self.test_message.body_text_unrendered), mail.outbox[0].body)
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.person.email)
         self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
@@ -99,8 +101,10 @@ class TestSendNewsletterMessageMail(MailTestCase):
         self.assertEquals(len(mail.outbox), 0)
 
     def test_send_messsage_does_not_send_to_not_double_opted_in(self):
+        self.subscription.double_opted_in = False
+        self.subscription.double_opted_in_at = None
+        self.person()
         self.send_newsletter_message()
-        print(self.subscription.__dict__)
         self.assertEquals(len(mail.outbox), 0)
 
     def test_send_messsage_still_sends_to_trolls(self):
