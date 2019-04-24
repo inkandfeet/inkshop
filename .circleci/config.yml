@@ -79,7 +79,6 @@ jobs:
 
 workflows:
   version: 2
-  context: inkshop
 
   deploy:
     jobs:
