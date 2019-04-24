@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'django_celery_results',
 
     'archives',
+    'clubhouse',
     'inkdots',
     'inkmail',
     'people',
