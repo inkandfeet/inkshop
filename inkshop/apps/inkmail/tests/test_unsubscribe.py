@@ -142,10 +142,6 @@ class TestUnsubscribeBasics(MailTestCase):
 
 class TestUnsubscribeResubscribe(MailTestCase):
 
-    def setUp(self, *args, **kwargs):
-        self.newsletter = Factory.newsletter()
-        super(TestUnsubscribeResubscribe, self).setUp(*args, **kwargs)
-
     def test_unsubscribe_resubscribe_allows_messages_sent(self):
         self.assertEquals(len(mail.outbox), 0)
         self.create_subscribed_person()
@@ -165,6 +161,8 @@ class TestUnsubscribeResubscribe(MailTestCase):
         # Fetch updated subscription
         self.subscription = Subscription.objects.get(pk=self.subscription.pk)
         self.assertEquals(self.subscription.unsubscribed, True)
+        self.assertEquals(self.subscription.double_opted_in, False)
+        self.assertEquals(self.subscription.double_opted_in_at, None)
         self.assertBasicallyEqualTimes(self.subscription.unsubscribed_at, self.now())
 
         # Re-subscribe
@@ -185,10 +183,11 @@ class TestUnsubscribeResubscribe(MailTestCase):
         self.assertEquals(self.subscription.unsubscribed_at, None)
 
         process_outgoing_message_queue()
-        self.assertEquals(len(mail.outbox), 3)
+        print([mm.__dict__ for mm in mail.outbox])
+        self.assertEquals(len(mail.outbox), 2)
         self.assertEquals(Subscription.objects.count(), 1)
         s = Subscription.objects.all()[0]
-        self.assertIn(s.opt_in_link, mail.outbox[3].body)
+        self.assertIn(s.opt_in_link, mail.outbox[1].body)
 
         # Re-double-opt-in
         self.get(s.opt_in_link)
@@ -236,6 +235,7 @@ class TestUnsubscribeResubscribe(MailTestCase):
             },
         )
         self.assertEquals(response.status_code, 200)
+        self.assertEquals(Subscription.objects.count(), 1)
         self.subscription = Subscription.objects.get(pk=self.subscription.pk)
         self.assertEquals(self.subscription.unsubscribed, False)
         self.assertEquals(self.subscription.unsubscribed_at, None)

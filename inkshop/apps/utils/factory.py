@@ -503,8 +503,14 @@ class Factory(DjangoFunctionalFactory):
             "description": cls.rand_text(),
             "from_name": "%s %s" % (cls.rand_name(), cls.rand_name()),
             "from_email": cls.rand_email(),
-            "confirm_message": cls.message(),
-            "welcome_message": cls.message(),
+            "confirm_message": cls.message(
+                subject="Please confirm your subscription!\n %s" % cls.rand_text(),
+                body_text_unrendered="Please confirm your subscription!\n %s" % cls.rand_paragraph(),
+            ),
+            "welcome_message": cls.message(
+                subject="Welcome aboard!\n %s" % cls.rand_text(),
+                body_text_unrendered="Welcome aboard!\n %s" % cls.rand_paragraph(),
+            ),
             "unsubscribe_footer": "%s [Click here to unsubscribe]({{ unsubscribe_link }}). \n ExampleCo, Inc is based at {{ organization_address }}" % cls.rand_text(),  # noqa
         }
         options.update(kwargs)

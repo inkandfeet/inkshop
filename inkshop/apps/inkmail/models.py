@@ -64,7 +64,7 @@ class Message(BaseModel):
 
 class Newsletter(BaseModel):
     name = models.CharField(max_length=254, blank=True, null=True)
-    internal_name = models.CharField(max_length=254, blank=True, null=True)
+    internal_name = models.CharField(unique=True, max_length=254, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     from_email = models.TextField(max_length=254)
     from_name = models.TextField(max_length=254)
@@ -181,6 +181,8 @@ class Subscription(BaseModel):
         if not self.unsubscribed:
             self.unsubscribed = True
             self.unsubscribed_at = timezone.now()
+            self.double_opted_in = False
+            self.double_opted_in_at = None
             self.save()
 
     def double_opt_in(self):

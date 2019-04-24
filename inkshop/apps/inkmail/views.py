@@ -17,7 +17,7 @@ from ipware import get_client_ip
 from inkmail.models import Newsletter, Subscription, OutgoingMessage
 from inkmail.tasks import send_subscription_confirmation
 from people.models import Person
-from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt
+from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, lookup_hash
 
 
 @render_to("inkmail/home.html")
@@ -36,25 +36,30 @@ def subscribe(request):
         if request.method == "POST":
             data = json.loads(request.body)
             if "email" in data and "newsletter" in data and "subscription_url" in data:
-                encrypted_email = normalize_lower_and_encrypt(data['email'])
+                hashed_email = lookup_hash(data['email'])
                 if Newsletter.objects.filter(internal_name=data["newsletter"]).count():
                     n = Newsletter.objects.get(internal_name=data["newsletter"])
-                    encrypted_first_name = None
-                    if "first_name" in data:
-                        encrypted_first_name = normalize_and_encrypt(data["first_name"])
-                    if Person.objects.filter(encrypted_email=encrypted_email):
-                        p = Person.objects.get(encrypted_email=encrypted_email)
+                    if Person.objects.filter(hashed_email=hashed_email).count() > 0:
+                        p = Person.objects.get(hashed_email=hashed_email)
+                        if "first_name" in data:
+                            p.first_name = data["first_name"]
                     else:
                         p = Person.objects.create(
-                            encrypted_email=encrypted_email,
-                            encrypted_first_name=encrypted_first_name,
+                            hashed_email=hashed_email,
                         )
+                        p.email = data["email"]
+                        if "first_name" in data:
+                            p.first_name = data["first_name"]
+                    p.save()
 
                     s, created = Subscription.objects.get_or_create(
                         person=p,
                         newsletter=n,
                     )
-                    if created:
+                    if created or s.unsubscribed:
+                        s.subscribed_at = timezone.now()
+                        s.unsubscribed = False
+                        s.unsubscribed_at = None
                         s.subscription_url = data["subscription_url"]
                         s.subscribed_from_ip, _ = get_client_ip(request)
                         s.save()
@@ -63,26 +68,31 @@ def subscribe(request):
     else:
         if request.method == "POST":
             if "email" in request.POST and "newsletter" in request.POST and "subscription_url" in request.POST:
-                encrypted_email = normalize_lower_and_encrypt(request.POST['email'])
+                hashed_email = lookup_hash(request.POST['email'])
                 if Newsletter.objects.filter(internal_name=request.POST["newsletter"]).count():
                     n = Newsletter.objects.get(internal_name=request.POST["newsletter"])
-                    encrypted_first_name = None
-                    if "first_name" in request.POST:
-                        encrypted_first_name = normalize_and_encrypt(request.POST["first_name"])
-                    if Person.objects.filter(encrypted_email=encrypted_email):
-                        p = Person.objects.get(encrypted_email=encrypted_email)
+
+                    if Person.objects.filter(hashed_email=hashed_email).count() > 0:
+                        p = Person.objects.get(hashed_email=hashed_email)
+                        if "first_name" in request.POST:
+                            p.first_name = request.POST["first_name"]
                     else:
                         p = Person.objects.create(
-                            encrypted_email=encrypted_email,
-                            encrypted_first_name=encrypted_first_name,
+                            hashed_email=hashed_email,
                         )
-
+                        p.email = request.POST["email"]
+                        if "first_name" in request.POST:
+                            p.first_name = request.POST["first_name"]
+                    p.save()
                     s, created = Subscription.objects.get_or_create(
                         person=p,
                         newsletter=n,
-                        subscription_url=request.POST["subscription_url"],
                     )
-                    if created:
+                    if created or s.unsubscribed:
+                        s.subscribed_at = timezone.now()
+                        s.unsubscribed = False
+                        s.unsubscribed_at = None
+
                         s.subscription_url = request.POST["subscription_url"]
                         s.subscribed_from_ip, _ = get_client_ip(request)
                         s.save()
