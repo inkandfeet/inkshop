@@ -6,6 +6,7 @@ from django.utils import timezone
 from utils.factory import Factory
 from inkmail.tasks import process_outgoing_message_queue
 from inkmail.helpers import queue_message, queue_newsletter_message, queue_transactional_message
+from inkmail.models import OutgoingMessage
 
 
 class MockRequests(object):
@@ -78,8 +79,10 @@ class MailTestCase(MockRequestsTestCase):
     def send_test_message(self):
         self.test_message = Factory.message()
         self.subject = self.test_message.subject
-        self.body = self.test_message.body_text_unrendered
+        self.body_unrendered = self.test_message.body_text_unrendered
         queue_message(message=self.test_message, subscription=self.subscription)
+        om = OutgoingMessage.objects.get(person=self.person, message=self.test_message,)
+        self.body = om.render_email_string(self.test_message.body_text_unrendered)
         process_outgoing_message_queue()
 
     def send_newsletter_message(self):
@@ -91,13 +94,18 @@ class MailTestCase(MockRequestsTestCase):
             use_local_time=False,
         )
         self.subject = self.scheduled_newsletter_message.message.subject
-        self.body = self.scheduled_newsletter_message.message.body_text_unrendered
+        self.body_unrendered = self.test_message.body_text_unrendered
         queue_newsletter_message(scheduled_newsletter_message=self.scheduled_newsletter_message)
+        om = OutgoingMessage.objects.get(person=self.person, message=self.scheduled_newsletter_message,)
+        self.body = om.render_email_string(self.scheduled_newsletter_message.body_text_unrendered)
         process_outgoing_message_queue()
 
     def send_test_transactional_message(self):
         self.transactional_message = Factory.message(person=self.person, transactional=True)
         self.subject = self.transactional_message.subject
         self.body = self.transactional_message.body_text_unrendered
+        self.body_unrendered = self.transactional_message.body_text_unrendered
         queue_transactional_message(message=self.transactional_message, person=self.person)
+        om = OutgoingMessage.objects.get(person=self.person, message=self.transactional_message,)
+        self.body = om.render_email_string(self.transactional_message.body_text_unrendered)
         process_outgoing_message_queue()
