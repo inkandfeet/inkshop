@@ -7,6 +7,7 @@ from django.conf import settings
 from django.test.utils import override_settings
 
 from people.models import Person
+from archives.models import HistoricalEvent
 from inkmail.models import Subscription, OutgoingMessage
 from inkmail.tasks import process_outgoing_message_queue
 from utils.factory import Factory
@@ -373,3 +374,44 @@ class TestWelcomeEmail(MockRequestsTestCase):
         self.assertEquals(len(mail.outbox[1].to), 1)
         self.assertEquals(mail.outbox[1].to[0], email)
         self.assertEquals(mail.outbox[1].from_email, self.newsletter.full_from_email)
+
+
+@override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
+class TestHistoricalEvent(MockRequestsTestCase):
+
+    def setUp(self, *args, **kwargs):
+        self.newsletter = Factory.newsletter()
+        super(TestHistoricalEvent, self).setUp(*args, **kwargs)
+
+    def test_post_subscribe_200(self):
+        email = Factory.rand_email()
+        name = Factory.rand_name()
+        subscription_url = Factory.rand_url()
+        response = self.post(
+            reverse(
+                'inkmail:subscribe',
+            ),
+            {
+                'first_name': name,
+                'email': email,
+                'newsletter': self.newsletter.internal_name,
+                'subscription_url': subscription_url,
+            },
+        )
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(HistoricalEvent.objects.count(), 1)
+        self.assertEquals(Person.objects.count(), 1)
+        self.assertEquals(Subscription.objects.count(), 1)
+        he = HistoricalEvent.objects.all()[0]
+        p = Person.objects.all()[0]
+        s = Subscription.objects.all()[0]
+        self.assertEquals(he.event_type, "subscribed")
+        self.assertEquals(he.event_creator_type, "person")
+        self.assertEquals(he.event_creator_pk, p.pk)
+        self.assertHistoricalEventDataEquality(
+            he,
+            person=p,
+            event_type="subscribed",
+            newsletter=self.newsletter,
+            subscription=s,
+        )

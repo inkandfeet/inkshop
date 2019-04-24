@@ -58,7 +58,3 @@ class PageView(BaseModel):
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
     page = models.ForeignKey('website.Page', blank=True, null=True, on_delete=models.SET_NULL)
     url = models.TextField(blank=True, null=True)
-
-    @cached_property
-    def opt_out_link(self):
-        return "%s%s" % (settings.API_ENDPOINT, reverse("people:opt_out", args=(self.opt_out_key,)))

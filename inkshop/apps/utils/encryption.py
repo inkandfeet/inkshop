@@ -65,7 +65,7 @@ def encrypt_bytes(s):
         return None
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
-    return f.encrypt(s)
+    return f.encrypt(s).decode('utf-8')
 
 
 def decrypt_bytes(s):
@@ -73,7 +73,7 @@ def decrypt_bytes(s):
         return None
     if settings.DISABLE_ENCRYPTION_FOR_TESTS:
         return s
-    return f.decrypt(s)
+    return f.decrypt(s.encode())
 
 
 def normalize_lower_and_encrypt(s):

@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from annoying.decorators import render_to, ajax_request
 from ipware import get_client_ip
 
+from archives.models import HistoricalEvent
 from inkmail.models import Newsletter, Subscription, OutgoingMessage
 from inkmail.tasks import send_subscription_confirmation, send_subscription_welcome
 from people.models import Person
@@ -104,6 +105,7 @@ def subscribe(request):
             return HttpResponse(status=422)
     else:
         send_subscription_confirmation.delay(s.pk)
+        HistoricalEvent.log(person=p, event_type="subscribed", newsletter=n, subscription=s)
 
     if request.is_ajax():
         return HttpResponse(json.dumps(ajax_response), content_type="application/json", status=200)
@@ -129,6 +131,14 @@ def confirm_subscription(request, opt_in_key):
     if not already_double_opted_in:
         send_subscription_welcome.delay(s.pk)
 
+    s = Subscription.objects.get(pk=s.pk)
+    HistoricalEvent.log(
+        person=p,
+        event_type="double-opt-in",
+        subscription=s,
+        newsletter=s.newsletter,
+    )
+
     return locals()
 
 
@@ -137,6 +147,12 @@ def unsubscribe(request, unsubscribe_key):
     om = OutgoingMessage.objects.get(unsubscribe_hash=unsubscribe_key)
     if om.subscription:
         om.subscription.unsubscribe()
+        HistoricalEvent.log(
+            person=om.person,
+            event_type="unsubscribe",
+            subscription=om.subscription,
+            outgoingmessage=om,
+        )
 
     return locals()
 
@@ -146,6 +162,12 @@ def delete_account(request, delete_key):
     om = OutgoingMessage.objects.get(delete_hash=delete_key)
     # if om.subscription:
     #     om.subscription.unsubscribe()
+    HistoricalEvent.log(
+        person=om.person,
+        event_type="delete_account",
+        subscription=om.subscription,
+        outgoingmessage=om,
+    )
 
     return locals()
 
@@ -156,15 +178,13 @@ def love_message(request, love_hash):
     om.loved = True
     om.loved_at = timezone.now()
     om.save()
+    HistoricalEvent.log(
+        person=om.person,
+        event_type="loved_message",
+        subscription=om.subscription,
+        outgoingmessage=om,
+    )
     # if om.subscription:
     #     om.subscription.unsubscribe()
 
-    return locals()
-
-
-@render_to("inkmail/opt_out.html")
-def opt_out(request, reader_opt_out_key):
-    p = Person.objects.get(opt_out_key=reader_opt_out_key)
-    p.opted_out_of_email = True
-    p.save()
     return locals()

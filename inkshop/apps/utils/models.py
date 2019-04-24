@@ -14,16 +14,27 @@ class BaseModel(models.Model):
     def get_field_names(cls):
         # Uses new recommended method:
         # https://docs.djangoproject.com/en/2.2/ref/models/meta/#migrating-from-the-old-api
-        return [
-            f.name
-            for f in cls._meta.get_fields()
-            if not f.is_relation
-            or f.one_to_one
-            or (f.many_to_one and f.related_model)
-        ]
+        fields = []
+        for f in cls._meta.get_fields():
+            if (
+                not hasattr(f, "storage")
+                and (
+                    not f.is_relation
+                    or f.one_to_one
+                    or (f.many_to_one and f.related_model)
+                )
+            ):
+                fields.append(f.name)
+        return fields
 
-    def get_data_dict(self):
+    def get_data_dict(self, instance=None):
         data = {}
-        for f in self.__class__.get_field_names():
-            data[f] = getattr(self, f)
+        if not instance:
+            instance = self
+        for f in instance.__class__.get_field_names():
+            if hasattr(getattr(instance, f).__class__, "get_field_names"):
+                val = self.get_data_dict(instance=getattr(instance, f))
+            else:
+                val = getattr(instance, f)
+            data[f] = val
         return data

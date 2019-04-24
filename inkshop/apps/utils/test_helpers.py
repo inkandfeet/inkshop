@@ -4,6 +4,7 @@ import unittest
 from django.test import TestCase
 from django.utils import timezone
 from utils.factory import Factory
+from archives.models import HistoricalEvent
 from inkmail.tasks import process_outgoing_message_queue
 from inkmail.helpers import queue_message, queue_newsletter_message, queue_transactional_message
 from inkmail.models import OutgoingMessage
@@ -61,6 +62,15 @@ class MockRequestsTestCase(TestCase):
     def get(self, *args, **kwargs):
         self._source_ip = Factory.rand_ip()
         return self.client.post(HTTP_X_FORWARDED_FOR=self._source_ip, *args, **kwargs)
+
+    def assertHistoricalEventDataEquality(self, he, **kwargs):  # noqa
+        instance_data, event_data = HistoricalEvent.expand_kwargs_to_instance_and_event_data(**kwargs)
+        self.assertEquals(
+            he.event_data,
+            event_data,
+        )
+        for k, v in instance_data.items():
+            self.assertEquals(getattr(he, k), v)
 
 
 class MailTestCase(MockRequestsTestCase):

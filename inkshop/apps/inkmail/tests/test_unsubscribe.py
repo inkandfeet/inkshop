@@ -140,6 +140,7 @@ class TestUnsubscribeBasics(MailTestCase):
         self.assertEquals(len(mail.outbox), 1)
 
 
+@override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
 class TestUnsubscribeResubscribe(MailTestCase):
 
     def test_unsubscribe_resubscribe_allows_messages_sent(self):
@@ -268,31 +269,63 @@ class TestUnsubscribeResubscribe(MailTestCase):
         self.assertEquals(self.subscription.subscription_url, subscription_url)
 
     def test_unsubscribe_resubscribe_has_records_of_all_actions(self):
+        self.newsletter = Factory.newsletter()
         self.assertEquals(HistoricalEvent.objects.count(), 0)
+        email = Factory.rand_email()
+        name = Factory.rand_name()
+        subscription_url = Factory.rand_url()
+        response = self.post(
+            reverse(
+                'inkmail:subscribe',
+            ),
+            {
+                'first_name': name,
+                'email': email,
+                'newsletter': self.newsletter.internal_name,
+                'subscription_url': subscription_url,
+            },
+        )
 
-        self.create_subscribed_person()
-        self.send_newsletter_message()
+        self.assertEquals(response.status_code, 200)
+
+        self.assertEquals(Person.objects.count(), 1)
+        self.assertEquals(Subscription.objects.count(), 1)
+        p = Person.objects.all()[0]
+        s = Subscription.objects.all()[0]
 
         self.assertEquals(HistoricalEvent.objects.count(), 1)
-        he = HistoricalEvent.objects.order_by("created_at").all()[0]
-        self.assertEquals(he.event_type, "subscribe")
+        he = HistoricalEvent.objects.order_by("-created_at").all()[0]
+        self.assertEquals(he.event_type, "subscribed")
         self.assertEquals(he.event_creator_type, "person")
-        self.assertEquals(he.event_creator_pk, self.person.pk)
-        self.assertEquals(he.event_data, {})
+        self.assertEquals(he.event_creator_pk, p.pk)
+        self.assertHistoricalEventDataEquality(
+            he,
+            person=p,
+            event_type="subscribed",
+            newsletter=self.newsletter,
+            subscription=s,
+        )
 
         # Unsubscribe
         om = OutgoingMessage.objects.all()[0]
         self.get(om.unsubscribe_link)
 
+        s = Subscription.objects.get(pk=s.pk)
         self.assertEquals(HistoricalEvent.objects.count(), 2)
-        he = HistoricalEvent.objects.order_by("created_at").all()[1]
+        he = HistoricalEvent.objects.order_by("-created_at").all()[0]
         self.assertEquals(he.event_type, "unsubscribe")
         self.assertEquals(he.event_creator_type, "person")
-        self.assertEquals(he.event_creator_pk, self.person.pk)
-        self.assertEquals(he.event_data, {})
+        self.assertEquals(he.event_creator_pk, p.pk)
+        self.assertHistoricalEventDataEquality(
+            he,
+            person=p,
+            event_type="unsubscribe",
+            subscription=s,
+            outgoingmessage=om,
+        )
 
         # Fetch updated subscription
-        self.subscription = Subscription.objects.get(pk=self.subscription.pk)
+        s = Subscription.objects.get(pk=s.pk)
 
         # Re-subscribe
         name = Factory.rand_name()
@@ -303,30 +336,45 @@ class TestUnsubscribeResubscribe(MailTestCase):
             ),
             {
                 'first_name': name,
-                'email': self.person.email,
+                'email': p.email,
                 'newsletter': self.newsletter.internal_name,
                 'subscription_url': subscription_url,
             },
         )
         self.assertEquals(response.status_code, 200)
-        self.subscription = Subscription.objects.get(pk=self.subscription.pk)
+        s = Subscription.objects.get(pk=s.pk)
+        p = Person.objects.get(pk=p.pk)
 
         self.assertEquals(HistoricalEvent.objects.count(), 3)
-        he = HistoricalEvent.objects.order_by("created_at").all()[1]
-        self.assertEquals(he.event_type, "subscribe")
+        he = HistoricalEvent.objects.order_by("-created_at").all()[0]
+        self.assertEquals(he.event_type, "subscribed")
         self.assertEquals(he.event_creator_type, "person")
-        self.assertEquals(he.event_creator_pk, self.person.pk)
-        self.assertEquals(he.event_data, {})
+        self.assertEquals(he.event_creator_pk, p.pk)
+        self.assertHistoricalEventDataEquality(
+            he,
+            person=p,
+            event_type="subscribed",
+            newsletter=self.newsletter,
+            subscription=s,
+        )
 
         process_outgoing_message_queue()
-        s = Subscription.objects.all()[0]
 
         # Re-double-opt-in
         self.get(s.opt_in_link)
 
-        self.assertEquals(HistoricalEvent.objects.count(), 2)
-        he = HistoricalEvent.objects.order_by("created_at").all()[1]
-        self.assertEquals(he.event_type, "double_opt_in")
+        s = Subscription.objects.get(pk=s.pk)
+        p = Person.objects.get(pk=p.pk)
+
+        self.assertEquals(HistoricalEvent.objects.count(), 4)
+        he = HistoricalEvent.objects.order_by("-created_at").all()[0]
+        self.assertEquals(he.event_type, "double-opt-in")
         self.assertEquals(he.event_creator_type, "person")
-        self.assertEquals(he.event_creator_pk, self.person.pk)
-        self.assertEquals(he.event_data, {})
+        self.assertEquals(he.event_creator_pk, p.pk)
+        self.assertHistoricalEventDataEquality(
+            he,
+            person=p,
+            event_type="double-opt-in",
+            newsletter=self.newsletter,
+            subscription=s,
+        )

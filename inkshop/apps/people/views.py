@@ -43,14 +43,6 @@ def confirm_email(request, email_key):
     return locals()
 
 
-@render_to("people/opt_out.html")
-def opt_out(request, reader_opt_out_key):
-    s = Person.objects.get(opt_out_key=reader_opt_out_key)
-    s.opted_out_of_email = True
-    s.save()
-    return locals()
-
-
 @ajax_request
 @csrf_exempt
 def user_authenticate(request):
