@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 import os
 import sys
@@ -38,9 +39,11 @@ EMAIL_SUBJECT_PREFIX = "%s " % INKSHOP_FRIENDLY_NAME
 DEFAULT_FROM_EMAIL = '%s <%s>' % (INKSHOP_FRIENDLY_NAME, INKSHOP_FROM_EMAIL)
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
+CLUBHOUSE_BASE_URL = INKSHOP_BASE_URL.replace("://", "://clubhouse.")
 CONFIRM_BASE_URL = INKSHOP_BASE_URL.replace("://", "://confirm.")
 DRAFT_BASE_URL = INKSHOP_BASE_URL.replace("://", "://draft.")
 ALLOWED_HOSTS = [
+    CLUBHOUSE_BASE_URL,
     INKSHOP_BASE_URL,
     DRAFT_BASE_URL,
     CONFIRM_BASE_URL,

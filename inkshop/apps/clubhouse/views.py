@@ -1,5 +1,4 @@
-# Portions of initial implementation are based on the BuddyUp codebase:
-# https://github.com/buddyup/api
+# -*- coding: utf-8 -*-
 
 from base64 import b64decode
 import datetime
@@ -16,7 +15,6 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from annoying.decorators import render_to, ajax_request
-from utils.factory import Factory
 from people.models import Person
 
 
