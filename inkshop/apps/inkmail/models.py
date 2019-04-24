@@ -231,6 +231,7 @@ class OutgoingMessage(BaseModel):
     send_at = models.DateTimeField()
     unsubscribe_hash = models.CharField(unique=True, max_length=512, blank=True, null=True)
     delete_hash = models.CharField(unique=True, max_length=512, blank=True, null=True)
+    love_hash = models.CharField(unique=True, max_length=512, blank=True, null=True)
 
     attempt_started = models.BooleanField(default=False)
     retry_if_not_complete_by = models.DateTimeField()
@@ -251,6 +252,9 @@ class OutgoingMessage(BaseModel):
         generate_delete_hash = False
         if not self.delete_hash:
             generate_delete_hash = True
+        generate_love_hash = False
+        if not self.love_hash:
+            generate_love_hash = True
 
         if not self.retry_if_not_complete_by and self.send_at:
             self.retry_if_not_complete_by = self.send_at + RETRY_IN_TIME
@@ -263,7 +267,9 @@ class OutgoingMessage(BaseModel):
             self.unsubscribe_hash = create_unique_hashid(self.pk, OutgoingMessage, "unsubscribe_hash")
         if generate_delete_hash:
             self.delete_hash = create_unique_hashid(self.pk, OutgoingMessage, "delete_hash")
-        if generate_unsubscribe_hash or generate_delete_hash:
+        if generate_delete_hash:
+            self.love_hash = create_unique_hashid(self.pk, OutgoingMessage, "love_hash")
+        if generate_unsubscribe_hash or generate_delete_hash or generate_love_hash:
             self.save()
 
     @property
@@ -278,6 +284,13 @@ class OutgoingMessage(BaseModel):
         return "%s%s" % (
             settings.CONFIRM_BASE_URL,
             reverse("inkmail:delete_account", args=(self.delete_hash, )),
+        )
+
+    @property
+    def love_link(self):
+        return "%s%s" % (
+            settings.CONFIRM_BASE_URL,
+            reverse("inkmail:love_message", args=(self.love_hash, )),
         )
 
     def render_email_string(self, string_to_render):

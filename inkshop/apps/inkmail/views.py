@@ -93,6 +93,7 @@ def subscribe(request):
         else:
             return HttpResponse(status=422)
     else:
+        print("valid subscription")
         send_subscription_confirmation.delay(s.pk)
 
     if request.is_ajax():
@@ -127,6 +128,15 @@ def unsubscribe(request, unsubscribe_key):
 @render_to("inkmail/delete_account_start.html")
 def delete_account(request, delete_key):
     om = OutgoingMessage.objects.get(delete_hash=delete_key)
+    # if om.subscription:
+    #     om.subscription.unsubscribe()
+
+    return locals()
+
+
+@render_to("inkmail/loved.html")
+def love_message(request, love_hash):
+    om = OutgoingMessage.objects.get(love_hash=love_hash)
     # if om.subscription:
     #     om.subscription.unsubscribe()
 

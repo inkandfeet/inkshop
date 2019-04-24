@@ -28,5 +28,4 @@ class TestReplyBasics(MailTestCase):
 
         self.assertEquals(len(mail.outbox), 1)
         m = mail.outbox[0]
-        print(m.__dict__)
-        self.assertEquals(m.reply_to, "%s <%s>" % (self.newsletter.from_name, self.newsletter.from_email))
+        self.assertEquals(m.from_email, "%s <%s>" % (self.newsletter.from_name, self.newsletter.from_email))

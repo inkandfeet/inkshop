@@ -21,6 +21,7 @@ def hello():
 
 @task
 def send_subscription_confirmation(subscription_pk):
+    print("send_subscription_confirmation")
     s = Subscription.objects.select_related('person').get(pk=subscription_pk)
     if (
         not s.double_opted_in
