@@ -8,6 +8,7 @@ from django.test.utils import override_settings
 
 from people.models import Person
 from inkmail.models import Subscription
+from inkmail.tasks import process_outgoing_message_queue
 from utils.factory import Factory
 from utils.test_helpers import MockRequestsTestCase
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, encrypt, decrypt
@@ -325,6 +326,7 @@ class TestConfirmEmail(MockRequestsTestCase):
             },
         )
         self.assertEquals(response.status_code, 200)
+        process_outgoing_message_queue()
 
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, self.newsletter.confirm_message.subject)
