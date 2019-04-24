@@ -94,7 +94,7 @@ class MailTestCase(MockRequestsTestCase):
             use_local_time=False,
         )
         self.subject = self.scheduled_newsletter_message.message.subject
-        self.body_unrendered = self.test_message.body_text_unrendered
+        self.body_unrendered = self.scheduled_newsletter_message.body_text_unrendered
         queue_newsletter_message(scheduled_newsletter_message=self.scheduled_newsletter_message)
         om = OutgoingMessage.objects.get(person=self.person, message=self.scheduled_newsletter_message,)
         self.body = om.render_email_string(self.scheduled_newsletter_message.body_text_unrendered)
