@@ -11,14 +11,14 @@ from freezegun import freeze_time
 from people.models import Person
 from inkmail.models import Subscription, Newsletter
 from utils.factory import Factory
-from utils.test_helpers import MockRequestsTestCase
+from utils.test_helpers import MailTestCase
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, encrypt, decrypt
 import mock
 import unittest
 from utils.encryption import lookup_hash
 
 
-class TestNewsletterImport(MockRequestsTestCase):
+class TestNewsletterImport(MailTestCase):
 
     def setUp(self, *args, **kwargs):
         # Create 2 banned users
@@ -506,7 +506,7 @@ class TestNewsletterImport(MockRequestsTestCase):
 
 # TODO: Enable when purchases are added.
 @unittest.skip("Once purchases are added in.")
-class TestPurchaserImport(MockRequestsTestCase):
+class TestPurchaserImport(MailTestCase):
 
     def setUp(self, *args, **kwargs):
         # Create 2 banned users

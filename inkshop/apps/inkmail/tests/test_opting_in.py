@@ -14,11 +14,11 @@ from people.models import Person
 from inkmail.models import Subscription
 from inkmail.tasks import process_outgoing_message_queue
 from utils.factory import Factory
-from utils.test_helpers import MockRequestsTestCase
+from utils.test_helpers import MailTestCase
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, encrypt, decrypt
 
 
-class TestDoubleOptIn(MockRequestsTestCase):
+class TestDoubleOptIn(MailTestCase):
 
     def setUp(self, *args, **kwargs):
         self.newsletter = Factory.newsletter()
