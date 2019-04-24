@@ -27,7 +27,8 @@ class TestSendMessageMail(MailTestCase):
         self.send_test_message()
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, self.test_message.subject)
-        self.assertEquals(mail.outbox[0].body, self.test_message.body_text_unrendered)
+        om = OutgoingMessage.objects.get(person=self.person, message=self.transactional_message,)
+        self.assertIn(om.render_email_string(self.transactional_message.body_text_unrendered), mail.outbox[0].body)
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.person.email)
         self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
@@ -48,7 +49,8 @@ class TestSendMessageMail(MailTestCase):
         self.send_test_message()
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, self.test_message.subject)
-        self.assertEquals(mail.outbox[0].body, self.test_message.body_text_unrendered)
+        om = OutgoingMessage.objects.get(person=self.person, message=self.transactional_message,)
+        self.assertIn(om.render_email_string(self.transactional_message.body_text_unrendered), mail.outbox[0].body)
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.person.email)
         self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
@@ -142,10 +144,7 @@ class TestSendTransactionalMessageToSubcriber(MailTestCase):
 
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, self.transactional_message.subject)
-        om = OutgoingMessage.objects.get(
-            person=self.person,
-            message=self.transactional_message,
-        )
+        om = OutgoingMessage.objects.get(person=self.person, message=self.transactional_message,)
         self.assertIn(om.render_email_string(self.transactional_message.body_text_unrendered), mail.outbox[0].body)
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.person.email)
@@ -158,10 +157,7 @@ class TestSendTransactionalMessageToSubcriber(MailTestCase):
 
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, self.transactional_message.subject)
-        om = OutgoingMessage.objects.get(
-            person=self.person,
-            message=self.transactional_message,
-        )
+        om = OutgoingMessage.objects.get(person=self.person, message=self.transactional_message,)
         self.assertIn(om.render_email_string(self.transactional_message.body_text_unrendered), mail.outbox[0].body)
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.person.email)
@@ -171,10 +167,7 @@ class TestSendTransactionalMessageToSubcriber(MailTestCase):
         self.send_test_transactional_message()
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, self.transactional_message.subject)
-        om = OutgoingMessage.objects.get(
-            person=self.person,
-            message=self.transactional_message,
-        )
+        om = OutgoingMessage.objects.get(person=self.person, message=self.transactional_message,)
         self.assertIn(om.render_email_string(self.transactional_message.body_text_unrendered), mail.outbox[0].body)
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.person.email)
@@ -187,10 +180,7 @@ class TestSendTransactionalMessageToSubcriber(MailTestCase):
 
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, self.transactional_message.subject)
-        om = OutgoingMessage.objects.get(
-            person=self.person,
-            message=self.transactional_message,
-        )
+        om = OutgoingMessage.objects.get(person=self.person, message=self.transactional_message,)
         self.assertIn(om.render_email_string(self.transactional_message.body_text_unrendered), mail.outbox[0].body)
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.person.email)
@@ -227,10 +217,7 @@ class TestSendTransactionalMessageToNonSubscriber(MailTestCase):
 
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, self.transactional_message.subject)
-        om = OutgoingMessage.objects.get(
-            person=self.person,
-            message=self.transactional_message,
-        )
+        om = OutgoingMessage.objects.get(person=self.person, message=self.transactional_message,)
         self.assertIn(om.render_email_string(self.transactional_message.body_text_unrendered), mail.outbox[0].body)
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.person.email)
@@ -242,10 +229,7 @@ class TestSendTransactionalMessageToNonSubscriber(MailTestCase):
 
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals(mail.outbox[0].subject, self.transactional_message.subject)
-        om = OutgoingMessage.objects.get(
-            person=self.person,
-            message=self.transactional_message,
-        )
+        om = OutgoingMessage.objects.get(person=self.person, message=self.transactional_message,)
         self.assertIn(om.render_email_string(self.transactional_message.body_text_unrendered), mail.outbox[0].body)
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.person.email)
