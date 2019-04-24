@@ -100,6 +100,7 @@ class TestSendNewsletterMessageMail(MailTestCase):
 
     def test_send_messsage_does_not_send_to_not_double_opted_in(self):
         self.send_newsletter_message()
+        print(self.subscription.__dict__)
         self.assertEquals(len(mail.outbox), 0)
 
     def test_send_messsage_still_sends_to_trolls(self):
