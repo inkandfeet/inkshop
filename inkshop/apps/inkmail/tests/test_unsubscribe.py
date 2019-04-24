@@ -183,15 +183,24 @@ class TestUnsubscribeResubscribe(MailTestCase):
         self.assertEquals(self.subscription.unsubscribed, False)
         self.assertEquals(self.subscription.unsubscribed_at, None)
 
-        # Double-opt-in message
-        self.assertEquals(len(mail.outbox), 2)
-        # TODO: Re-double-opt in.
+        process_outgoing_message_queue()
+        self.assertEquals(len(mail.outbox), 3)
+        self.assertEquals(Subscription.objects.count(), 1)
+        s = Subscription.objects.all()[0]
+        self.assertIn(s.opt_in_link, mail.outbox[3].body)
 
+        # Re-double-opt-in
+        self.get(s.opt_in_link)
+        self.subscription = Subscription.objects.get(pk=self.subscription.pk)
+        self.assertEquals(self.subscription.unsubscribed, False)
+        self.assertEquals(self.subscription.unsubscribed_at, None)
+
+        # Send newsletter, make sure it sent.
         self.send_newsletter_message()
         self.assertEquals(len(mail.outbox), 3)
 
     def test_unsubscribe_resubscribe_updates_all_fields(self):
-        self.assertEquals(False, "Test written")
+        self.assertEquals("based on previous test", False)
 
     def test_unsubscribe_resubscribe_has_records_of_all_actions(self):
         self.assertEquals(False, "Test written")

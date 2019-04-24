@@ -22,4 +22,11 @@ class TestReplyBasics(MockRequestsTestCase):
         super(TestReplyBasics, self).setUp(*args, **kwargs)
 
     def test_reply_address_is_correct(self):
-        self.assertEquals(False, "Test written")
+        s = Factory.subscription(newsletter=self.newsletter)
+        s.double_opt_in()
+        self.send_newsletter_message()
+
+        self.assertEquals(len(mail.outbox), 1)
+        m = mail.outbox[0]
+        print(m.__dict__)
+        self.assertEquals(m.reply_to, "%s <%s>" % (self.newsletter.from_name, self.newsletter.from_email))

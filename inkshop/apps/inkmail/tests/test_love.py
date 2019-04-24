@@ -7,7 +7,7 @@ from django.conf import settings
 from django.test.utils import override_settings
 
 from people.models import Person
-from inkmail.models import Subscription
+from inkmail.models import Subscription, OutgoingMessage
 from utils.factory import Factory
 from utils.test_helpers import MockRequestsTestCase
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, encrypt, decrypt
@@ -22,13 +22,27 @@ class TestLoveBasics(MockRequestsTestCase):
         super(TestLoveBasics, self).setUp(*args, **kwargs)
 
     def test_love_link_included_in_message_send(self):
-        self.assertEquals(False, "Test written")
+        self.assertEquals(len(mail.outbox), 0)
+        self.create_subscribed_person()
+        self.send_test_transactional_message()
+
+        self.assertEquals(len(mail.outbox), 1)
+        m = mail.outbox[0]
+        self.assertEquals(OutgoingMessage.objects.count(), 1)
+        self.om = OutgoingMessage.objects.all()[0]
+        self.assertNotIn(self.om.love_link, m.body)
 
     def test_clicking_love_marks_as_loved(self):
-        self.assertEquals(False, "Test written")
+        self.test_love_link_included_in_message_send()
+        self.loved_resp = self.get(self.om.love_link)
+
+        self.assertEquals(self.om.loved, True)
+        self.assertBasicallyEqualTimes(self.om.loved_at, self.now())
 
     def test_clicking_love_shows_correct_page(self):
-        self.assertEquals(False, "Test written")
+        self.test_clicking_love_marks_as_loved()
+        self.assertIn(self.loved_resp, "Hooray!")
 
     def test_clicking_love_shows_adorable_gif(self):
-        self.assertEquals(False, "Test written")
+        self.test_clicking_love_marks_as_loved()
+        self.assertIn(self.loved_resp, ".gif")
