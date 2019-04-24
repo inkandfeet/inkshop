@@ -40,6 +40,7 @@ class TestSendMessageMail(MailTestCase):
         self.assertEquals(len(mail.outbox), 0)
 
     def test_send_messsage_does_not_send_to_not_double_opted_in(self):
+        self.assertEquals(len(mail.outbox), 0)
         self.send_test_message()
         self.assertEquals(len(mail.outbox), 0)
 
