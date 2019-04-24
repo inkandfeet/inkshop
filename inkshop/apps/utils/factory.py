@@ -13,7 +13,7 @@ getcontext().prec = 7
 fake = Faker()
 
 from people.models import Person
-from inkmail.models import Newsletter, Subscription, Message
+from inkmail.models import Newsletter, Subscription, Message, ScheduledNewsletterMessage, Organization
 
 
 class DjangoFunctionalFactory:
@@ -41,6 +41,10 @@ class DjangoFunctionalFactory:
         if not words:
             words = cls.rand_int(start=1, end=15)
         return fake.sentence(nb_words=words)
+
+    @classmethod
+    def rand_paragraph(cls):
+        return fake.text()
 
     @classmethod
     def rand_bool(cls):
@@ -122,7 +126,7 @@ class DjangoFunctionalFactory:
     def rand_email(cls, first_name=None):
         if not first_name:
             first_name = cls.rand_name().lower()
-        return "%s@%s" % (first_name, cls.rand_domain())
+        return "%s%s@%s" % (first_name, cls.rand_int(), cls.rand_domain())
 
     @classmethod
     def rand_url(cls, domain=None, include_query_parms=True):
@@ -492,16 +496,28 @@ class Factory(DjangoFunctionalFactory):
 
     @classmethod
     def newsletter(cls, *args, **kwargs):
+        cls.organization()
         options = {
             "name": cls.rand_tree(),
-            "internal_name": cls.rand_tree().lower(),
+            "internal_name": "%s%s" % (cls.rand_tree().lower(), cls.rand_str()),
             "description": cls.rand_text(),
             "from_name": "%s %s" % (cls.rand_name(), cls.rand_name()),
             "from_email": cls.rand_email(),
-            "confirm_message": cls.message(),
-            "welcome_message": cls.message(),
+            "confirm_message": cls.message(
+                subject="Please confirm your subscription! %s" % cls.rand_text(),
+                body_text_unrendered="Please confirm your subscription! Click here: {{ opt_in_link }}\n%s" % cls.rand_paragraph(),
+                transactional=True,
+                transactional_no_unsubscribe_reason="send opt-in messages to people who fill out the form %s" % cls.rand_text(),
+                transactional_send_reason="someone (hopefully you) entered your email on my website %s" % cls.rand_text(),
+            ),
+            "welcome_message": cls.message(
+                subject="Welcome aboard! %s" % cls.rand_text(),
+                body_text_unrendered="Welcome aboard!\n %s" % cls.rand_paragraph(),
+            ),
+            "unsubscribe_footer": "%s [Click here to unsubscribe]({{ unsubscribe_link }}). \n ExampleCo, Inc is based at {{ organization_address }}" % cls.rand_text(),  # noqa
         }
         options.update(kwargs)
+        Organization.get()
 
         n = Newsletter.objects.create(**options)
 
@@ -509,10 +525,14 @@ class Factory(DjangoFunctionalFactory):
 
     @classmethod
     def subscription(cls, *args, **kwargs):
+        cls.organization()
         options = {
-            "person": cls.person(),
-            "newsletter": cls.newsletter(),
+            "double_opted_in": False,
         }
+        if "person" not in kwargs:
+            options["person"] = cls.person()
+        if "newsletter" not in kwargs:
+            options["newsletter"] = cls.newsletter()
         options.update(kwargs)
 
         s = Subscription.objects.create(**options)
@@ -521,13 +541,64 @@ class Factory(DjangoFunctionalFactory):
 
     @classmethod
     def message(cls, newsletter=None, *args, **kwargs):
+        cls.organization()
         options = {
             "subject": cls.rand_text(),
-            "body_text_unrendered": cls.rand_text(),
-            "body_html_unrendered": cls.rand_text(),
+            "body_text_unrendered": cls.rand_paragraph(),
+            "body_html_unrendered": cls.rand_paragraph(),
+            "transactional": False,
+            "transactional_send_reason": cls.rand_text(),
+            "transactional_no_unsubscribe_reason": cls.rand_text(),
         }
         options.update(kwargs)
 
         m = Message.objects.create(**options)
 
+        if newsletter:
+            ScheduledNewsletterMessage.objects.create(
+                message=m,
+                newsletter=newsletter,
+                enabled=True,
+                send_at_date=cls.rand_date(),
+                send_at_hour=cls.rand_int(end=23),
+                send_at_minute=cls.rand_int(end=59),
+                use_local_time=cls.rand_bool(),
+            )
+
         return m
+
+    @classmethod
+    def scheduled_newsletter_message(cls, *args, **kwargs):
+        cls.organization()
+        if "newsletter" not in kwargs:
+            kwargs["newsletter"] = cls.newsletter()
+
+        options = {
+            "message": cls.message(),
+            "enabled": True,
+            "send_at_date": cls.rand_date(),
+            "send_at_hour": cls.rand_int(end=23),
+            "send_at_minute": cls.rand_int(end=59),
+            "use_local_time": cls.rand_bool(),
+        }
+        options.update(kwargs)
+
+        snm = ScheduledNewsletterMessage.objects.create(**options)
+
+        return snm
+
+    @classmethod
+    def organization(cls):
+        changed = False
+        o = Organization.get()
+        if not o.name:
+            o.name = "%s Inc" % cls.rand_plant_name()
+            changed = True
+        if not o.address:
+            o.address = fake.address()
+            changed = True
+        if not o.transactional_footer:
+            o.transactional_footer = "%s You're receiving this email because {{ transactional_send_reason }}.   Normally, there's an unsubscribe link down here, but to be able to {{ transactional_no_unsubscribe_reason }}, there isn't a way to unsubscribe.\n\n However, if you want to completely delete your account, you can do that by [going here]({{ delete_account_link }}).\n\nThis email was sent by me, Jill Example, of {{ organization_address }}." % cls.rand_text()  # noqa
+        if changed:
+            o.save()
+        return o

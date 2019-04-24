@@ -3,7 +3,7 @@ import time
 import yaml
 
 from django.core.management.base import BaseCommand
-from inkmail.models import Newsletter, Message
+from inkmail.models import Newsletter, Message, Organization
 from people.models import Person
 from utils.encryption import lookup_hash
 
@@ -22,6 +22,12 @@ class Command(BaseCommand):
         with open("initial_data.yml", encoding='utf8') as f:
             data = yaml.safe_load(f)
             print(data)
+
+            if "organization" in data:
+                o = Organization.get()
+                for k, v in data["organization"]:
+                    setattr(o, k, v)
+                o.save()
 
             if "newsletters" in data:
                 for name, info in data["newsletters"].items():

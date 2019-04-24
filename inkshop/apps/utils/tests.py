@@ -22,7 +22,7 @@ class TestTestHarness(MockRequestsTestCase):
 class TestBasicEncryptionHarness(MockRequestsTestCase):
 
     def test_basic_encryption(self):
-        e = Factory.rand_str()
+        e = Factory.rand_str(include_emoji=False)
         self.assertEquals(e, decrypt(encrypt(e)))
 
         e = "😀💌❤️"

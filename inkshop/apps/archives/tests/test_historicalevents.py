@@ -9,14 +9,14 @@ from django.test.utils import override_settings
 from people.models import Person
 from inkmail.models import Subscription
 from utils.factory import Factory
-from utils.test_helpers import MockRequestsTestCase
+from utils.test_helpers import MailTestCase
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, encrypt, decrypt
 import mock
 import unittest
 from history.models import HistoricalEvent
 
 
-class TestHistoricalEvents(MockRequestsTestCase):
+class TestHistoricalEvents(MailTestCase):
 
     def setUp(self, *args, **kwargs):
         super(TestHistoricalEvents, self).setUp(*args, **kwargs)
@@ -26,7 +26,7 @@ class TestHistoricalEvents(MockRequestsTestCase):
 
 
 @override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
-class TestBasicEncryptionHarness(MockRequestsTestCase):
+class TestHistoricalBasicEncryptionHarness(MailTestCase):
 
     def test_basic_encryption(self):
         e = Factory.rand_str()
@@ -55,7 +55,7 @@ class TestBasicEncryptionHarness(MockRequestsTestCase):
 
 
 @override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
-class TestEncryptionHarnessForOddTypes(MockRequestsTestCase):
+class TestHistoricalEncryptionHarnessForOddTypes(MailTestCase):
 
     def test_extended_types_encryption(self):
         e = Factory.rand_phone()
@@ -84,7 +84,7 @@ class TestEncryptionHarnessForOddTypes(MockRequestsTestCase):
 
 
 @override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
-class TestEncryptionHarnessForObjects(MockRequestsTestCase):
+class TestHistoricalEncryptionHarnessForObjects(MailTestCase):
 
     def test_extended_types_encryption(self):
         e = {

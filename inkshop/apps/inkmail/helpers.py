@@ -4,92 +4,65 @@ import logging
 import requests
 
 from django.conf import settings
-from django.core.mail import send_mail as django_send_mail
 from django.template.loader import render_to_string
 from celery.task import task, periodic_task
 from django.utils import timezone
 
 
-@task
-def send_message(message_id, subscription_pk):
+def queue_message(message, subscription, at=None, scheduled_newsletter_message=None):
     """Sends a message to a particular subscriber"""
-    from inkmail.models import Subscription, Message  # Avoid circular imports
+    from inkmail.models import OutgoingMessage  # Avoid circular imports
+    if not at:
+        at = timezone.now()
 
-    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
-    message = Message.objects.get(pk=message_id)
+    OutgoingMessage.objects.create(
+        subscription=subscription,
+        person=subscription.person,
+        message=message,
+        send_at=at,
+    )
 
-    subject, body = message.render_subject_and_body(subscription=s)
 
-    send_mail.delay(subscription_pk, subject, body)
-
-
-@task
-def send_opt_in_message(message_id, subscription_pk):
+def queue_newsletter_message(scheduled_newsletter_message, at=None):
     """Sends a message to a particular subscriber"""
-    from inkmail.models import Subscription, Message  # Avoid circular imports
+    from inkmail.models import OutgoingMessage  # Avoid circular imports
 
-    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
-    message = Message.objects.get(pk=message_id)
+    if not at:
+        if scheduled_newsletter_message.send_at_date:
+            at = scheduled_newsletter_message.send_at_date
+            # TODO: Use local time
+            # scheduled_newsletter_message.use_local_time
+            at = at.replace(
+                hour=scheduled_newsletter_message.send_at_hour,
+                minute=scheduled_newsletter_message.send_at_minute,
+            )
+        else:
+            at = timezone.now()
 
-    subject, body = message.render_subject_and_body(subscription=s)
-
-    send_transactional_email(subscription_pk, subject, body)
-
-
-@task
-def send_transactional_message(message_id, subscription_pk):
-    """Sends a message to a particular person, even if they're not a subscriber"""
-    from inkmail.models import Subscription, Message  # Avoid circular imports
-
-    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
-    message = Message.objects.get(pk=message_id)
-
-    subject, body = message.render_subject_and_body(subscription=s)
-
-    send_transactional_email(subscription_pk, subject, body)
-
-
-@task
-def send_mail(subscription_pk, subject, body):
-    from inkmail.models import Subscription  # Avoid circular imports
-
-    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
-
-    if (
-        s.double_opted_in
-        and not s.unsubscribed
-        and not s.person.banned
-        and not s.person.hard_bounced
-    ):
-        # Safe to send email.
-        django_send_mail(subject, body, s.newsletter.full_from_email, [s.person.email, ], fail_silently=False)
+    for subscription in scheduled_newsletter_message.recipients:
+        OutgoingMessage.objects.create(
+            scheduled_newsletter_message=scheduled_newsletter_message,
+            person=subscription.person,
+            subscription=subscription,
+            message=scheduled_newsletter_message.message,
+            send_at=at,
+        )
 
 
-@task
-def send_even_if_not_double_opted_in(subscription_pk, subject, body):
-    # Avoid circular imports
-    from inkmail.models import Subscription
-    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
+def queue_transactional_message(message, person, at=None, scheduled_newsletter_message=None, subscription=None):
+    """Sends a message to a particular subscriber"""
+    from inkmail.models import OutgoingMessage  # Avoid circular imports
 
-    if (
-        not s.unsubscribed
-        and not s.person.banned
-        and not s.person.hard_bounced
-    ):
-        # Safe to send email.
-        django_send_mail(subject, body, s.newsletter.full_from_email, [s.person.email, ], fail_silently=False)
+    if not at:
+        at = timezone.now()
 
+    if not message.transactional:
+        raise Exception("Attempting to queue a non-transactional message in the transactional queue.")
 
-@task
-def send_transactional_email(subscription_pk, subject, body):
-    # Avoid circular imports
-    from inkmail.models import Subscription
-    s = Subscription.objects.select_related('person').get(pk=subscription_pk)
-
-    if (
-        # not s.unsubscribed and  # TODO: Decide on this.
-        not s.person.banned
-        and not s.person.hard_bounced
-    ):
-        # Safe to send email.
-        django_send_mail(subject, body, s.newsletter.full_from_email, [s.person.email, ], fail_silently=False)
+    OutgoingMessage.objects.create(
+        person=person,
+        message=message,
+        scheduled_newsletter_message=scheduled_newsletter_message,
+        subscription=subscription,
+        send_at=at
+    )

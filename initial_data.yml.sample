@@ -1,5 +1,15 @@
 # The newsletters you send out.
-  monthly:
+organization:
+    name: ExampleCo
+    address: 123 1st St, Anytown, 87654, Country
+    transactional_footer: |
+                            You're receiving this email because {{ transactional_send_reason }}.   Normally, there's an unsubscribe link down here, but to be able to {{ transactional_no_unsubscribe_reason }}, there isn't a way to unsubscribe.
+                            
+                            However, if you want to completely delete your account, you can do that by [going here]({{ delete_account_link }}).
+                            
+                            This email was sent by me, Jill Example, of {{ organization_address }}
+
+monthly:
     name: My Monthly Newsletter
     internal_name: monthly
     description: Learn about the latest here at ExampleCo, and hear what we have coming up
@@ -10,15 +20,9 @@
 
                           You're receiving this email because you signed up back on {{ signed_up_at|date }}.  It was sent by me, Jill Example, of ExampleCo.
 
-                          ExampleCo, Inc is based at 123 1st St, Anytown, 87654, Country
+                          ExampleCo, Inc is based at {{ organization_address }}
 
 
-    transactional_footer: |
-                          You're receiving this email because {{ reason }}.   Normally, there's an unsubscribe link down here, but to be able to {{ able_to_reason }}, there isn't a way to unsubscribe.
-                          
-                          However, if you want to completely delete your account, you can do that by [clicking here]({{ delete_account_link }}).
-                          
-                          It was sent by me, Jill Example, of ExampleCo, Inc at 123 1st St, Anytown, 87654, Country
 
 
     confirm_subject: "You're almost subscribed."

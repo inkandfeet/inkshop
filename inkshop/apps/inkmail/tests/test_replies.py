@@ -9,18 +9,23 @@ from django.test.utils import override_settings
 from people.models import Person
 from inkmail.models import Subscription
 from utils.factory import Factory
-from utils.test_helpers import MockRequestsTestCase
+from utils.test_helpers import MailTestCase
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, encrypt, decrypt
 import mock
 import unittest
 
 
-@unittest.skip("For Friday")
-class TestReplyBasics(MockRequestsTestCase):
+class TestReplyBasics(MailTestCase):
 
     def setUp(self, *args, **kwargs):
         self.newsletter = Factory.newsletter()
         super(TestReplyBasics, self).setUp(*args, **kwargs)
 
     def test_reply_address_is_correct(self):
-        self.assertEquals(False, "Test written")
+        s = Factory.subscription(newsletter=self.newsletter)
+        s.double_opt_in()
+        self.send_newsletter_message()
+
+        self.assertEquals(len(mail.outbox), 1)
+        m = mail.outbox[0]
+        self.assertEquals(m.from_email, "%s <%s>" % (self.newsletter.from_name, self.newsletter.from_email))

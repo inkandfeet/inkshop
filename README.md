@@ -36,7 +36,7 @@ When it's at 1.0, this project will let you:
 - Test different versions of content on your site
 - Share posts to social media
 - Protect your sanity against trolls and abusive people
-- Export and backup every bit of data to in the system.
+- Export and backup every bit of data in the system.  Import it back again
 
 It won't ever let you:
 - Spam people who haven't fully consented to receive your mailings
@@ -163,6 +163,7 @@ Bonus
 
 -- Next Week
 
+- Move inkmail helpers to tasks?  Think about abstraction this.
 - `django-admin squashmigrations app_label`
 - Handle simle
 - Auto-delete any un-clicked confirmations after 7 days.
@@ -172,6 +173,7 @@ Bonus
 
 ## Open threads the architecture isn't decided on yet.
 - Structure for GDPR dump.  JSON?  Zip?
+- Structure for full-system export/import.  JSON?  Zip?
 - Handle opt-in separately from transactional?
 - Import flow for people who don't have double-opt-in records.  
 - Transactional emails - how out is opted out?   (Everything vs subsciption is the most common pattern, but what's the simpler solution?)

@@ -13,5 +13,4 @@ urlpatterns = [
     url(r'^auth/confirm-delete$', views.confirm_delete, name='confirm_delete'),
     url(r'^auth/confirm/(?P<email_key>[\w-]+)/?$', views.confirm_email, name='confirm_email'),
     url(r'^confirm-reset/(?P<email_key>[\w-]+)/$', views.confirm_reset, name='confirm_reset'),
-    url(r'^opt-out/(?P<reader_opt_out_key>[\w-]+)/?$', views.opt_out, name='opt_out'),
 ]
