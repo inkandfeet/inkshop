@@ -36,13 +36,15 @@ class TestLoveBasics(MailTestCase):
         self.test_love_link_included_in_message_send()
         self.loved_resp = self.get(self.om.love_link)
 
+        # Refresh
+        self.om = OutgoingMessage.objects.get(pk=self.om.pk)
         self.assertEquals(self.om.loved, True)
         self.assertBasicallyEqualTimes(self.om.loved_at, self.now())
 
     def test_clicking_love_shows_correct_page(self):
         self.test_clicking_love_marks_as_loved()
-        self.assertIn(self.loved_resp, "Hooray!")
+        self.assertIn("Loved!", self.loved_resp.content.decode('utf-8'))
 
     def test_clicking_love_shows_adorable_gif(self):
         self.test_clicking_love_marks_as_loved()
-        self.assertIn(self.loved_resp, ".gif")
+        self.assertIn(".gif", self.loved_resp.content.decode('utf-8'))

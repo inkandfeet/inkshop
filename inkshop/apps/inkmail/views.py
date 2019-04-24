@@ -15,7 +15,7 @@ from annoying.decorators import render_to, ajax_request
 from ipware import get_client_ip
 
 from inkmail.models import Newsletter, Subscription, OutgoingMessage
-from inkmail.tasks import send_subscription_confirmation
+from inkmail.tasks import send_subscription_confirmation, send_subscription_welcome
 from people.models import Person
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, lookup_hash
 
@@ -103,7 +103,6 @@ def subscribe(request):
         else:
             return HttpResponse(status=422)
     else:
-        print("valid subscription")
         send_subscription_confirmation.delay(s.pk)
 
     if request.is_ajax():
@@ -115,14 +114,21 @@ def subscribe(request):
 @render_to("inkmail/email_confirmation.html")
 def confirm_subscription(request, opt_in_key):
     s = Subscription.objects.get(opt_in_key=opt_in_key)
-    s.double_opted_in = True
-    s.double_opted_in_at = timezone.now()
-    s.save()
+    already_double_opted_in = True
+    if not s.double_opted_in:
+        already_double_opted_in = False
+        s.double_opted_in = True
+        s.double_opted_in_at = timezone.now()
+        s.save()
 
     p = s.person
     p.email_verified = True
     p.save()
     email_confirmed = True
+
+    if not already_double_opted_in:
+        send_subscription_welcome.delay(s.pk)
+
     return locals()
 
 
@@ -147,6 +153,9 @@ def delete_account(request, delete_key):
 @render_to("inkmail/loved.html")
 def love_message(request, love_hash):
     om = OutgoingMessage.objects.get(love_hash=love_hash)
+    om.loved = True
+    om.loved_at = timezone.now()
+    om.save()
     # if om.subscription:
     #     om.subscription.unsubscribe()
 

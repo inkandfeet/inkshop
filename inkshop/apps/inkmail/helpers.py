@@ -49,16 +49,20 @@ def queue_newsletter_message(scheduled_newsletter_message, at=None):
         )
 
 
-def queue_transactional_message(message, person, at=None, scheduled_newsletter_message=None):
+def queue_transactional_message(message, person, at=None, scheduled_newsletter_message=None, subscription=None):
     """Sends a message to a particular subscriber"""
     from inkmail.models import OutgoingMessage  # Avoid circular imports
 
     if not at:
         at = timezone.now()
 
+    if not message.transactional:
+        raise Exception("Attempting to queue a non-transactional message in the transactional queue.")
+
     OutgoingMessage.objects.create(
         person=person,
         message=message,
         scheduled_newsletter_message=scheduled_newsletter_message,
-        send_at=at,
+        subscription=subscription,
+        send_at=at
     )

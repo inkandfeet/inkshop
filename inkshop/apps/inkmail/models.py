@@ -201,7 +201,7 @@ class Subscription(BaseModel):
         if not self.opt_in_key or self.opt_in_key_created_at < timezone.now() - OPT_IN_LINK_EXPIRE_TIME:
             self.generate_opt_in_link()
 
-        return "%s/%s" % (settings.CONFIRM_BASE_URL, reverse("inkmail:confirm_subscription", args=(self.opt_in_key,)))
+        return "%s%s" % (settings.CONFIRM_BASE_URL, reverse("inkmail:confirm_subscription", args=(self.opt_in_key,)))
 
 
 class ScheduledNewsletterMessage(BaseModel):
@@ -234,6 +234,8 @@ class OutgoingMessage(BaseModel):
     unsubscribe_hash = models.CharField(unique=True, max_length=512, blank=True, null=True)
     delete_hash = models.CharField(unique=True, max_length=512, blank=True, null=True)
     love_hash = models.CharField(unique=True, max_length=512, blank=True, null=True)
+    loved = models.BooleanField(default=False)
+    loved_at = models.DateTimeField(blank=True, null=True)
 
     attempt_started = models.BooleanField(default=False)
     retry_if_not_complete_by = models.DateTimeField()
@@ -369,9 +371,11 @@ class OutgoingMessage(BaseModel):
         # print("not self.attempt_started: %s" % (not self.attempt_started))
         # print("self.message.transactional is True: %s" % (self.message.transactional is True))
         # print("self.subscription: %s" % (self.subscription))
-        # print("self.subscription.person is self.person.pk: %s" % (self.subscription.person.pk == self.person.pk))
-        # print("self.subscription.double_opted_in: %s" % (self.subscription.double_opted_in))
-        # print("not self.subscription.unsubscribed: %s" % (not self.subscription.unsubscribed))
+        # print("self.subscription.person is self.person.pk: %s" % (
+        #   self.subscription and self.subscription.person.pk == self.person.pk)
+        # )
+        # print("self.subscription.double_opted_in: %s" % (self.subscription and  self.subscription.double_opted_in))
+        # print("not self.subscription.unsubscribed: %s" % (self.subscription and not self.subscription.unsubscribed))
         # print("not self.person.banned: %s" % (not self.person.banned))
         # print("not self.person.hard_bounced: %s" % (not self.person.hard_bounced))
         if (
