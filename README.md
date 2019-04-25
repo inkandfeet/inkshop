@@ -163,6 +163,12 @@ Bonus
 - [ ] import list into production
 - [ ] schedule letter for sunday
 
+-- Next up
+- create admin user
+- login, create basic crud around message, newsletter messsage, see outgoing messages, person, scheduled newsletter message
+- basic import
+- test with myself
+
 -- Next Week
 
 - Move inkmail helpers to tasks?  Think about abstraction this.

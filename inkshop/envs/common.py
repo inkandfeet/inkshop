@@ -121,7 +121,7 @@ ROOT_HOSTCONF = 'inkshop.hosts'
 DEFAULT_HOST = 'root'
 SITE_ID = 1
 
-# AUTH_USER_MODEL = 'people.User'
+AUTH_USER_MODEL = 'clubhouse.StaffMember'
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 SESSION_SAVE_EVERY_REQUEST = True
