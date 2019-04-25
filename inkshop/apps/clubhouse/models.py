@@ -1,7 +1,6 @@
 import datetime
 import hashlib
 import logging
-import jwt
 import random
 import time
 import uuid
@@ -20,7 +19,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
 
-from utils.models import BaseModel
+from utils.models import BaseModel, HashidModelMixin, HasJWTBaseModel
 from utils.encryption import encrypt, decrypt, lookup_hash
 
 
@@ -38,43 +37,7 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password)
 
 
-class HasJWTBaseModel(BaseModel):
-    inkid = models.CharField(blank=True, null=True, max_length=512, unique=True, db_index=True, editable=False)
-    salted_inkid = models.CharField(blank=True, null=True, max_length=512, unique=True, db_index=True, editable=False)
-    api_jwt_cached = models.CharField(blank=True, null=True, max_length=512, unique=True, editable=False)
-
-    class Meta:
-        abstract = True
-
-    def regenerate_api_jwt(self):
-        self.api_jwt_cached = jwt.encode({
-            'inkid': self.inkid,
-            'version': 1,
-            'user_type': self.user_type,
-
-        }, settings.JWT_SECRET, algorithm='HS256').decode()
-
-        return self.api_jwt_cached
-
-    @cached_property
-    def api_jwt(self):
-        if not self.api_jwt_cached:
-            self.api_jwt_cached = self.regenerate_api_jwt()
-            self.save()
-
-        return self.api_jwt_cached
-
-    @cached_property
-    def events(self):
-        from events.models import Event
-        return Event.objects.filter(creator=self.inkid)
-
-    @cached_property
-    def unique_name(self):
-        return "%s %s" % (self.adjective.title(), self.noun.title())
-
-
-class StaffMember(AbstractBaseUser, HasJWTBaseModel):
+class StaffMember(AbstractBaseUser, HasJWTBaseModel, HashidModelMixin):
     user_type = "user"
 
     encrypted_first_name = models.CharField(max_length=254, blank=True, null=True)

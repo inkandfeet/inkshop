@@ -25,7 +25,7 @@ from django.utils.functional import cached_property
 from django.utils import timezone
 
 from people.models import Person
-from utils.models import BaseModel
+from utils.models import BaseModel, HashidModelMixin
 from utils.encryption import lookup_hash, encrypt, decrypt, create_unique_hashid
 
 markdown = mistune.Markdown()
@@ -34,7 +34,7 @@ RETRY_IN_TIME = datetime.timedelta(minutes=2)
 ORG_SINGLETON_KEY = "KLJF83jlaesfkj"
 
 
-class Organization(BaseModel):
+class Organization(BaseModel, HashidModelMixin):
     singleton_key = models.CharField(max_length=254, unique=True)
     name = models.CharField(max_length=254, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
@@ -47,7 +47,7 @@ class Organization(BaseModel):
         return cls._singleton
 
 
-class Message(BaseModel):
+class Message(BaseModel, HashidModelMixin):
     name = models.CharField(max_length=254, blank=True, null=True)
     subject = models.CharField(max_length=254, blank=True, null=True)
     body_text_unrendered = models.TextField(blank=True, null=True)
@@ -63,7 +63,7 @@ class Message(BaseModel):
     transactional_no_unsubscribe_reason = models.CharField(max_length=254, blank=True, null=True)
 
 
-class Newsletter(BaseModel):
+class Newsletter(BaseModel, HashidModelMixin):
     name = models.CharField(max_length=254, blank=True, null=True)
     internal_name = models.CharField(unique=True, max_length=254, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -158,7 +158,7 @@ class Newsletter(BaseModel):
         return self.subscription_set.filter(unsubscribed=False).select_related('person').all()
 
 
-class Subscription(BaseModel):
+class Subscription(BaseModel, HashidModelMixin):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
     subscribed_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
@@ -205,7 +205,7 @@ class Subscription(BaseModel):
         return "%s%s" % (settings.CONFIRM_BASE_URL, reverse("inkmail:confirm_subscription", args=(self.opt_in_key,)))
 
 
-class ScheduledNewsletterMessage(BaseModel):
+class ScheduledNewsletterMessage(BaseModel, HashidModelMixin):
     message = models.ForeignKey(Message, blank=True, null=True, on_delete=models.SET_NULL)
     newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False)
