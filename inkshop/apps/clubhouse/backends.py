@@ -32,7 +32,6 @@ class UserManager(BaseUserManager):
         u.email = email
         u.set_password(password)
         u.save()
-        return u
 
     def create_superuser(self, email, password):
         return self.create_user(email, password)

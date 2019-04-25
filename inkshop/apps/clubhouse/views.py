@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from annoying.decorators import render_to, ajax_request
 from people.models import Person
 from inkmail.models import ScheduledNewsletterMessage, Message, OutgoingMessage, Newsletter
-from clubhouse.model import StaffMember
+from clubhouse.models import StaffMember
 
 
 @render_to("clubhouse/dashboard.html")
@@ -77,7 +77,7 @@ def newsletter(request, hashid):
 
 @render_to("clubhouse/scheduled_newsletters.html")
 @login_required
-def scheduled_newsletters(request, hashid):
+def scheduled_newsletters(request):
     page_name = "scheduled_newsletters"
     snms = ScheduledNewsletterMessage.objects.all()
     return locals()
