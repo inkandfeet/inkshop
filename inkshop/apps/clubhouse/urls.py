@@ -3,8 +3,7 @@ from django.contrib import admin
 from clubhouse import views
 
 urlpatterns = [
-    url(r'^$', views.home, name='home'),
-    url(r'^home/$', views.home, name='home'),
+    url(r'^$', views.dashboard, name='dashboard'),
     url(r'^messages/$', views.messages, name='messages'),
     url(r'^message/(?P<hashid>[0-9A-Za-z_\-]+)/$', views.message, name='message'),
     url(r'^people/$', views.people, name='people'),
