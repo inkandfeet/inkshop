@@ -357,7 +357,6 @@ class OutgoingMessage(BaseModel):
                 "delete_account_link": self.delete_account_link,
             })
 
-        print(string_to_render)
         c = Context(context)
         t = Template(string_to_render.replace("\\\n", "\n"))
 
@@ -440,17 +439,17 @@ class OutgoingMessage(BaseModel):
         tombstone = False
         subject = False
         body = False
-        print("om.send")
-        print("not self.attempt_started: %s" % (not self.attempt_started))
-        print("self.message.transactional is True: %s" % (self.message.transactional is True))
-        print("self.subscription: %s" % (self.subscription))
-        print("self.subscription.person is self.person.pk: %s" % (
-            self.subscription and self.subscription.person.pk == self.person.pk)
-        )
-        print("self.subscription.double_opted_in: %s" % (self.subscription and self.subscription.double_opted_in))
-        print("not self.subscription.unsubscribed: %s" % (self.subscription and not self.subscription.unsubscribed))
-        print("not self.person.banned: %s" % (not self.person.banned))
-        print("not self.person.hard_bounced: %s" % (not self.person.hard_bounced))
+        #  print("om.send")
+        #  print("not self.attempt_started: %s" % (not self.attempt_started))
+        #  print("self.message.transactional is True: %s" % (self.message.transactional is True))
+        #  print("self.subscription: %s" % (self.subscription))
+        #  print("self.subscription.person is self.person.pk: %s" % (
+        #    self.subscription and self.subscription.person.pk == self.person.pk)
+        #  )
+        #  print("self.subscription.double_opted_in: %s" % (self.subscription and self.subscription.double_opted_in))
+        #  print("not self.subscription.unsubscribed: %s" % (self.subscription and not self.subscription.unsubscribed))
+        #  print("not self.person.banned: %s" % (not self.person.banned))
+        #  print("not self.person.hard_bounced: %s" % (not self.person.hard_bounced))
         if (
             # Don't dogpile.
             not self.attempt_started
@@ -471,7 +470,7 @@ class OutgoingMessage(BaseModel):
             and not self.person.hard_bounced
         ):
             try:
-                print("trying")
+                # print("trying")
                 # Save about to send metadata
                 self.attempt_started = True
                 self.attempt_complete = False
@@ -479,12 +478,12 @@ class OutgoingMessage(BaseModel):
                 self.save()
 
                 subject, body, html_body = self.render_subject_and_body()
-                print("subject: %s" % subject)
-                print("body: %s" % body)
+                # print("subject: %s" % subject)
+                # print("body: %s" % body)
 
-                print(self.message.transactional_send_reason)
-                print(self.message.transactional_no_unsubscribe_reason)
-                print(self.delete_account_link)
+                # print(self.message.transactional_send_reason)
+                # print(self.message.transactional_no_unsubscribe_reason)
+                # print(self.delete_account_link)
                 # Final checks to make sure unsubscribe and CAN_SPAM compliance
                 if self.message.transactional:
                     if (
@@ -500,13 +499,13 @@ class OutgoingMessage(BaseModel):
                         self.valid_message = False
                         self.save()
                         if self.message.transactional_send_reason not in body:
-                            print("Transactional message was attempted without transactional_send_reason. Refusing to send.")  # noqa
+                            # print("Transactional message was attempted without transactional_send_reason. Refusing to send.")  # noqa
                             logging.warn("Transactional message was attempted without transactional_send_reason. Refusing to send.")  # noqa
                         if self.message.transactional_no_unsubscribe_reason not in body:
-                            print("Transactional message was attempted without transactional_no_unsubscribe_reason. Refusing to send.")  # noqa
+                            # print("Transactional message was attempted without transactional_no_unsubscribe_reason. Refusing to send.")  # noqa
                             logging.warn("Transactional message was attempted without transactional_no_unsubscribe_reason. Refusing to send.")  # noqa
                         if self.delete_account_link not in body:
-                            print("Transactional message was attempted without delete_account_link. Refusing to send.")
+                            # print("Transactional message was attempted without delete_account_link. Refusing to send.")
                             logging.warn("Transactional message was attempted without delete_account_link. Refusing to send.")
                         return False
                 else:
@@ -518,10 +517,10 @@ class OutgoingMessage(BaseModel):
                         self.attempt_count = self.attempt_count + 1
                         self.valid_message = False
                         self.save()
-                        print("Message was attempted without including the unsubscribe_link. Refusing to send.")
+                        # print("Message was attempted without including the unsubscribe_link. Refusing to send.")
                         logging.warn("Message was attempted without including the unsubscribe_link. Refusing to send.")
                         return False
-                print("final checks passsed")
+                # print("final checks passsed")
 
                 tombstone, _ = OutgoingMessageAttemptTombstone.objects.get_or_create(
                     send_time=timezone.now(),
@@ -538,7 +537,7 @@ class OutgoingMessage(BaseModel):
                 ):
                     from_email = self.subscription.newsletter.full_from_email
 
-                print("django_send_mail")
+                # print("django_send_mail")
                 logging.warn("django_send_mail")
                 django_send_mail(subject, body, from_email, [self.person.email, ], html_message=html_body, fail_silently=False)
                 self.attempt_complete = True
@@ -553,7 +552,7 @@ class OutgoingMessage(BaseModel):
                 import traceback
                 traceback.print_exc()
                 logging.warn(e)
-                print(e)
+                # print(e)
                 self.attempt_complete = True
                 self.attempt_completed_at = timezone.now()
                 self.attempt_count = self.attempt_count + 1
@@ -598,7 +597,8 @@ class OutgoingMessage(BaseModel):
                 self.send_success = False
                 self.attempt_skipped = True
                 self.save()
-                print("logging as skipped.")
+                # print("logging as skipped.")
+                logging.warn("Skipping message.")
 
 
 class OutgoingMessageAttemptTombstone(BaseModel):

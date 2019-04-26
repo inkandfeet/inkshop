@@ -542,10 +542,11 @@ class Factory(DjangoFunctionalFactory):
     @classmethod
     def message(cls, newsletter=None, *args, **kwargs):
         cls.organization()
+        body_text = cls.rand_paragraph()
         options = {
             "subject": cls.rand_text(),
-            "body_text_unrendered": cls.rand_paragraph(),
-            "body_html_unrendered": cls.rand_paragraph(),
+            "body_text_unrendered": body_text,
+            "body_html_unrendered": None,
             "transactional": False,
             "transactional_send_reason": cls.rand_text(),
             "transactional_no_unsubscribe_reason": cls.rand_text(),

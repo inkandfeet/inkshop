@@ -115,5 +115,6 @@ class MailTestCase(MockRequestsTestCase):
         self.body_unrendered = self.transactional_message.body_text_unrendered
         queue_transactional_message(message=self.transactional_message, person=self.person)
         om = OutgoingMessage.objects.get(person=self.person, message=self.transactional_message,)
-        self.body = om.render_email_string(self.transactional_message.body_text_unrendered)
+        self.body = om.render_email_string(self.transactional_message.body_text_unrendered, plain_text=True)
+
         process_outgoing_message_queue()

@@ -76,7 +76,7 @@ class TestUnsubscribeBasics(MailTestCase):
         m = mail.outbox[0]
         self.assertEquals(OutgoingMessage.objects.count(), 1)
         om = OutgoingMessage.objects.all()[0]
-        self.assertIn(om.render_email_string(self.newsletter.unsubscribe_footer), m.body)
+        self.assertIn(om.render_email_string(self.newsletter.unsubscribe_footer, plain_text=True), m.body)
 
     def test_newsletter_footer_included_in_every_newsletter_send(self):
         self.assertEquals(len(mail.outbox), 0)
@@ -87,7 +87,7 @@ class TestUnsubscribeBasics(MailTestCase):
         m = mail.outbox[0]
         self.assertEquals(OutgoingMessage.objects.count(), 1)
         om = OutgoingMessage.objects.all()[0]
-        self.assertIn(om.render_email_string(self.newsletter.unsubscribe_footer), m.body)
+        self.assertIn(om.render_email_string(self.newsletter.unsubscribe_footer, plain_text=True), m.body)
 
     def test_transactional_footer_included_in_every_transactional_send(self):
         self.assertEquals(len(mail.outbox), 0)
@@ -99,7 +99,7 @@ class TestUnsubscribeBasics(MailTestCase):
         self.assertEquals(OutgoingMessage.objects.count(), 1)
         o = Factory.organization()
         om = OutgoingMessage.objects.all()[0]
-        self.assertIn(om.render_email_string(o.transactional_footer), m.body)
+        self.assertIn(om.render_email_string(o.transactional_footer, plain_text=True), m.body)
 
     def test_transactional_required_fields_included_in_every_transactional_send(self):
         self.assertEquals(len(mail.outbox), 0)

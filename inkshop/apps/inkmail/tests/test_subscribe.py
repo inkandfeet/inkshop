@@ -333,7 +333,14 @@ class TestConfirmEmail(MockRequestsTestCase):
         self.assertEquals(mail.outbox[0].subject, self.newsletter.confirm_message.subject)
         self.assertEquals(OutgoingMessage.objects.count(), 1)
         om = OutgoingMessage.objects.all()[0]
-        self.assertIn(om.render_email_string(self.newsletter.confirm_message.body_text_unrendered), mail.outbox[0].body)
+        self.assertIn(
+            om.render_email_string(self.newsletter.confirm_message.body_text_unrendered),
+            mail.outbox[0].alternatives[0][0]
+        )
+        self.assertIn(
+            om.render_email_string(self.newsletter.confirm_message.body_text_unrendered, plain_text=True),
+            mail.outbox[0].body
+        )
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], email)
         self.assertEquals(mail.outbox[0].from_email, self.newsletter.full_from_email)
@@ -370,7 +377,14 @@ class TestWelcomeEmail(MockRequestsTestCase):
         self.assertEquals(len(mail.outbox), 2)
         self.assertEquals(mail.outbox[1].subject, self.newsletter.welcome_message.subject)
         om = OutgoingMessage.objects.all()[0]
-        self.assertIn(om.render_email_string(self.newsletter.welcome_message.body_text_unrendered), mail.outbox[1].body)
+        self.assertIn(
+            om.render_email_string(self.newsletter.welcome_message.body_text_unrendered),
+            mail.outbox[1].alternatives[0][0]
+        )
+        self.assertIn(
+            om.render_email_string(self.newsletter.welcome_message.body_text_unrendered, plain_text=True),
+            mail.outbox[1].body
+        )
         self.assertEquals(len(mail.outbox[1].to), 1)
         self.assertEquals(mail.outbox[1].to[0], email)
         self.assertEquals(mail.outbox[1].from_email, self.newsletter.full_from_email)
