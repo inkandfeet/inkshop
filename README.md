@@ -49,7 +49,7 @@ Without all the bulk of tracking software, your site renders _fast_.  On mobile 
 [![TravisCI](https://travis-ci.org/inkandfeet/inkshop.svg?branch=master)](https://travis-ci.org/inkandfeet/inkshop)
 
 
-I'm bootstrapping this project on my own site, [Ink and Feet](https://inkandfeet.com). 
+I'm bootstrapping this project on my own site, [Ink and Feet](https://inkandfeet.com).   It's currently running my mailing list (but not my site), but unless you're a professional programmer or super risk tolerant, I wouldn't advise you move your list over to it just yet.  It's been two weeks. Give it a month or two. :)
 
 You can read more about the decision to move to inkshop in [this open letter.]()
 
