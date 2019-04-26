@@ -1,0 +1,8 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>Scheduled Newsletter {{ snm }}</h1>
+    <p>&hearts;</p>
+    Send {{snm}} to {{snm.recipients.count}} people?
+
+    <a href="{% url 'clubhouse:scheduled_newsletter_message_queued' snm.hashid %}">Yes, Send.</a>
+{% endblock %}

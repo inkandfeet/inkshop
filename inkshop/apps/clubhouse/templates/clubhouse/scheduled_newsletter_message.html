@@ -1,0 +1,13 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>Scheduled Newsletter {{ snm }}</h1>
+    <p>&hearts;</p>
+    {% if saved %}Saved{% endif %}
+    <form method="POST" enctype="multipart/form-data" action=".">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit">
+    </form>
+
+    <a href="{% url 'clubhouse:scheduled_newsletter_message_confirm_queue' snm.hashid %}">Queue for Sending</a>
+{% endblock %}

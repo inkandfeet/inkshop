@@ -15,6 +15,25 @@ urlpatterns = [
     url(r'^newsletters/$', views.newsletters, name='newsletters'),
     url(r'^newsletters/new/$', views.create_newsletter, name='create_newsletter'),
     url(r'^newsletter/(?P<hashid>[0-9A-Za-z_\-]+)/$', views.newsletter, name='newsletter'),
-    url(r'^scheduled_newsletters/$', views.scheduled_newsletters, name='scheduled_newsletters'),
-    url(r'^scheduled_newsletter/(?P<hashid>[0-9A-Za-z_\-]+)/$', views.scheduled_newsletter, name='scheduled_newsletter'),  # noqa
+    url(r'^scheduled_newsletter_messages/$', views.scheduled_newsletter_messages, name='scheduled_newsletter_messages'),
+    url(
+        r'^scheduled_newsletter_messages/new$',
+        views.create_scheduled_newsletter_message,
+        name='create_scheduled_newsletter_message'
+    ),
+    url(
+        r'^scheduled_newsletter_message/(?P<hashid>[0-9A-Za-z_\-]+)/$',
+        views.scheduled_newsletter_message,
+        name='scheduled_newsletter_message'
+    ),
+    url(
+        r'^scheduled_newsletter_message/(?P<hashid>[0-9A-Za-z_\-]+)/queue/$',
+        views.scheduled_newsletter_message_confirm_queue,
+        name='scheduled_newsletter_message_confirm_queue'
+    ),
+    url(
+        r'^scheduled_newsletter_message/(?P<hashid>[0-9A-Za-z_\-]+)/queue-confirm/$',
+        views.scheduled_newsletter_message_queued,
+        name='scheduled_newsletter_message_queued'
+    ),
 ]

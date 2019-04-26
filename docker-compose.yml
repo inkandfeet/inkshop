@@ -31,7 +31,7 @@ services:
       - "./services/traefik/acme.json:/acme.json"
       - "./services/traefik/data:/traefik/acme/account"
       - "/var/run/docker.sock:/var/run/docker.sock"
-    restart: unless-stopped
+    # restart: unless-stopped
 
   db:
     image: postgres
@@ -41,11 +41,12 @@ services:
       - ".env"
     volumes:
      - ./postgres-data:/var/lib/postgresql/data
+     # restart: unless-stopped
 
   redis:
     image: redis:4.0-alpine
     container_name: inkshop_redis
-    restart: unless-stopped
+    # restart: unless-stopped
 
   # rabbitmq:
   #   image: rabbitmq
@@ -79,7 +80,7 @@ services:
     command: bash -c 'service nginx start; cd /project; PYTHONIOENCODING="utf-8" python3 manage.py collectstatic --noinput --settings=inkshop.envs.dev; honcho start -f Procfile.dev'
     tty: true
     stdin_open: true
-    restart: unless-stopped
+    # restart: unless-stopped
 
 networks:
   default:

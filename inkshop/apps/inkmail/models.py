@@ -18,6 +18,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.files.base import ContentFile
 from django.core.mail import send_mail as django_send_mail
 from django.contrib.auth.signals import user_logged_in
+from django.template.defaultfilters import linebreaks
 from django.template.loader import render_to_string
 from django.template import Template, Context
 from django.urls import reverse
@@ -90,6 +91,11 @@ class Newsletter(HashidBaseModel):
     unsubscribe_if_no_hearts_after_days_num = models.IntegerField(blank=True, null=True, default=184)
     unsubscribe_if_no_hearts_after_messages = models.BooleanField(default=True)
     unsubscribe_if_no_hearts_after_messages_num = models.IntegerField(blank=True, null=True, default=26)
+
+    def __str__(self):
+        if self.name:
+            return "%s" % (self.name, )
+        return "%s" % self.internal_name
 
     @property
     def full_from_email(self):
@@ -213,14 +219,14 @@ class Subscription(HashidBaseModel):
 
 class ScheduledNewsletterMessage(HashidBaseModel):
     message = models.ForeignKey(Message, blank=True, null=True, on_delete=models.SET_NULL)
-    newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
+    newsletter = models.ForeignKey(Newsletter, blank=True, null=True, on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False)
     complete = models.BooleanField(default=False)
 
     send_at_date = models.DateField(blank=True, null=True, default=timezone.now)
-    send_at_hour = models.IntegerField()
-    send_at_minute = models.IntegerField()
-    use_local_time = models.BooleanField(default=True)  # if False, use UTC.
+    send_at_hour = models.IntegerField(blank=True, null=True)
+    send_at_minute = models.IntegerField(blank=True, null=True)
+    use_local_time = models.BooleanField(default=False)  # if False, use UTC.
 
     num_scheduled = models.IntegerField(default=0)
     # num_queued = models.IntegerField(default=0) ?
@@ -228,7 +234,15 @@ class ScheduledNewsletterMessage(HashidBaseModel):
 
     @property
     def recipients(self):
-        return self.newsletter.subscriptions
+        return self.newsletter.subscriptions.filter(double_opted_in=True, unsubscribed=False)
+
+    @property
+    def num_outgoingmessages_sent(self):
+        return self.outgoingmessage_set.filter(attempt_complete=True).count()
+
+    @property
+    def num_outgoingmessages_queued(self):
+        return self.outgoingmessage_set.count()
 
 
 class OutgoingMessage(BaseModel):
@@ -247,6 +261,7 @@ class OutgoingMessage(BaseModel):
     attempt_started = models.BooleanField(default=False)
     retry_if_not_complete_by = models.DateTimeField()
     attempt_complete = models.BooleanField(default=False)
+    attempt_skipped = models.BooleanField(default=False)
     attempt_count = models.IntegerField(default=0)
     should_retry = models.BooleanField(default=False)
     valid_message = models.BooleanField(default=True)
@@ -340,6 +355,10 @@ class OutgoingMessage(BaseModel):
 
         parsed_source = t.render(c).encode("utf-8").decode()
 
+        if not strip_linebreaks and not plain_text:
+            parsed_source = parsed_source.replace("\r", "\n")
+            parsed_source = parsed_source.replace("\n\n", "<br>\n")
+
         if not plain_text:
             rendered_string = markdown(parsed_source)
         else:
@@ -354,8 +373,10 @@ class OutgoingMessage(BaseModel):
             rendered_string = bleach.clean(rendered_string, strip=True)
 
         if not strip_linebreaks and not plain_text:
-            rendered_string = rendered_string.replace("\n\n", "<br/><br/>\n")
-            rendered_string = rendered_string.replace("\n", "<br/>\n")
+            rendered_string = rendered_string.replace("\r", "\n")
+            rendered_string = rendered_string.replace("\n", "<br>\n")
+            # rendered_string = rendered_string.replace("\n", "<br>")
+            # rendered_string = linebreaks(rendered_string)
 
         if strip_linebreaks:
             rendered_string = rendered_string.replace("\n", "")
@@ -551,6 +572,21 @@ class OutgoingMessage(BaseModel):
             if body is not False:
                 tombstone.encrypted_message_body = encrypt(body)
             tombstone.save()
+        else:
+            if (
+                not self.subscription
+                or self.subscription.person.pk is not self.person.pk
+                or not self.subscription.double_opted_in
+                or self.subscription.unsubscribed
+                or self.person.banned
+                or self.person.hard_bounced
+            ):
+                self.attempt_started = True
+                self.attempt_complete = True
+                self.send_success = False
+                self.attempt_skipped = True
+                self.save()
+                print("logging as skipped.")
 
 
 class OutgoingMessageAttemptTombstone(BaseModel):

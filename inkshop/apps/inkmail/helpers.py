@@ -26,27 +26,35 @@ def queue_message(message, subscription, at=None, scheduled_newsletter_message=N
 def queue_newsletter_message(scheduled_newsletter_message, at=None):
     """Sends a message to a particular subscriber"""
     from inkmail.models import OutgoingMessage  # Avoid circular imports
+    if (
+        scheduled_newsletter_message
+        and scheduled_newsletter_message.enabled
+        and not scheduled_newsletter_message.complete
+    ):
+        if not at:
+            if scheduled_newsletter_message.send_at_date:
+                at = scheduled_newsletter_message.send_at_date
+                # TODO: Use local time
+                # scheduled_newsletter_message.use_local_time
+                at = at.replace(
+                    hour=scheduled_newsletter_message.send_at_hour,
+                    minute=scheduled_newsletter_message.send_at_minute,
+                )
+            else:
+                at = timezone.now()
 
-    if not at:
-        if scheduled_newsletter_message.send_at_date:
-            at = scheduled_newsletter_message.send_at_date
-            # TODO: Use local time
-            # scheduled_newsletter_message.use_local_time
-            at = at.replace(
-                hour=scheduled_newsletter_message.send_at_hour,
-                minute=scheduled_newsletter_message.send_at_minute,
+        for subscription in scheduled_newsletter_message.recipients:
+            OutgoingMessage.objects.create(
+                scheduled_newsletter_message=scheduled_newsletter_message,
+                person=subscription.person,
+                subscription=subscription,
+                message=scheduled_newsletter_message.message,
+                send_at=at,
             )
-        else:
-            at = timezone.now()
-
-    for subscription in scheduled_newsletter_message.recipients:
-        OutgoingMessage.objects.create(
-            scheduled_newsletter_message=scheduled_newsletter_message,
-            person=subscription.person,
-            subscription=subscription,
-            message=scheduled_newsletter_message.message,
-            send_at=at,
-        )
+        scheduled_newsletter_message.complete = True
+        scheduled_newsletter_message.save()
+    else:
+        logging.warn("Message not enabled or has already been sent.")
 
 
 def queue_transactional_message(message, person, at=None, scheduled_newsletter_message=None, subscription=None):

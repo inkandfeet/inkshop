@@ -22,6 +22,7 @@ from inkmail.models import ScheduledNewsletterMessage, Message, OutgoingMessage,
 from inkmail.models import Organization
 from inkmail.forms import ScheduledNewsletterMessageForm, MessageForm, OutgoingMessageForm
 from inkmail.forms import NewsletterForm, SubscriptionForm, OrganizationForm
+from inkmail.helpers import queue_message, queue_newsletter_message
 from clubhouse.models import StaffMember
 
 
@@ -140,17 +141,48 @@ def organization(request):
     return locals()
 
 
-@render_to("clubhouse/scheduled_newsletters.html")
 @login_required
-def scheduled_newsletters(request):
-    page_name = "scheduled_newsletters"
-    snms = ScheduledNewsletterMessage.objects.all()
+def create_scheduled_newsletter_message(request):
+    snm = ScheduledNewsletterMessage.objects.create()
+    return redirect(reverse('clubhouse:scheduled_newsletter_message', kwargs={"hashid": snm.hashid, }))
+
+
+@render_to("clubhouse/scheduled_newsletter_messages.html")
+@login_required
+def scheduled_newsletter_messages(request):
+    page_name = "scheduled_newsletter_messages"
+    scheduled_newsletter_messages = ScheduledNewsletterMessage.objects.all()
     return locals()
 
 
-@render_to("clubhouse/scheduled_newsletter.html")
+@render_to("clubhouse/scheduled_newsletter_message.html")
 @login_required
-def scheduled_newsletter(request, hashid):
-    page_name = "scheduled_newsletters"
+def scheduled_newsletter_message(request, hashid):
+    page_name = "scheduled_newsletter_messages"
     snm = ScheduledNewsletterMessage.objects.get(hashid=hashid)
+    if request.method == "POST":
+        form = ScheduledNewsletterMessageForm(request.POST, instance=snm)
+        if form.is_valid():
+            form.save()
+            saved = True
+    else:
+        form = ScheduledNewsletterMessageForm(instance=snm)
+    return locals()
+
+
+@render_to("clubhouse/scheduled_newsletter_message_confirm_queue.html")
+@login_required
+def scheduled_newsletter_message_confirm_queue(request, hashid):
+    page_name = "scheduled_newsletter_messages"
+    snm = ScheduledNewsletterMessage.objects.get(hashid=hashid)
+    return locals()
+
+
+@render_to("clubhouse/scheduled_newsletter_message_queued.html")
+@login_required
+def scheduled_newsletter_message_queued(request, hashid):
+    page_name = "scheduled_newsletter_messages"
+    snm = ScheduledNewsletterMessage.objects.get(hashid=hashid)
+    queue_newsletter_message(scheduled_newsletter_message=snm)
+
     return locals()
