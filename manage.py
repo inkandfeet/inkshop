@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
 import locale
-import locale
 try:
     locale.setlocale(locale.LC_ALL, str('en_US.UTF-8'))
     locale.setlocale(locale.LANG, str('en_US.UTF-8'))
