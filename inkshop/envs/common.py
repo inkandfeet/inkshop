@@ -31,7 +31,6 @@ ANYMAIL = {
 }
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
-
 DEV_SETUP = False
 SESSION_EXPIRES_AFTER_SECONDS = 30 * 60  # 30 minutes
 
@@ -41,6 +40,7 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 CLUBHOUSE_BASE_URL = INKSHOP_BASE_URL.replace("://", "://clubhouse.")
 CONFIRM_BASE_URL = INKSHOP_BASE_URL.replace("://", "://confirm.")
+CONFIRM_BASE_URL = INKSHOP_BASE_URL.replace("://", "://")
 DRAFT_BASE_URL = INKSHOP_BASE_URL.replace("://", "://draft.")
 ALLOWED_HOSTS = [
     CLUBHOUSE_BASE_URL,
@@ -51,6 +51,7 @@ ALLOWED_HOSTS = [
     INKSHOP_BASE_URL.replace("://", "://heart."),
     INKSHOP_BASE_URL.replace("://", "://dots."),
 ]
+APPEND_SLASH = True
 
 # Application definition
 INSTALLED_APPS = [

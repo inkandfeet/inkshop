@@ -4,8 +4,10 @@
     <p>&hearts;</p>
     <a href="{% url 'clubhouse:create_newsletter' %}">Create New</a>
 
+    <ul>
     {% for n in newsletters %}
-    <a href="{% url 'clubhouse:newsletter' n.hashid %}">{{ n.name }}</a>
+    <li>    <a href="{% url 'clubhouse:newsletter' n.hashid %}">{{ n.name }}</a></li>
     {% endfor %}
+    </ul>
 
 {% endblock %}

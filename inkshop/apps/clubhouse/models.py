@@ -44,7 +44,7 @@ class StaffMember(AbstractBaseUser, HasJWTBaseModel):
 
     encrypted_first_name = models.CharField(max_length=254, blank=True, null=True)
     encrypted_last_name = models.CharField(max_length=254, blank=True, null=True)
-    encrypted_email = models.CharField(unique=True, max_length=1024, blank=True, null=True,)
+    encrypted_email = models.CharField(unique=True, max_length=1024, blank=True, null=True, verbose_name="Email")
     hashed_first_name = models.CharField(max_length=254, blank=True, null=True)
     hashed_last_name = models.CharField(max_length=254, blank=True, null=True)
     hashed_email = models.CharField(unique=True, max_length=1024, blank=True, null=True,)

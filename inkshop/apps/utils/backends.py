@@ -7,9 +7,6 @@ from utils.encryption import lookup_hash, encrypt, decrypt, create_unique_hashid
 class EncryptedEmailBackend(object):
     def authenticate(self, request, username=None, password=None):
         try:
-            print(username)
-            print(password)
-            print(request)
             try:
                 user = StaffMember.objects.get(hashed_email=lookup_hash(username))
                 if user.check_password(password):

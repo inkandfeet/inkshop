@@ -5,8 +5,10 @@ from clubhouse import views
 urlpatterns = [
     url(r'^$', views.dashboard, name='dashboard'),
     url(r'^messages/$', views.messages, name='messages'),
+    url(r'^messages/new/$', views.create_message, name='create_message'),
     url(r'^message/(?P<hashid>[0-9A-Za-z_\-]+)/$', views.message, name='message'),
     url(r'^people/$', views.people, name='people'),
+    url(r'^organization/$', views.organization, name='organization'),
     url(r'^person/(?P<hashid>[0-9A-Za-z_\-]+)/$', views.person, name='person'),
     url(r'^subscriptions/$', views.subscriptions, name='subscriptions'),
     url(r'^subscription/(?P<hashid>[0-9A-Za-z_\-]+)/$', views.subscription, name='subscription'),

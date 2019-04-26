@@ -20,6 +20,8 @@ from annoying.decorators import render_to, ajax_request
 from people.models import Person
 from inkmail.models import ScheduledNewsletterMessage, Message, OutgoingMessage, Newsletter, Subscription
 from inkmail.models import Organization
+from inkmail.forms import ScheduledNewsletterMessageForm, MessageForm, OutgoingMessageForm
+from inkmail.forms import NewsletterForm, SubscriptionForm, OrganizationForm
 from clubhouse.models import StaffMember
 
 
@@ -28,6 +30,12 @@ from clubhouse.models import StaffMember
 def dashboard(request):
     page_name = "dashboard"
     return locals()
+
+
+@login_required
+def create_message(request):
+    m = Message.objects.create()
+    return redirect(reverse('clubhouse:message', kwargs={"hashid": m.hashid, }))
 
 
 @render_to("clubhouse/messages.html")
@@ -43,6 +51,14 @@ def messages(request):
 def message(request, hashid):
     page_name = "messages"
     message = Message.objects.get(hashid=hashid)
+    saved = False
+    if request.method == "POST":
+        form = MessageForm(request.POST, instance=message)
+        if form.is_valid():
+            form.save()
+            saved = True
+    else:
+        form = MessageForm(instance=message)
     return locals()
 
 
@@ -82,7 +98,7 @@ def subscription(request, hashid):
 @login_required
 def newsletters(request):
     page_name = "newsletters"
-    Newsletter.objects.all()
+    newsletters = Newsletter.objects.all()
     return locals()
 
 
@@ -90,15 +106,21 @@ def newsletters(request):
 @login_required
 def newsletter(request, hashid):
     page_name = "newsletters"
-    Newsletter.objects.get(hashid=hashid)
+    saved = False
+    n = Newsletter.objects.get(hashid=hashid)
+    if request.method == "POST":
+        form = NewsletterForm(request.POST, instance=n)
+        if form.is_valid():
+            form.save()
+            saved = True
+    else:
+        form = NewsletterForm(instance=n)
     return locals()
 
 
 @login_required
 def create_newsletter(request):
     n = Newsletter.objects.create()
-    print(n)
-    print(n.__dict__)
     return redirect(reverse('clubhouse:newsletter', kwargs={"hashid": n.hashid, }))
 
 
@@ -107,6 +129,14 @@ def create_newsletter(request):
 def organization(request):
     page_name = "organization"
     o = Organization.get()
+    if request.method == "POST":
+        form = OrganizationForm(request.POST, instance=o)
+        if form.is_valid():
+            form.save()
+            saved = True
+    else:
+        form = OrganizationForm(instance=o)
+
     return locals()
 
 

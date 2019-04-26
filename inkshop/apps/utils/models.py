@@ -63,7 +63,7 @@ class HashidBaseModel(DataDictMixin, models.Model):
         super(HashidBaseModel, self).save(*args, **kwargs)
 
         if create_hashid:
-            self.hashid = create_unique_hashid(self.pk, self.__cls__, "hashid")
+            self.hashid = create_unique_hashid(self.pk, self.__class__, "hashid")
             self.save()
 
 
