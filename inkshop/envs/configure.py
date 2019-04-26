@@ -60,8 +60,8 @@ set_required_key("AWS_STORAGE_BUCKET_NAME")
 set_required_key("AWS_S3_HOST")
 
 # Database config
-set_required_key("POSTGRES_DB")
-set_required_key("POSTGRES_USER")
-set_required_key("POSTGRES_PASSWORD")
+# set_required_key("POSTGRES_DB")
+# set_required_key("POSTGRES_USER")
+# set_required_key("POSTGRES_PASSWORD")
 
 set_required_key("HASHID_SALT", fallback="ULfX^Jm")
