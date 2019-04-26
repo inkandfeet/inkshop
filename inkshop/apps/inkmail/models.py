@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import bleach
 import datetime
 import hashlib
@@ -17,6 +18,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.files.base import ContentFile
 from django.core.mail import send_mail as django_send_mail
 from django.contrib.auth.signals import user_logged_in
+from django.template.defaultfilters import linebreaks
 from django.template.loader import render_to_string
 from django.template import Template, Context
 from django.urls import reverse
@@ -24,7 +26,7 @@ from django.utils.functional import cached_property
 from django.utils import timezone
 
 from people.models import Person
-from utils.models import BaseModel
+from utils.models import HashidBaseModel, BaseModel
 from utils.encryption import lookup_hash, encrypt, decrypt, create_unique_hashid
 
 markdown = mistune.Markdown()
@@ -45,8 +47,11 @@ class Organization(BaseModel):
             cls._singleton, _ = cls.objects.get_or_create(singleton_key=ORG_SINGLETON_KEY)
         return cls._singleton
 
+    def __str__(self):
+        return "%s" % (self.name,)
 
-class Message(BaseModel):
+
+class Message(HashidBaseModel):
     name = models.CharField(max_length=254, blank=True, null=True)
     subject = models.CharField(max_length=254, blank=True, null=True)
     body_text_unrendered = models.TextField(blank=True, null=True)
@@ -61,14 +66,17 @@ class Message(BaseModel):
     transactional_send_reason = models.CharField(max_length=254, blank=True, null=True)
     transactional_no_unsubscribe_reason = models.CharField(max_length=254, blank=True, null=True)
 
+    def __str__(self):
+        return "%s" % (self.name,)
 
-class Newsletter(BaseModel):
+
+class Newsletter(HashidBaseModel):
     name = models.CharField(max_length=254, blank=True, null=True)
     internal_name = models.CharField(unique=True, max_length=254, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     from_email = models.TextField(max_length=254)
     from_name = models.TextField(max_length=254)
-    unsubscribe_footer = models.TextField(max_length=254)
+    unsubscribe_footer = models.TextField()
 
     confirm_message = models.ForeignKey(
         Message,
@@ -84,6 +92,11 @@ class Newsletter(BaseModel):
     unsubscribe_if_no_hearts_after_messages = models.BooleanField(default=True)
     unsubscribe_if_no_hearts_after_messages_num = models.IntegerField(blank=True, null=True, default=26)
 
+    def __str__(self):
+        if self.name:
+            return "%s" % (self.name, )
+        return "%s" % self.internal_name
+
     @property
     def full_from_email(self):
         return '%s <%s>' % (self.from_name, self.from_email)
@@ -97,6 +110,9 @@ class Newsletter(BaseModel):
         subscription_url,
         double_opted_in,
         double_opted_in_at=None,
+        hard_bounced=False,
+        hard_bounced_at=None,
+        hard_bounced_reason=None,
         first_name=None,
         last_name=None,
         subscription_ip=None,
@@ -128,6 +144,9 @@ class Newsletter(BaseModel):
         p.time_zone = time_zone
         p.was_imported = True
         p.was_imported_at = datetime.datetime.now(timezone.utc)
+        p.hard_bounced = hard_bounced
+        p.hard_bounced_at = hard_bounced_at
+        p.hard_bounced_reason = hard_bounced_reason
         p.import_source = import_source
         p.save()
 
@@ -154,10 +173,10 @@ class Newsletter(BaseModel):
 
     @property
     def subscriptions(self):
-        return self.subscription_set.filter(unsubscribed=False).select_related('person').all()
+        return self.subscription_set.filter(unsubscribed=False, person__hard_bounced=False).select_related('person').all()
 
 
-class Subscription(BaseModel):
+class Subscription(HashidBaseModel):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
     subscribed_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
@@ -204,16 +223,16 @@ class Subscription(BaseModel):
         return "%s%s" % (settings.CONFIRM_BASE_URL, reverse("inkmail:confirm_subscription", args=(self.opt_in_key,)))
 
 
-class ScheduledNewsletterMessage(BaseModel):
+class ScheduledNewsletterMessage(HashidBaseModel):
     message = models.ForeignKey(Message, blank=True, null=True, on_delete=models.SET_NULL)
-    newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
+    newsletter = models.ForeignKey(Newsletter, blank=True, null=True, on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False)
     complete = models.BooleanField(default=False)
 
     send_at_date = models.DateField(blank=True, null=True, default=timezone.now)
-    send_at_hour = models.IntegerField()
-    send_at_minute = models.IntegerField()
-    use_local_time = models.BooleanField(default=True)  # if False, use UTC.
+    send_at_hour = models.IntegerField(blank=True, null=True)
+    send_at_minute = models.IntegerField(blank=True, null=True)
+    use_local_time = models.BooleanField(default=False)  # if False, use UTC.
 
     num_scheduled = models.IntegerField(default=0)
     # num_queued = models.IntegerField(default=0) ?
@@ -221,7 +240,15 @@ class ScheduledNewsletterMessage(BaseModel):
 
     @property
     def recipients(self):
-        return self.newsletter.subscriptions
+        return self.newsletter.subscriptions.filter(double_opted_in=True, unsubscribed=False)
+
+    @property
+    def num_outgoingmessages_sent(self):
+        return self.outgoingmessage_set.filter(attempt_complete=True).count()
+
+    @property
+    def num_outgoingmessages_queued(self):
+        return self.outgoingmessage_set.count()
 
 
 class OutgoingMessage(BaseModel):
@@ -240,12 +267,15 @@ class OutgoingMessage(BaseModel):
     attempt_started = models.BooleanField(default=False)
     retry_if_not_complete_by = models.DateTimeField()
     attempt_complete = models.BooleanField(default=False)
+    attempt_completed_at = models.DateTimeField(blank=True, null=True)
+    attempt_skipped = models.BooleanField(default=False)
     attempt_count = models.IntegerField(default=0)
     should_retry = models.BooleanField(default=False)
     valid_message = models.BooleanField(default=True)
     send_success = models.NullBooleanField(default=None)
 
     hard_bounced = models.BooleanField(default=False)
+    hard_bounced_at = models.DateTimeField(blank=True, null=True)
     hard_bounce_reason = models.CharField(max_length=254, blank=True, null=True)
 
     def save(self, *args, **kwargs):
@@ -297,7 +327,7 @@ class OutgoingMessage(BaseModel):
             reverse("inkmail:love_message", args=(self.love_hash, )),
         )
 
-    def render_email_string(self, string_to_render):
+    def render_email_string(self, string_to_render, strip_linebreaks=False, plain_text=False):
         o = Organization.get()
         context = {
             "transactional": self.message.transactional,
@@ -313,11 +343,12 @@ class OutgoingMessage(BaseModel):
         if self.subscription:
             context.update({
                 "subscribed_at": self.subscription.subscribed_at,
-                "self.subscription_url": self.subscription.subscription_url,
+                "subscription_url": self.subscription.subscription_url,
                 "subscribed_from_ip": self.subscription.subscribed_from_ip,
                 "has_set_never_unsubscribe": self.subscription.has_set_never_unsubscribe,
                 "opt_in_link": self.subscription.opt_in_link,
                 "unsubscribe_link": self.unsubscribe_link,
+                "love_link": self.love_link,
             })
         if self.message.transactional:
             context.update({
@@ -327,21 +358,42 @@ class OutgoingMessage(BaseModel):
             })
 
         c = Context(context)
-        t = Template(string_to_render)
+        t = Template(string_to_render.replace("\\\n", "\n"))
 
         parsed_source = t.render(c).encode("utf-8").decode()
 
-        rendered_string = markdown(parsed_source)
+        if not strip_linebreaks and not plain_text:
+            parsed_source = parsed_source.replace("\r", "\n")
+            parsed_source = parsed_source.replace("\n\n", "<br>\n")
+
+        if not plain_text:
+            rendered_string = markdown(parsed_source)
+        else:
+            rendered_string = parsed_source
+
         rendered_string = rendered_string.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
         rendered_string = rendered_string.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
-        rendered_string = bleach.clean(rendered_string, strip=True).replace("\n", "")
-        if rendered_string[-1] == "\n":
-            rendered_string = rendered_string[:-1]
+
+        if plain_text:
+            rendered_string = bleach.clean(rendered_string, tags=[], strip=True)
+        else:
+            rendered_string = bleach.clean(rendered_string, strip=True)
+
+        if not strip_linebreaks and not plain_text:
+            rendered_string = rendered_string.replace("\r", "\n")
+            rendered_string = rendered_string.replace("\n", "<br>\n")
+            # rendered_string = rendered_string.replace("\n", "<br>")
+            # rendered_string = linebreaks(rendered_string)
+
+        if strip_linebreaks:
+            rendered_string = rendered_string.replace("\n", "")
+            if rendered_string[-1] == "\n":
+                rendered_string = rendered_string[:-1]
         return rendered_string
 
     def render_subject_and_body(self):
         o = Organization.get()
-        subject = self.render_email_string(self.message.subject)
+        subject = self.render_email_string(self.message.subject, strip_linebreaks=True, plain_text=True)
 
         # Render non-transactional messages
         if not self.message.transactional:
@@ -359,25 +411,45 @@ class OutgoingMessage(BaseModel):
             else:
                 body_source = self.message.body_text_unrendered
 
-        body = self.render_email_string(body_source)
+        text_body = self.render_email_string(body_source, plain_text=True)
 
-        return subject, body
+        if self.message.body_html_unrendered:
+            if not self.message.transactional:
+                if self.subscription and self.subscription.newsletter and "unsubscribe_link" not in self.message.body_html_unrendered:  # noqa
+                    html_source = "%s\n%s" % (self.message.body_html_unrendered, self.subscription.newsletter.unsubscribe_footer)
+                else:
+                    html_source = self.message.body_html_unrendered
+            else:
+                if (
+                    "transactional_send_reason" not in self.message.body_html_unrendered
+                    or "transactional_no_unsubscribe_reason" not in self.message.body_html_unrendered
+                    or "delete_account_link" not in self.message.body_html_unrendered
+                ):
+                    html_source = "%s\n%s" % (self.message.body_html_unrendered, o.transactional_footer)
+                else:
+                    html_source = self.message.body_html_unrendered
+        else:
+            html_source = body_source
+
+        html_body = self.render_email_string(html_source)
+
+        return subject, text_body, html_body
 
     def send(self):
         tombstone = False
         subject = False
         body = False
-        # print("om.send")
-        # print("not self.attempt_started: %s" % (not self.attempt_started))
-        # print("self.message.transactional is True: %s" % (self.message.transactional is True))
-        # print("self.subscription: %s" % (self.subscription))
-        # print("self.subscription.person is self.person.pk: %s" % (
-        #   self.subscription and self.subscription.person.pk == self.person.pk)
-        # )
-        # print("self.subscription.double_opted_in: %s" % (self.subscription and  self.subscription.double_opted_in))
-        # print("not self.subscription.unsubscribed: %s" % (self.subscription and not self.subscription.unsubscribed))
-        # print("not self.person.banned: %s" % (not self.person.banned))
-        # print("not self.person.hard_bounced: %s" % (not self.person.hard_bounced))
+        #  print("om.send")
+        #  print("not self.attempt_started: %s" % (not self.attempt_started))
+        #  print("self.message.transactional is True: %s" % (self.message.transactional is True))
+        #  print("self.subscription: %s" % (self.subscription))
+        #  print("self.subscription.person is self.person.pk: %s" % (
+        #    self.subscription and self.subscription.person.pk == self.person.pk)
+        #  )
+        #  print("self.subscription.double_opted_in: %s" % (self.subscription and self.subscription.double_opted_in))
+        #  print("not self.subscription.unsubscribed: %s" % (self.subscription and not self.subscription.unsubscribed))
+        #  print("not self.person.banned: %s" % (not self.person.banned))
+        #  print("not self.person.hard_bounced: %s" % (not self.person.hard_bounced))
         if (
             # Don't dogpile.
             not self.attempt_started
@@ -398,16 +470,20 @@ class OutgoingMessage(BaseModel):
             and not self.person.hard_bounced
         ):
             try:
+                # print("trying")
                 # Save about to send metadata
                 self.attempt_started = True
                 self.attempt_complete = False
                 self.retry_if_not_complete_by = timezone.now() + RETRY_IN_TIME
                 self.save()
 
-                subject, body = self.render_subject_and_body()
+                subject, body, html_body = self.render_subject_and_body()
                 # print("subject: %s" % subject)
                 # print("body: %s" % body)
 
+                # print(self.message.transactional_send_reason)
+                # print(self.message.transactional_no_unsubscribe_reason)
+                # print(self.delete_account_link)
                 # Final checks to make sure unsubscribe and CAN_SPAM compliance
                 if self.message.transactional:
                     if (
@@ -418,14 +494,18 @@ class OutgoingMessage(BaseModel):
                         self.should_retry = False
                         self.send_success = False
                         self.attempt_complete = True
+                        self.attempt_completed_at = timezone.now()
                         self.attempt_count = self.attempt_count + 1
                         self.valid_message = False
                         self.save()
                         if self.message.transactional_send_reason not in body:
+                            # print("Transactional message was attempted without transactional_send_reason. Refusing to send.")  # noqa
                             logging.warn("Transactional message was attempted without transactional_send_reason. Refusing to send.")  # noqa
                         if self.message.transactional_no_unsubscribe_reason not in body:
+                            # print("Transactional message was attempted without transactional_no_unsubscribe_reason. Refusing to send.")  # noqa
                             logging.warn("Transactional message was attempted without transactional_no_unsubscribe_reason. Refusing to send.")  # noqa
                         if self.delete_account_link not in body:
+                            # print("Transactional message was attempted without delete_account_link. Refusing to send.")
                             logging.warn("Transactional message was attempted without delete_account_link. Refusing to send.")
                         return False
                 else:
@@ -433,9 +513,11 @@ class OutgoingMessage(BaseModel):
                         self.should_retry = False
                         self.send_success = False
                         self.attempt_complete = True
+                        self.attempt_completed_at = timezone.now()
                         self.attempt_count = self.attempt_count + 1
                         self.valid_message = False
                         self.save()
+                        # print("Message was attempted without including the unsubscribe_link. Refusing to send.")
                         logging.warn("Message was attempted without including the unsubscribe_link. Refusing to send.")
                         return False
                 # print("final checks passsed")
@@ -455,7 +537,9 @@ class OutgoingMessage(BaseModel):
                 ):
                     from_email = self.subscription.newsletter.full_from_email
 
-                django_send_mail(subject, body, from_email, [self.person.email, ], fail_silently=False)
+                # print("django_send_mail")
+                logging.warn("django_send_mail")
+                django_send_mail(subject, body, from_email, [self.person.email, ], html_message=html_body, fail_silently=False)
                 self.attempt_complete = True
                 self.attempt_count = self.attempt_count + 1
                 self.send_success = True
@@ -464,8 +548,13 @@ class OutgoingMessage(BaseModel):
                 # print("success")
 
             except Exception as e:
-                print(e)
+                print("exception throw")
+                import traceback
+                traceback.print_exc()
+                logging.warn(e)
+                # print(e)
                 self.attempt_complete = True
+                self.attempt_completed_at = timezone.now()
                 self.attempt_count = self.attempt_count + 1
                 self.send_success = False
                 self.save()
@@ -493,6 +582,23 @@ class OutgoingMessage(BaseModel):
             if body is not False:
                 tombstone.encrypted_message_body = encrypt(body)
             tombstone.save()
+        else:
+            if (
+                not self.subscription
+                or self.subscription.person.pk is not self.person.pk
+                or not self.subscription.double_opted_in
+                or self.subscription.unsubscribed
+                or self.person.banned
+                or self.person.hard_bounced
+            ):
+                self.attempt_started = True
+                self.attempt_complete = True
+                self.attempt_completed_at = timezone.now()
+                self.send_success = False
+                self.attempt_skipped = True
+                self.save()
+                # print("logging as skipped.")
+                logging.warn("Skipping message.")
 
 
 class OutgoingMessageAttemptTombstone(BaseModel):

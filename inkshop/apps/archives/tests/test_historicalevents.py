@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 import json
 
@@ -33,24 +34,33 @@ class TestHistoricalBasicEncryptionHarness(MailTestCase):
         historical_event = HistoricalEvent.objects.create()
         historical_event.event_data = e
         historical_event.save()
+        historical_event = None
+        historical_event = HistoricalEvent.objects.all()[0]
+
         self.assertEquals(historical_event.event_data, e)
 
         e = "😀💌❤️"
         historical_event = HistoricalEvent.objects.create()
         historical_event.event_data = e
         historical_event.save()
+        historical_event = None
+        historical_event = HistoricalEvent.objects.all()[0]
         self.assertEquals(historical_event.event_data, e)
 
         e = Factory.rand_text()
         historical_event = HistoricalEvent.objects.create()
         historical_event.event_data = e
         historical_event.save()
+        historical_event = None
+        historical_event = HistoricalEvent.objects.all()[0]
         self.assertEquals(historical_event.event_data, e)
 
         e = Factory.rand_email()
         historical_event = HistoricalEvent.objects.create()
         historical_event.event_data = e
         historical_event.save()
+        historical_event = None
+        historical_event = HistoricalEvent.objects.all()[0]
         self.assertEquals(historical_event.event_data, e)
 
 
@@ -62,24 +72,32 @@ class TestHistoricalEncryptionHarnessForOddTypes(MailTestCase):
         historical_event = HistoricalEvent.objects.create()
         historical_event.event_data = e
         historical_event.save()
+        historical_event = None
+        historical_event = HistoricalEvent.objects.all()[0]
         self.assertEquals(historical_event.event_data, e)
 
         e = Factory.rand_name()
         historical_event = HistoricalEvent.objects.create()
         historical_event.event_data = e
         historical_event.save()
+        historical_event = None
+        historical_event = HistoricalEvent.objects.all()[0]
         self.assertEquals(historical_event.event_data, e)
 
         e = Factory.temp_password()
         historical_event = HistoricalEvent.objects.create()
         historical_event.event_data = e
         historical_event.save()
+        historical_event = None
+        historical_event = HistoricalEvent.objects.all()[0]
         self.assertEquals(historical_event.event_data, e)
 
         e = Factory.rand_url()
         historical_event = HistoricalEvent.objects.create()
         historical_event.event_data = e
         historical_event.save()
+        historical_event = None
+        historical_event = HistoricalEvent.objects.all()[0]
         self.assertEquals(historical_event.event_data, e)
 
 
@@ -95,6 +113,8 @@ class TestHistoricalEncryptionHarnessForObjects(MailTestCase):
         historical_event = HistoricalEvent.objects.create()
         historical_event.event_data = e
         historical_event.save()
+        historical_event = None
+        historical_event = HistoricalEvent.objects.all()[0]
         self.assertEquals(historical_event.event_data, e)
 
         e = {
@@ -105,6 +125,8 @@ class TestHistoricalEncryptionHarnessForObjects(MailTestCase):
         historical_event = HistoricalEvent.objects.create()
         historical_event.event_data = e
         historical_event.save()
+        historical_event = None
+        historical_event = HistoricalEvent.objects.all()[0]
         self.assertEquals(historical_event.event_data, e)
 
         e = {
@@ -115,6 +137,8 @@ class TestHistoricalEncryptionHarnessForObjects(MailTestCase):
         historical_event = HistoricalEvent.objects.create()
         historical_event.event_data = e
         historical_event.save()
+        historical_event = None
+        historical_event = HistoricalEvent.objects.all()[0]
         self.assertEquals(historical_event.event_data, e)
 
         e = {
@@ -125,4 +149,6 @@ class TestHistoricalEncryptionHarnessForObjects(MailTestCase):
         historical_event = HistoricalEvent.objects.create()
         historical_event.event_data = e
         historical_event.save()
+        historical_event = None
+        historical_event = HistoricalEvent.objects.all()[0]
         self.assertEquals(historical_event.event_data, e)

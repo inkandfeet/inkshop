@@ -1,0 +1,10 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>All Subscriptions</h1>
+    <p>&hearts;</p>
+    <ul>
+    {% for s in subscriptions %}
+    <li>    <a href="{% url 'clubhouse:subscription' s.hashid %}">{{ s }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

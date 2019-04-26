@@ -1,0 +1,10 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>All People</h1>
+    <p>&hearts;</p>
+    <ul>
+    {% for p in people %}
+    <li>    <a href="{% url 'clubhouse:person' p.hashid %}">{{ p }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

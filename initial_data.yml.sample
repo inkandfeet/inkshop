@@ -18,7 +18,7 @@ monthly:
     unsubscribe_footer: |
                           Don't want any more email from us?  No problem.  [Click here to unsubscribe]({{ unsubscribe_link }}).
 
-                          You're receiving this email because you signed up back on {{ signed_up_at|date }}.  It was sent by me, Jill Example, of ExampleCo.
+                          You're receiving this email because you signed up back on {{ subscribed_at|date }}.  It was sent by me, Jill Example, of ExampleCo.
 
                           ExampleCo, Inc is based at {{ organization_address }}
 
@@ -83,7 +83,7 @@ monthly:
                           -Jill and everyone here at Example Co
                           
                           
-                          p.s. Did you love this email?  [Click here]({{ loved_link }}) to let us know, keep your subscription active, and get this month's coupons. :)
+                          p.s. Did you love this email?  [Click here]({{ love_link }}) to let us know, keep your subscription active, and get this month's coupons. :)
 
 
 # These people can receive emails and buy things as normal,

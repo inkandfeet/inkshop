@@ -1,0 +1,12 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>All messages</h1>
+    <p>&hearts;</p>
+    <a href="{% url 'clubhouse:create_message' %}">Create New</a>
+
+    <ul>
+    {% for m in messages %}
+    <li>    <a href="{% url 'clubhouse:message' m.hashid %}">{{ m.subject }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
+import locale
+try:
+    locale.setlocale(locale.LC_ALL, str('en_US.UTF-8'))
+    locale.setlocale(locale.LANG, str('en_US.UTF-8'))
+except:
+    locale.setlocale(locale.LC_ALL, str('C.UTF-8'))
+    # locale.setlocale(locale.LANG, str('C.UTF-8'))
+
 import os
+os.environ["LANG"] = 'en_US.UTF-8'
+os.environ["LC_ALL"] = 'en_US.UTF-8'
 import sys
 from sys import path
 

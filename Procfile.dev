@@ -1,3 +1,3 @@
-web: PYTHONUNBUFFERED=true gunicorn inkshop.wsgi -b "0.0.0.0:$PORT" --workers=4 --reload
-celery: rm celerybeat.pid; DJANGO_SETTINGS_MODULE=inkshop.envs.dev C_FORCE_ROOT=true celery worker -c 4 -Q celery --app inkshop
-beat: rm celerybeat.pid; DJANGO_SETTINGS_MODULE=inkshop.envs.dev C_FORCE_ROOT=true celery beat --app inkshop
+web: PYTHONUNBUFFERED=true LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 gunicorn inkshop.wsgi -b "0.0.0.0:$PORT" --workers=4 --reload
+celery: rm celerybeat.pid; DJANGO_SETTINGS_MODULE=inkshop.envs.dev C_FORCE_ROOT=true LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 celery worker -c 4 -Q celery --app inkshop
+beat: rm celerybeat.pid; DJANGO_SETTINGS_MODULE=inkshop.envs.dev C_FORCE_ROOT=true LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 celery beat --app inkshop

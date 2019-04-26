@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 import os
 import sys
@@ -30,7 +31,6 @@ ANYMAIL = {
 }
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
-
 DEV_SETUP = False
 SESSION_EXPIRES_AFTER_SECONDS = 30 * 60  # 30 minutes
 
@@ -38,9 +38,12 @@ EMAIL_SUBJECT_PREFIX = "%s " % INKSHOP_FRIENDLY_NAME
 DEFAULT_FROM_EMAIL = '%s <%s>' % (INKSHOP_FRIENDLY_NAME, INKSHOP_FROM_EMAIL)
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
+CLUBHOUSE_BASE_URL = INKSHOP_BASE_URL.replace("://", "://clubhouse.")
 CONFIRM_BASE_URL = INKSHOP_BASE_URL.replace("://", "://confirm.")
+CONFIRM_BASE_URL = INKSHOP_BASE_URL.replace("://", "://")
 DRAFT_BASE_URL = INKSHOP_BASE_URL.replace("://", "://draft.")
 ALLOWED_HOSTS = [
+    CLUBHOUSE_BASE_URL,
     INKSHOP_BASE_URL,
     DRAFT_BASE_URL,
     CONFIRM_BASE_URL,
@@ -48,6 +51,7 @@ ALLOWED_HOSTS = [
     INKSHOP_BASE_URL.replace("://", "://heart."),
     INKSHOP_BASE_URL.replace("://", "://dots."),
 ]
+APPEND_SLASH = True
 
 # Application definition
 INSTALLED_APPS = [
@@ -63,6 +67,7 @@ INSTALLED_APPS = [
     'django_celery_results',
 
     'archives',
+    'clubhouse',
     'inkdots',
     'inkmail',
     'people',
@@ -117,7 +122,7 @@ ROOT_HOSTCONF = 'inkshop.hosts'
 DEFAULT_HOST = 'root'
 SITE_ID = 1
 
-# AUTH_USER_MODEL = 'people.User'
+AUTH_USER_MODEL = 'clubhouse.StaffMember'
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 SESSION_SAVE_EVERY_REQUEST = True
@@ -201,6 +206,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+]
+AUTHENTICATION_BACKENDS = [
+    'utils.backends.EncryptedEmailBackend',
 ]
 
 

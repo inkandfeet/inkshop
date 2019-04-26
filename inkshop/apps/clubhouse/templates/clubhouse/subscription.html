@@ -1,0 +1,7 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>Subscription {{s}}</h1>
+    {{s.email}}
+    <p>&hearts;</p>
+    {{s.get_data_dict}}
+{% endblock %}

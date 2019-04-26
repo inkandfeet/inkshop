@@ -34,8 +34,9 @@ set_required_key("INKSHOP_FRIENDLY_NAME")
 # Unique name for the shop, used to configure internal services
 set_required_key("INKSHOP_NAMESPACE")
 
-# Shop encryption key, used to encrypt customer.  Keep this safe, and keep a backup!
+# Shop encryption key, used to encrypt customer data.  Keep this safe, and keep a backup!
 set_required_key("INKSHOP_ENCRYPTION_KEY")
+set_required_key("INKSHOP_ENCRYPTION_SALT")
 
 # The base URL for the shop.
 set_required_key("INKSHOP_DOMAIN")

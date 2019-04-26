@@ -22,7 +22,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 password = settings.INKSHOP_ENCRYPTION_KEY.encode("utf-8")
-salt = os.urandom(16)
+salt = settings.INKSHOP_ENCRYPTION_SALT.encode("utf-8")
 kdf = PBKDF2HMAC(
     algorithm=hashes.SHA256(),
     length=32,
@@ -34,8 +34,8 @@ key = Fernet(base64.urlsafe_b64encode(kdf.derive(password)))
 
 # Future support for key rotation
 # https://cryptography.io/en/latest/fernet/#cryptography.fernet.MultiFernet
-# f = MultiFernet([key, ])
-f = key
+f = MultiFernet([key, ])
+# f = key
 
 
 def rand_str(length=20):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 WSGI config for inkshop project.
 
@@ -7,6 +8,13 @@ For more information on this file, see
 https://docs.djangoproject.com/en/2.2/howto/deployment/wsgi/
 """
 
+import locale
+try:
+    locale.setlocale(locale.LC_ALL, str('en_US.UTF-8'))
+    locale.setlocale(locale.LANG, str('en_US.UTF-8'))
+except:
+    locale.setlocale(locale.LC_ALL, str('C.UTF-8'))
+    # locale.setlocale(locale.LANG, str('C.UTF-8'))
 import os
 from sys import path
 

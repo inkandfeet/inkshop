@@ -85,6 +85,7 @@ def subscribe(request):
                         if "first_name" in request.POST:
                             p.first_name = request.POST["first_name"]
                     p.save()
+
                     s, created = Subscription.objects.get_or_create(
                         person=p,
                         newsletter=n,
