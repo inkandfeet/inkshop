@@ -20,11 +20,11 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
 
-from utils.models import BaseModel, HashidModelMixin
+from utils.models import HashidBaseModel
 from utils.encryption import encrypt, decrypt, lookup_hash
 
 
-class Person(BaseModel, HashidModelMixin):
+class Person(HashidBaseModel):
     encrypted_first_name = models.CharField(max_length=254, blank=True, null=True)
     encrypted_last_name = models.CharField(max_length=254, blank=True, null=True)
     encrypted_email = models.CharField(unique=True, max_length=1024, blank=True, null=True,)

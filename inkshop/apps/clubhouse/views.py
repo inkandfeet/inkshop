@@ -12,11 +12,14 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.utils import timezone
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from annoying.decorators import render_to, ajax_request
 from people.models import Person
-from inkmail.models import ScheduledNewsletterMessage, Message, OutgoingMessage, Newsletter
+from inkmail.models import ScheduledNewsletterMessage, Message, OutgoingMessage, Newsletter, Subscription
+from inkmail.models import Organization
 from clubhouse.models import StaffMember
 
 
@@ -59,6 +62,22 @@ def person(request, hashid):
     return locals()
 
 
+@render_to("clubhouse/subscriptions.html")
+@login_required
+def subscriptions(request):
+    page_name = "subscriptions"
+    subscriptions = Subscription.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/subscription.html")
+@login_required
+def subscription(request, hashid):
+    page_name = "subscriptions"
+    s = Subscription.objects.get(hashid=hashid)
+    return locals()
+
+
 @render_to("clubhouse/newsletters.html")
 @login_required
 def newsletters(request):
@@ -72,6 +91,22 @@ def newsletters(request):
 def newsletter(request, hashid):
     page_name = "newsletters"
     Newsletter.objects.get(hashid=hashid)
+    return locals()
+
+
+@login_required
+def create_newsletter(request):
+    n = Newsletter.objects.create()
+    print(n)
+    print(n.__dict__)
+    return redirect(reverse('clubhouse:newsletter', kwargs={"hashid": n.hashid, }))
+
+
+@render_to("clubhouse/organization.html")
+@login_required
+def organization(request):
+    page_name = "organization"
+    o = Organization.get()
     return locals()
 
 

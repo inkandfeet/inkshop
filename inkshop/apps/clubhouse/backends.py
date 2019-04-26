@@ -19,7 +19,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
 
-from utils.models import BaseModel, HashidModelMixin, HasJWTBaseModel
+from utils.models import HashidBaseModel, HasJWTBaseModel
 from utils.encryption import encrypt, decrypt, lookup_hash
 
 
@@ -37,7 +37,7 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password)
 
 
-class StaffMember(AbstractBaseUser, HasJWTBaseModel, HashidModelMixin):
+class StaffMember(AbstractBaseUser, HasJWTBaseModel):
     user_type = "user"
     USERNAME_FIELD = "hashed_email"
 

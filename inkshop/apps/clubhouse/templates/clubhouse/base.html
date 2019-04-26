@@ -7,6 +7,7 @@
     <div class="links">
         <a class="{% if page_name == 'dashboard' %}current{% endif %}" href="{% url 'clubhouse:dashboard' %}" >Dashboard</a>
         <a class="{% if page_name == 'messages' %}current{% endif %}" href="{% url 'clubhouse:messages' %}" >Messages</a>
+        <a class="{% if page_name == 'subscriptions' %}current{% endif %}" href="{% url 'clubhouse:subscriptions' %}" >Subscriptions</a>
         <a class="{% if page_name == 'people' %}current{% endif %}" href="{% url 'clubhouse:people' %}" >People</a>
         <a class="{% if page_name == 'newsletters' %}current{% endif %}" href="{% url 'clubhouse:newsletters' %}" >Newsletters</a>
         <a class="{% if page_name == 'scheduled_newsletters' %}current{% endif %}" href="{% url 'clubhouse:scheduled_newsletters' %}" >Scheduled Newsletters</a>

@@ -7,12 +7,7 @@ from utils.encryption import create_unique_hashid
 from django.utils.functional import cached_property
 
 
-class BaseModel(models.Model):
-    created_at = models.DateTimeField(db_index=True, blank=True, null=True, default=timezone.now)
-    modified_at = models.DateTimeField(blank=True, null=True, auto_now=True)
-
-    class Meta:
-        abstract = True
+class DataDictMixin(object):
 
     @classmethod
     def get_field_names(cls):
@@ -44,17 +39,32 @@ class BaseModel(models.Model):
         return data
 
 
-class HashidModelMixin(object):
+class BaseModel(DataDictMixin, models.Model):
+    created_at = models.DateTimeField(db_index=True, blank=True, null=True, default=timezone.now)
+    modified_at = models.DateTimeField(blank=True, null=True, auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class HashidBaseModel(DataDictMixin, models.Model):
+    created_at = models.DateTimeField(db_index=True, blank=True, null=True, default=timezone.now)
+    modified_at = models.DateTimeField(blank=True, null=True, auto_now=True)
+
+    class Meta:
+        abstract = True
+
     hashid = models.CharField(max_length=254, blank=True, null=True, db_index=True)
 
     def save(self, *args, **kwargs):
         create_hashid = False
         if not self.hashid:
             create_hashid = True
-        super(HashidModelMixin, self).save(*args, **kwargs)
+        super(HashidBaseModel, self).save(*args, **kwargs)
 
         if create_hashid:
-            create_unique_hashid(self.pk, HashidModelMixin, "hashid")
+            self.hashid = create_unique_hashid(self.pk, self.__cls__, "hashid")
+            self.save()
 
 
 class HasJWTBaseModel(BaseModel):

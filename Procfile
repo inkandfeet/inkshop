@@ -1,3 +1,3 @@
-web: bin/start-stunnel && gunicorn inkshop.wsgi -b "0.0.0.0:$PORT" --workers=10
-beat: bin/start-stunnel && DJANGO_SETTINGS_MODULE=inkshop.envs.live celery beat --app inkshop
-celery: bin/start-stunnel && DJANGO_SETTINGS_MODULE=inkshop.envs.live celery worker -c 12 -Q celery --app inkshop
+web: bin/start-stunnel && LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 gunicorn inkshop.wsgi -b "0.0.0.0:$PORT" --workers=10
+beat: bin/start-stunnel && DJANGO_SETTINGS_MODULE=inkshop.envs.live LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 celery beat --app inkshop
+celery: bin/start-stunnel && DJANGO_SETTINGS_MODULE=inkshop.envs.live LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 celery worker -c 12 -Q celery --app inkshop

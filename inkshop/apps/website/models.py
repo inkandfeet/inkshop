@@ -16,7 +16,6 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
 
-from people.models import Person
 from utils.models import BaseModel
 
 
