@@ -110,6 +110,9 @@ class Newsletter(HashidBaseModel):
         subscription_url,
         double_opted_in,
         double_opted_in_at=None,
+        hard_bounced=False,
+        hard_bounced_at=None,
+        hard_bounced_reason=None,
         first_name=None,
         last_name=None,
         subscription_ip=None,
@@ -141,6 +144,9 @@ class Newsletter(HashidBaseModel):
         p.time_zone = time_zone
         p.was_imported = True
         p.was_imported_at = datetime.datetime.now(timezone.utc)
+        p.hard_bounced = hard_bounced
+        p.hard_bounced_at = hard_bounced_at
+        p.hard_bounced_reason = hard_bounced_reason
         p.import_source = import_source
         p.save()
 
@@ -167,7 +173,7 @@ class Newsletter(HashidBaseModel):
 
     @property
     def subscriptions(self):
-        return self.subscription_set.filter(unsubscribed=False).select_related('person').all()
+        return self.subscription_set.filter(unsubscribed=False, person__hard_bounced=False).select_related('person').all()
 
 
 class Subscription(HashidBaseModel):
@@ -261,6 +267,7 @@ class OutgoingMessage(BaseModel):
     attempt_started = models.BooleanField(default=False)
     retry_if_not_complete_by = models.DateTimeField()
     attempt_complete = models.BooleanField(default=False)
+    attempt_completed_at = models.DateTimeField(blank=True, null=True)
     attempt_skipped = models.BooleanField(default=False)
     attempt_count = models.IntegerField(default=0)
     should_retry = models.BooleanField(default=False)
@@ -268,6 +275,7 @@ class OutgoingMessage(BaseModel):
     send_success = models.NullBooleanField(default=None)
 
     hard_bounced = models.BooleanField(default=False)
+    hard_bounced_at = models.DateTimeField(blank=True, null=True)
     hard_bounce_reason = models.CharField(max_length=254, blank=True, null=True)
 
     def save(self, *args, **kwargs):
@@ -487,6 +495,7 @@ class OutgoingMessage(BaseModel):
                         self.should_retry = False
                         self.send_success = False
                         self.attempt_complete = True
+                        self.attempt_completed_at = timezone.now()
                         self.attempt_count = self.attempt_count + 1
                         self.valid_message = False
                         self.save()
@@ -505,6 +514,7 @@ class OutgoingMessage(BaseModel):
                         self.should_retry = False
                         self.send_success = False
                         self.attempt_complete = True
+                        self.attempt_completed_at = timezone.now()
                         self.attempt_count = self.attempt_count + 1
                         self.valid_message = False
                         self.save()
@@ -545,6 +555,7 @@ class OutgoingMessage(BaseModel):
                 logging.warn(e)
                 print(e)
                 self.attempt_complete = True
+                self.attempt_completed_at = timezone.now()
                 self.attempt_count = self.attempt_count + 1
                 self.send_success = False
                 self.save()
@@ -583,6 +594,7 @@ class OutgoingMessage(BaseModel):
             ):
                 self.attempt_started = True
                 self.attempt_complete = True
+                self.attempt_completed_at = timezone.now()
                 self.send_success = False
                 self.attempt_skipped = True
                 self.save()

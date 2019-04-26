@@ -6,7 +6,7 @@
 
     <ul>
     {% for n in newsletters %}
-    <li>    <a href="{% url 'clubhouse:newsletter' n.hashid %}">{{ n.name }}</a></li>
+    <li>    <a href="{% url 'clubhouse:newsletter' n.hashid %}">{{ n.name }}  {{n.subscriptions.count}} subscriptions.</a></li>
     {% endfor %}
     </ul>
 

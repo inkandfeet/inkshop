@@ -58,23 +58,27 @@ class Command(BaseCommand):
                         # date_portion = " ".join(row[58].split(" ")[:-1])
                         # tz_portion = row[58].split(" ")[-1]
                         subscribed_at = parse(row[58], tzinfos=us_tzinfos)
+                        hard_bounced_at = parse(row[61], tzinfos=us_tzinfos)
                         # subscribed_at = datetime.datetime.strptime(row[58], "%m-%d-%Y %H:%M %p")
 
                         subscribe_ip = row[62]
 
-                        print(first_name)
-                        print(last_name)
-                        print(email)
-                        print(status)
-                        print(subscribed_at)
-                        print(subscribe_ip)
+                        # print(first_name)
+                        # print(last_name)
+                        print("Hard bounced: %s at %s" % (email, hard_bounced_at))
+                        # print(status)
+                        # print(subscribed_at)
+                        # print(subscribe_ip)
                         Newsletter.import_subscriber(
-                            "csv-ontraport",
-                            email,
-                            subscribed_at,
-                            "https://inkandfeet.com/letter",
-                            True,
+                            import_source="csv-hard-bounce-%s" % options["hard_bounce"],
+                            email=email,
+                            subscribed_at=subscribed_at,
+                            subscription_url="https://inkandfeet.com/letter",
+                            double_opted_in=False,
                             double_opted_in_at=subscribed_at,
+                            hard_bounced=True,
+                            hard_bounced_at=hard_bounced_at,
+                            hard_bounced_reason="Unsubscribed in previous system.",
                             first_name=first_name,
                             last_name=last_name,
                             subscription_ip=subscribe_ip,
@@ -132,11 +136,11 @@ class Command(BaseCommand):
                         if status == "Double Opt-In" or status == "Single Opt-in":
                             # print("do import")
                             Newsletter.import_subscriber(
-                                "csv-ontraport",
-                                email,
-                                subscribed_at,
-                                "https://inkandfeet.com/letter",
-                                True,
+                                import_source="csv-subscribers-%s" % options["subscribers"],
+                                email=email,
+                                subscribed_at=subscribed_at,
+                                subscription_url="https://inkandfeet.com/letter",
+                                double_opted_in=True,
                                 double_opted_in_at=subscribed_at,
                                 first_name=first_name,
                                 last_name=last_name,

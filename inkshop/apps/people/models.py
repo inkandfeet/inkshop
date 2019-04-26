@@ -113,3 +113,6 @@ class Person(HashidBaseModel):
 
     def gdpr_dump(self):
         raise NotImplementedError("Haven't implemented GPDR dump yet")
+
+    def messages_sent(self):
+        return self.outgoingmessage_set.order_by("created_at").all()

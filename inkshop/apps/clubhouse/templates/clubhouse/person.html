@@ -2,5 +2,12 @@
 {% block content %}
     <h1>Person {{p}}</h1>
     <p>&hearts;</p>
+    {{p.email}}<br/>
+
     {{p.get_data_dict}}
+
+    <h2>Sent messages</h2>
+    {% for m in p.messages_sent %}
+        {% if m.loved %}&hearts;{% endif %} {{ m.message.subject }}</br>
+    {% endfor %}
 {% endblock %}
