@@ -36,18 +36,22 @@ It won't ever let you:
 
 Some core principles that set it apart:
 
-Real email.
+**Real email.**
+
 Engaged subscription, built on active, positive consent and auto-unsubscribing.
 
 Get amazing deliverability and response by sending emails only to people who have shown you that they're interested and want to keep hearing from you.
 
-Fast.
+**Fast.**
+
 Without all the bulk of tracking software, your site renders _fast_.  On mobile and desktop.
 
-Integrated.
+**Integrated.**
+
 One of the big trends has been having a specialized system for everything, and plugging them into each other.  But that means your and your customer's data is spread out in a dozen places you can't control.  Inkshop bucks that trend, and puts everything you need in one user-friendly place.
 
-Compliant.
+**Compliant.**
+
 Inkshop does things the right way, and so you'll automatically comply with current - and future - privacy regulation.
 
 
@@ -56,7 +60,7 @@ Inkshop does things the right way, and so you'll automatically comply with curre
 [![TravisCI](https://travis-ci.org/inkandfeet/inkshop.svg?branch=master)](https://travis-ci.org/inkandfeet/inkshop)
 
 
-I'm bootstrapping this project on my own site, [Ink and Feet](https://inkandfeet.com).   It's currently running my [mailing list](https://inkandfeet.com/letter) on it (but not my site). However, unless you're a professional programmer or super risk tolerant, I wouldn't advise you move your list over to it just yet.  It's been two weeks. Give it a month or two. :)
+I'm bootstrapping this project on my own site, [Ink and Feet](https://inkandfeet.com).   It's currently running my [mailing list](https://inkandfeet.com/letter) on it (but not my site yet). However, unless you're a professional programmer or super risk tolerant, I wouldn't advise you move your list over to it just yet.  It's been two weeks. Give it at least a month or two. :)
 
 You can read more about the decision to move to inkshop in [this open letter.](https://inkandfeet.com/letter-april-28-2019-ants-being-watched-and-building-a-better-future)
 
@@ -149,6 +153,8 @@ python3 manage.py import_ontraport_csv --subscribers subscribers.csv --hard_boun
 - [ ] schedule letter for sunday
 
 -- Next Week
+- delete flow finished
+- poll mailgun (or webhook) for hard bounces
 - add fallback gif
 - scale down workers
 - Move inkmail helpers to tasks?  Think about abstraction this.
