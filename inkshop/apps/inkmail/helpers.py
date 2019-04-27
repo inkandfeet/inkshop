@@ -36,8 +36,8 @@ def queue_newsletter_message(scheduled_newsletter_message, at=None):
                 # TODO: Use local time
                 # scheduled_newsletter_message.use_local_time
                 at = scheduled_newsletter_message.send_at_date
-                time = datetime.min.time()
-                at = datetime.combine(at, time)
+                time = datetime.time()
+                at = datetime.datetime.combine(at, time)
                 if scheduled_newsletter_message.send_at_hour:
                     at = at.replace(
                         hour=scheduled_newsletter_message.send_at_hour,
