@@ -6,7 +6,7 @@
 
     <ul>
     {% for m in messages %}
-    <li>    <a href="{% url 'clubhouse:message' m.hashid %}">{{ m.subject }}</a></li>
+    <li>  {{ m.name }} - <a href="{% url 'clubhouse:message' m.hashid %}">{{ m.subject }}</a></li>
     {% endfor %}
     </ul>
 {% endblock %}
