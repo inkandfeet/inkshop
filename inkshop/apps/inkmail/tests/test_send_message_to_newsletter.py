@@ -125,11 +125,12 @@ class TestSendToNewsletter(MailTestCase):
             s.double_opt_in()
             people.append(s)
 
+        future_date = self.now() - datetime.timedelta(hours=1)
         self.scheduled_newsletter_message = Factory.scheduled_newsletter_message(
             newsletter=self.newsletter,
-            send_at_date=self.now(),
-            send_at_hour=self.now().hour - 1,
-            send_at_minute=self.now().minute,
+            send_at_date=future_date,
+            send_at_hour=future_date.hour,
+            send_at_minute=future_date.minute,
             use_local_time=False,
         )
         self.subject = self.scheduled_newsletter_message.message.subject
