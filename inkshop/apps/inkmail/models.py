@@ -239,6 +239,30 @@ class ScheduledNewsletterMessage(HashidBaseModel):
     num_sent = models.IntegerField(default=0)
 
     @property
+    def __str__(self):
+        if self.send_at_date:
+            if self.use_local_time:
+                timestamp = "%s %s:%s local time" % (
+                    self.send_at_date,
+                    self.send_at_hour,
+                    self.send_at_minute,
+                )
+            else:
+                timestamp = "%s %s:%s" % (
+                    self.send_at_date,
+                    self.send_at_hour,
+                    self.send_at_minute,
+                )
+        else:
+            timestamp = self.modified_at
+
+        return "%s - %s to %s" % (
+            timestamp,
+            self.message,
+            self.newsletter
+        )
+
+    @property
     def recipients(self):
         return self.newsletter.subscriptions.filter(double_opted_in=True, unsubscribed=False)
 
