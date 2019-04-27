@@ -44,6 +44,7 @@ BROKER_URL = STUNNELED_URL
 CELERY_BROKER_URL = STUNNELED_URL
 
 # AWS_S3_CALLING_FORMAT = 'boto.s3.connection.OrdinaryCallingFormat'
+AWS_DEFAULT_ACL = "public-read"
 AWS_S3_CUSTOM_DOMAIN = AWS_STORAGE_BUCKET_NAME
 MEDIA_URL = 'https://%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
 STATIC_URL = 'https://%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME

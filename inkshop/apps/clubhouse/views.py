@@ -36,7 +36,7 @@ def dashboard(request):
 @login_required
 def create_message(request):
     m = Message.objects.create()
-    return redirect(reverse('clubhouse:message', kwargs={"hashid": m.hashid, }))
+    return redirect(reverse('clubhouse:message', kwargs={"hashid": m.hashid, }, host='clubhouse'))
 
 
 @render_to("clubhouse/messages.html")
@@ -122,7 +122,7 @@ def newsletter(request, hashid):
 @login_required
 def create_newsletter(request):
     n = Newsletter.objects.create()
-    return redirect(reverse('clubhouse:newsletter', kwargs={"hashid": n.hashid, }))
+    return redirect(reverse('clubhouse:newsletter', kwargs={"hashid": n.hashid, }, host='clubhouse'))
 
 
 @render_to("clubhouse/organization.html")
@@ -144,7 +144,7 @@ def organization(request):
 @login_required
 def create_scheduled_newsletter_message(request):
     snm = ScheduledNewsletterMessage.objects.create()
-    return redirect(reverse('clubhouse:scheduled_newsletter_message', kwargs={"hashid": snm.hashid, }))
+    return redirect(reverse('clubhouse:scheduled_newsletter_message', kwargs={"hashid": snm.hashid, }, host='clubhouse'))
 
 
 @render_to("clubhouse/scheduled_newsletter_messages.html")
