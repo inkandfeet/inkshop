@@ -158,6 +158,7 @@ def scheduled_newsletter_messages(request):
 @render_to("clubhouse/scheduled_newsletter_message.html")
 @login_required
 def scheduled_newsletter_message(request, hashid):
+    now = timezone.now()
     page_name = "scheduled_newsletter_messages"
     snm = ScheduledNewsletterMessage.objects.get(hashid=hashid)
     if request.method == "POST":

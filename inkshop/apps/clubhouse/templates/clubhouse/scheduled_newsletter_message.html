@@ -2,6 +2,7 @@
 {% block content %}
     <h1>Scheduled Newsletter {{ snm }}</h1>
     <p>&hearts;</p>
+    <p>It's currently {{now}} in the server's time.</p>
     {% if saved %}Saved{% endif %}
     <form method="POST" enctype="multipart/form-data" action=".">
         {% csrf_token %}
