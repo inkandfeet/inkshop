@@ -30,7 +30,7 @@ class Person(HashidBaseModel):
     encrypted_email = models.CharField(unique=True, max_length=4096, blank=True, null=True,)
     hashed_first_name = models.CharField(max_length=4096, blank=True, null=True)
     hashed_last_name = models.CharField(max_length=4096, blank=True, null=True)
-    hashed_email = models.CharField(unique=True, max_length=4096, blank=True, null=True,)
+    hashed_email = models.CharField(unique=True, max_length=4096, blank=True, null=True, verbose_name="Email")
     email_verified = models.BooleanField(default=False)
     time_zone = models.CharField(max_length=254, blank=True, null=True,)
 

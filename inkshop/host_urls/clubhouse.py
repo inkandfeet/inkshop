@@ -8,7 +8,8 @@ from django.views.static import serve
 
 
 urlpatterns = [
-    url(r'^$', include(('clubhouse.urls', 'clubhouse'), namespace="clubhouse")),
+    url(r'^', include(('clubhouse.urls', 'clubhouse'), namespace="clubhouse")),
+
     url(r'^admin/password_reset/$', auth_views.PasswordResetView, name='admin_password_reset'),
     url(r'^admin/password_reset/done/$', auth_views.PasswordResetDoneView, name='password_reset_done'),
 
