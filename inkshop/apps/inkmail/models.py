@@ -220,7 +220,7 @@ class Subscription(HashidBaseModel):
         if not self.opt_in_key or self.opt_in_key_created_at < timezone.now() - OPT_IN_LINK_EXPIRE_TIME:
             self.generate_opt_in_link()
 
-        return "%s%s" % (settings.CONFIRM_BASE_URL, reverse("inkmail:confirm_subscription", args=(self.opt_in_key,)))
+        return "%s%s" % (settings.MAIL_BASE_URL, reverse("inkmail:confirm_subscription", args=(self.opt_in_key,)))
 
 
 class ScheduledNewsletterMessage(HashidBaseModel):
@@ -309,21 +309,21 @@ class OutgoingMessage(BaseModel):
     @property
     def unsubscribe_link(self):
         return "%s%s" % (
-            settings.CONFIRM_BASE_URL,
+            settings.MAIL_BASE_URL,
             reverse("inkmail:unsubscribe", args=(self.unsubscribe_hash, )),
         )
 
     @property
     def delete_account_link(self):
         return "%s%s" % (
-            settings.CONFIRM_BASE_URL,
+            settings.MAIL_BASE_URL,
             reverse("inkmail:delete_account", args=(self.delete_hash, )),
         )
 
     @property
     def love_link(self):
         return "%s%s" % (
-            settings.CONFIRM_BASE_URL,
+            settings.MAIL_BASE_URL,
             reverse("inkmail:love_message", args=(self.love_hash, )),
         )
 
