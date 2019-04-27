@@ -3,7 +3,7 @@
 
 It's an all-in-one system for businesses that do things the right way.  Battieries are included - manage your website, mailing list, store, and reporting all in one.  It's free.
 
-But there are lots of good systems out there.  Inkshop sticks out because it's people-focused.  It treats your customers and visitors like people, not data-points.
+There are tons of good systems out there.  Inkshop sticks out because it's people-focused.  It treats your customers and visitors like people, not data points.
 
 That means no creepy tracking, no big-data segmentation, and encryption baked-in to provide strong privacy protection for both you and your customers. 
 
@@ -34,9 +34,9 @@ It won't ever let you:
 - Break GDPR or similar laws
 
 
-Some features and principles that set it apart:
+Some core principles that set it apart:
 
-Email:
+Real email.
 Active, positive consent.  Auto-unsubscribing.
 
 Get amazing deliverability and response by sending emails only to people who have shown you that they're interested and want to keep hearing from you.
@@ -44,12 +44,16 @@ Get amazing deliverability and response by sending emails only to people who hav
 Fast.
 Without all the bulk of tracking software, your site renders _fast_.  On mobile and desktop.
 
+Compliant.
+Inkshop does things the right way, and so you'll automatically comply with current - and future - privacy regulation.
+
+
 ## Current status:
 
 [![TravisCI](https://travis-ci.org/inkandfeet/inkshop.svg?branch=master)](https://travis-ci.org/inkandfeet/inkshop)
 
 
-I'm bootstrapping this project on my own site, [Ink and Feet](https://inkandfeet.com).   It's currently running my mailing list (but not my site), but unless you're a professional programmer or super risk tolerant, I wouldn't advise you move your list over to it just yet.  It's been two weeks. Give it a month or two. :)
+I'm bootstrapping this project on my own site, [Ink and Feet](https://inkandfeet.com).   It's currently running my mailing list (but not my site). However, unless you're a professional programmer or super risk tolerant, I wouldn't advise you move your list over to it just yet.  It's been two weeks. Give it a month or two. :)
 
 You can read more about the decision to move to inkshop in [this open letter.]()
 
