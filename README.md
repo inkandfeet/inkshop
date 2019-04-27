@@ -1,7 +1,7 @@
 
 # Inkshop is about people.
 
-It's an all-in-one system for businesses that do things the right way.  Battieries are included - manage your website, mailing list, store, and reporting all in one.  It's free.
+It's an all-in-one system for businesses and organizations that do things the right way.  Battieries are included - manage your website, mailing list, store, and reporting all in one.  It's free.
 
 There are tons of good systems out there.  Inkshop sticks out because it's people-focused.  It treats you, your customers, and your visitors like people, not data points.
 
@@ -36,22 +36,18 @@ It won't ever let you:
 
 Some core principles that set it apart:
 
-**Real email.**
-
+**Real email.**<br/>
 Engaged subscription, built on active, positive consent and auto-unsubscribing.
 
 Get amazing deliverability and response by sending emails only to people who have shown you that they're interested and want to keep hearing from you.
 
-**Fast.**
-
+**Fast.**<br/>
 Without all the bulk of tracking software, your site renders _fast_.  On mobile and desktop.
 
-**Integrated.**
-
+**Complete.**<br/>
 One of the big trends has been having a specialized system for everything, and plugging them into each other.  But that means your and your customer's data is spread out in a dozen places you can't control.  Inkshop bucks that trend, and puts everything you need in one user-friendly place.
 
-**Compliant.**
-
+**Compliant.**<br/>
 Inkshop does things the right way, and so you'll automatically comply with current - and future - privacy regulation.
 
 
@@ -75,7 +71,7 @@ I'll be moving from a setup with:
 
 The project _just_ got started, on April 15 2019.   Mailing list is the first thing to build. Target for basic mailing list was April 28, 2019, and it's been hit.
 
-Right now, it handles
+Right now, it handles:
 - Subscribe
 - Create mailing lists
 - Send message to a mailing list
@@ -149,16 +145,13 @@ python3 manage.py import_ontraport_csv --subscribers subscribers.csv --hard_boun
 
 ## Current working list
 
-- [ ] import list into production
-- [ ] schedule letter for sunday
+Next Week:
 
--- Next Week
 - delete flow finished
 - poll mailgun (or webhook) for hard bounces
 - add fallback gif
 - scale down workers
-- Move inkmail helpers to tasks?  Think about abstraction this.
-- Handle simle
+- Move all inkmail helpers to tasks?  Think about abstraction this.
 - Auto-delete any un-clicked confirmations after 7 days.
 - Handle if people click them later, make sure we never delete people who were already subscribed, etc.
 
@@ -166,8 +159,4 @@ python3 manage.py import_ontraport_csv --subscribers subscribers.csv --hard_boun
 ## Open threads the architecture isn't decided on yet.
 - Structure for GDPR dump.  JSON?  Zip?
 - Structure for full-system export/import.  JSON?  Zip?
-- Handle opt-in separately from transactional?
-- Import flow for people who don't have double-opt-in records.  
-- Transactional emails - how out is opted out?   (Everything vs subsciption is the most common pattern, but what's the simpler solution?)
-- Resubscribe flow.  If you unsubscribe, then sign up again, can I send you an email to get you back on my list?  (Probably add confirmation to the signup flow).
-- Capitalizing first names - better to do it in the template, or the source data?
+- Import flow for people who don't have double-opt-in records.
