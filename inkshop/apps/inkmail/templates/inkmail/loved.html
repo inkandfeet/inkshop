@@ -1,10 +1,28 @@
 <html>
 <head> 
+    <style type="text/css">
+        .giant_heart {
+            color: red;
+            font-size: 3em;
+        }
+        html {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+    <div class="giant_heart">&hearts;</div>
+
+    <h2>Awesome. I'm so glad you enjoyed it - and thanks for letting me know!</h2>
+
+    <p>Please enjoy this week's wonderful piece of the internet, in gif form. :) </p>
+    <p>-Steven</p>
     <h1>Loved!!</h1>
-    <p>&hearts;</p>
-    {% if om.message.reward_image %}<img src="{{ om.message.reward_image.url }}"/> {% endif %}
+    
+    <div class="reward_image">
+        {% if om.message.reward_image %}<img src="{{ om.message.reward_image.url }}"/> {% endif %}
+    </div>
+    <!-- <p>&hearts;</p> -->
     <!-- Awesome .gif -->
 </body>
 </html>

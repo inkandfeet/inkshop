@@ -105,7 +105,7 @@ def subscribe(request):
         else:
             return HttpResponse(status=422)
     else:
-        send_subscription_confirmation(s.pk)
+        send_subscription_confirmation.delay(s.pk)
         HistoricalEvent.log(person=p, event_type="subscribed", newsletter=n, subscription=s)
 
     if request.is_ajax():
