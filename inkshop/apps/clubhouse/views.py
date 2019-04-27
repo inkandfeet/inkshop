@@ -54,7 +54,7 @@ def message(request, hashid):
     message = Message.objects.get(hashid=hashid)
     saved = False
     if request.method == "POST":
-        form = MessageForm(request.POST, instance=message)
+        form = MessageForm(request.POST, request.FILES, instance=message)
         if form.is_valid():
             form.save()
             saved = True
@@ -110,7 +110,7 @@ def newsletter(request, hashid):
     saved = False
     n = Newsletter.objects.get(hashid=hashid)
     if request.method == "POST":
-        form = NewsletterForm(request.POST, instance=n)
+        form = NewsletterForm(request.POST, request.FILES, instance=n)
         if form.is_valid():
             form.save()
             saved = True
@@ -131,7 +131,7 @@ def organization(request):
     page_name = "organization"
     o = Organization.get()
     if request.method == "POST":
-        form = OrganizationForm(request.POST, instance=o)
+        form = OrganizationForm(request.POST, request.FILES, instance=o)
         if form.is_valid():
             form.save()
             saved = True
@@ -161,7 +161,7 @@ def scheduled_newsletter_message(request, hashid):
     page_name = "scheduled_newsletter_messages"
     snm = ScheduledNewsletterMessage.objects.get(hashid=hashid)
     if request.method == "POST":
-        form = ScheduledNewsletterMessageForm(request.POST, instance=snm)
+        form = ScheduledNewsletterMessageForm(request.POST, request.FILES, instance=snm)
         if form.is_valid():
             form.save()
             saved = True

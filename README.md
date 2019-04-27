@@ -113,6 +113,15 @@ docker-compose run inkshop pt --autoreload
 ```
 
 
+## Migrating from other services.
+
+Ontraport:
+
+
+```bash
+python3 manage.py import_ontraport_csv --subscribers subscribers.csv --hard_bounce hard_bounces.csv  --newsletter my-newsletter
+```
+
 
 ## Opinionated, and built on:
 - [Pyca Cryptograpy](https://github.com/pyca/cryptography) for encryption.
