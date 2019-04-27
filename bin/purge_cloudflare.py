@@ -63,5 +63,6 @@ def do_purge():
     else:
         print("No domains specified. Try `python purge_cloudflare.py example.com` or similar")
 
+
 if __name__ == '__main__':
     do_purge()
