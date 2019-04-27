@@ -238,7 +238,6 @@ class ScheduledNewsletterMessage(HashidBaseModel):
     # num_queued = models.IntegerField(default=0) ?
     num_sent = models.IntegerField(default=0)
 
-    @property
     def __str__(self):
         if self.send_at_date:
             if self.use_local_time:
