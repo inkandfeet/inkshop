@@ -75,7 +75,7 @@ jobs:
            command: heroku run "python manage.py collectstatic --settings=envs.live_local --noinput && python manage.py collectstatic --settings=envs.live --noinput" --app inkandfeet-inkshop
       - run:
            name: Purge Cloudflare Cache
-           command: 'sudo pip install requests; python bin/purge_cloudflare.py dev.inkandfeet.com'
+           command: 'sudo pip install requests; python bin/purge_cloudflare.py mail.inkandfeet.com clubhouse.inkandfeet.com'
 
 workflows:
   version: 2
