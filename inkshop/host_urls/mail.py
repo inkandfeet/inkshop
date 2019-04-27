@@ -9,7 +9,7 @@ from django.views.static import serve
 
 urlpatterns = [
     url(r'^', include(('inkmail.urls', 'inkmail'), namespace="inkmail")),
-    url(r'^mail/', include(('inkmail.urls', 'inkmail'), namespace="inkmail")),
+    url(r'^mail/', include(('inkmail.urls', 'inkmail'), namespace="inkmail_scoped")),
 
     url(r'^admin/password_reset/$', auth_views.PasswordResetView, name='admin_password_reset'),
     url(r'^admin/password_reset/done/$', auth_views.PasswordResetDoneView, name='password_reset_done'),
