@@ -18,7 +18,7 @@ from archives.models import HistoricalEvent
 from inkmail.models import Newsletter, Subscription, OutgoingMessage
 from inkmail.tasks import send_subscription_confirmation, send_subscription_welcome
 from people.models import Person
-from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, lookup_hash
+from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, lookup_hash, f
 
 
 @render_to("inkmail/home.html")
@@ -105,7 +105,7 @@ def subscribe(request):
         else:
             return HttpResponse(status=422)
     else:
-        send_subscription_confirmation.delay(s.pk)
+        send_subscription_confirmation(s.pk)
         HistoricalEvent.log(person=p, event_type="subscribed", newsletter=n, subscription=s)
 
     if request.is_ajax():
