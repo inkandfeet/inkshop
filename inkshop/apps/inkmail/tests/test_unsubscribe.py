@@ -1,6 +1,6 @@
 import logging
 import json
-from django_hosts.resolvers import reverse
+from utils.helpers import reverse
 from django.core import mail
 from django.conf import settings
 
@@ -168,8 +168,12 @@ class TestUnsubscribeResubscribe(MailTestCase):
 
         # Re-subscribe
         response = self.post(
-            reverse(
-                'inkmail:subscribe',
+            "%s%s" % (
+                settings.MAIL_BASE_URL,
+                reverse(
+                    'inkmail:subscribe',
+                    host='mail',
+                )
             ),
             {
                 'first_name': self.person.first_name,
@@ -233,9 +237,14 @@ class TestUnsubscribeResubscribe(MailTestCase):
         # Re-subscribe
         name = Factory.rand_name()
         subscription_url = Factory.rand_url()
+
         response = self.post(
-            reverse(
-                'inkmail:subscribe',
+            "%s%s" % (
+                settings.MAIL_BASE_URL,
+                reverse(
+                    'inkmail:subscribe',
+                    host='mail',
+                )
             ),
             {
                 'first_name': name,
@@ -275,8 +284,12 @@ class TestUnsubscribeResubscribe(MailTestCase):
         name = Factory.rand_name()
         subscription_url = Factory.rand_url()
         response = self.post(
-            reverse(
-                'inkmail:subscribe',
+            "%s%s" % (
+                settings.MAIL_BASE_URL,
+                reverse(
+                    'inkmail:subscribe',
+                    host='mail',
+                )
             ),
             {
                 'first_name': name,
@@ -331,8 +344,12 @@ class TestUnsubscribeResubscribe(MailTestCase):
         name = Factory.rand_name()
         subscription_url = Factory.rand_url()
         response = self.post(
-            reverse(
-                'inkmail:subscribe',
+            "%s%s" % (
+                settings.MAIL_BASE_URL,
+                reverse(
+                    'inkmail:subscribe',
+                    host='mail',
+                )
             ),
             {
                 'first_name': name,

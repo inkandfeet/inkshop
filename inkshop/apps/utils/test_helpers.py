@@ -1,8 +1,11 @@
 
 import mock
 import unittest
+from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import timezone
+from django.urls.base import set_urlconf
 from utils.factory import Factory
 from archives.models import HistoricalEvent
 from inkmail.tasks import process_outgoing_message_queue

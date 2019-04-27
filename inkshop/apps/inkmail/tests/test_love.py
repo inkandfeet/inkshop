@@ -1,7 +1,7 @@
 import logging
 import json
 
-from django_hosts.resolvers import reverse
+from utils.helpers import reverse
 from django.core import mail
 from django.conf import settings
 from django.test.utils import override_settings
@@ -34,6 +34,7 @@ class TestLoveBasics(MailTestCase):
 
     def test_clicking_love_marks_as_loved(self):
         self.test_love_link_included_in_message_send()
+        print(self.om.love_link)
         self.loved_resp = self.get(self.om.love_link)
 
         # Refresh

@@ -1,7 +1,7 @@
 import logging
 import json
 
-from django_hosts.resolvers import reverse
+from utils.helpers import reverse
 from django.core import mail
 from django.conf import settings
 from django.test.utils import override_settings
@@ -30,6 +30,7 @@ class TestPostSubscribes(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             {
                 'first_name': name,
@@ -48,6 +49,7 @@ class TestPostSubscribes(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             {
                 'first_name': name,
@@ -77,6 +79,7 @@ class TestPostSubscribes(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             {
                 'email': email,
@@ -105,6 +108,7 @@ class TestPostSubscribes(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             {
                 'first_name': name,
@@ -124,6 +128,7 @@ class TestPostSubscribes(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             {
                 'first_name': name,
@@ -144,6 +149,7 @@ class TestPostSubscribes(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             {
                 'first_name': name,
@@ -171,6 +177,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             json.dumps({
                 'first_name': name,
@@ -194,6 +201,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             json.dumps({
                 'first_name': name,
@@ -228,6 +236,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             json.dumps({
                 'email': email,
@@ -261,6 +270,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             json.dumps({
                 'first_name': name,
@@ -285,6 +295,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             json.dumps({
                 'first_name': name,
@@ -318,6 +329,7 @@ class TestConfirmEmail(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             {
                 'first_name': name,
@@ -359,6 +371,7 @@ class TestWelcomeEmail(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             {
                 'first_name': name,
@@ -404,6 +417,7 @@ class TestHistoricalEvent(MockRequestsTestCase):
         response = self.post(
             reverse(
                 'inkmail:subscribe',
+                host='mail',
             ),
             {
                 'first_name': name,
