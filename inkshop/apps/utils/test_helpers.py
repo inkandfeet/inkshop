@@ -105,7 +105,7 @@ class MailTestCase(MockRequestsTestCase):
         )
         self.subject = self.scheduled_newsletter_message.message.subject
         self.body_unrendered = self.scheduled_newsletter_message.message.body_text_unrendered
-        queue_newsletter_message(scheduled_newsletter_message=self.scheduled_newsletter_message)
+        queue_newsletter_message.delay(self.scheduled_newsletter_message.hashid)
         process_outgoing_message_queue()
 
     def send_test_transactional_message(self):

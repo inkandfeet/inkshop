@@ -84,7 +84,7 @@ class TestSendToNewsletter(MailTestCase):
         )
         self.subject = self.scheduled_newsletter_message.message.subject
         self.body = self.scheduled_newsletter_message.message.body_text_unrendered
-        queue_newsletter_message(scheduled_newsletter_message=self.scheduled_newsletter_message)
+        queue_newsletter_message(self.scheduled_newsletter_message.hashid)
         process_outgoing_message_queue()
         process_outgoing_message_queue()
         process_outgoing_message_queue()
@@ -109,7 +109,7 @@ class TestSendToNewsletter(MailTestCase):
         )
         self.subject = self.scheduled_newsletter_message.message.subject
         self.body = self.scheduled_newsletter_message.message.body_text_unrendered
-        queue_newsletter_message(scheduled_newsletter_message=self.scheduled_newsletter_message)
+        queue_newsletter_message(self.scheduled_newsletter_message.hashid)
         process_outgoing_message_queue()
         self.assertEquals(len(mail.outbox), 0)
 
@@ -135,7 +135,7 @@ class TestSendToNewsletter(MailTestCase):
         )
         self.subject = self.scheduled_newsletter_message.message.subject
         self.body = self.scheduled_newsletter_message.message.body_text_unrendered
-        queue_newsletter_message(scheduled_newsletter_message=self.scheduled_newsletter_message)
+        queue_newsletter_message(self.scheduled_newsletter_message.hashid)
         process_outgoing_message_queue()
         self.assertEquals(len(mail.outbox), num_subscribers)
 
@@ -156,7 +156,7 @@ class TestSendToNewsletter(MailTestCase):
         )
         self.subject = self.scheduled_newsletter_message.message.subject
         self.body = self.scheduled_newsletter_message.message.body_text_unrendered
-        queue_newsletter_message(scheduled_newsletter_message=self.scheduled_newsletter_message)
+        queue_newsletter_message(self.scheduled_newsletter_message.hashid)
         process_outgoing_message_queue()
         self.assertEquals(len(mail.outbox), num_subscribers)
 

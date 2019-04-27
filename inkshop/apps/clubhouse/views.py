@@ -184,6 +184,6 @@ def scheduled_newsletter_message_confirm_queue(request, hashid):
 def scheduled_newsletter_message_queued(request, hashid):
     page_name = "scheduled_newsletter_messages"
     snm = ScheduledNewsletterMessage.objects.get(hashid=hashid)
-    queue_newsletter_message(scheduled_newsletter_message=snm)
+    queue_newsletter_message.delay(snm.hashid)
 
     return locals()

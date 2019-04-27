@@ -23,9 +23,12 @@ def queue_message(message, subscription, at=None, scheduled_newsletter_message=N
     )
 
 
-def queue_newsletter_message(scheduled_newsletter_message, at=None):
+@task
+def queue_newsletter_message(scheduled_newsletter_message_hashid, at=None):
     """Sends a message to a particular subscriber"""
-    from inkmail.models import OutgoingMessage  # Avoid circular imports
+    from inkmail.models import OutgoingMessage, ScheduledNewsletterMessage  # Avoid circular imports
+    scheduled_newsletter_message = ScheduledNewsletterMessage.objects.get(hashid=scheduled_newsletter_message_hashid)
+
     if (
         scheduled_newsletter_message
         and scheduled_newsletter_message.enabled
