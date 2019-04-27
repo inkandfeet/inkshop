@@ -173,13 +173,14 @@ Bonus
 - [ ] schedule letter for sunday
 
 -- Next up
-- create admin user
-- login, create basic crud around message, newsletter messsage, see outgoing messages, person, scheduled newsletter message
-- basic import
-- test with myself
+X create admin user
+X login, create basic crud around message, newsletter messsage, see outgoing messages, person, scheduled newsletter message
+X basic import
+X test with myself
 
 -- Next Week
-
+- add fallback gif
+- scale down workers
 - Move inkmail helpers to tasks?  Think about abstraction this.
 - `django-admin squashmigrations app_label`
 - Handle simle
