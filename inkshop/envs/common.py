@@ -126,6 +126,7 @@ MIDDLEWARE = (
 
 ROOT_URLCONF = 'inkshop.urls'
 ROOT_HOSTCONF = 'inkshop.hosts'
+HOST_SCHEME = ''
 DEFAULT_HOST = 'root'
 SITE_ID = 1
 

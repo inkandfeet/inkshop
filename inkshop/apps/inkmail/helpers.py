@@ -46,6 +46,9 @@ def queue_newsletter_message(scheduled_newsletter_message, at=None):
                     at = at.replace(
                         minute=scheduled_newsletter_message.send_at_minute,
                     )
+                at = at.replace(
+                    tzinfo=timezone.now().tzinfo
+                )
             else:
                 at = timezone.now()
 

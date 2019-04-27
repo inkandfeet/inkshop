@@ -21,7 +21,8 @@ from django.contrib.auth.signals import user_logged_in
 from django.template.defaultfilters import linebreaks
 from django.template.loader import render_to_string
 from django.template import Template, Context
-from django_hosts.resolvers import reverse
+from utils.helpers import reverse
+# from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
 
