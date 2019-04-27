@@ -12,7 +12,7 @@ from tempfile import NamedTemporaryFile
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django_hosts.resolvers import reverse
+from utils.helpers import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
 
