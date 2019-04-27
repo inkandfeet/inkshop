@@ -43,7 +43,7 @@ else:
 BROKER_URL = STUNNELED_URL
 CELERY_BROKER_URL = STUNNELED_URL
 
-AWS_S3_CALLING_FORMAT = 'boto.s3.connection.OrdinaryCallingFormat'
+# AWS_S3_CALLING_FORMAT = 'boto.s3.connection.OrdinaryCallingFormat'
 AWS_S3_CUSTOM_DOMAIN = AWS_STORAGE_BUCKET_NAME
 MEDIA_URL = 'https://%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
 STATIC_URL = 'https://%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
@@ -66,7 +66,7 @@ CACHES = {
 
 DATABASES = None
 DATABASES = postgresify()
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE = DEFAULT_FILE_STORAGE
 COMPRESS_STORAGE = STATICFILES_STORAGE
 COMPRESS_URL = STATIC_URL
