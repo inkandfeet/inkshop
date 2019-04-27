@@ -33,13 +33,19 @@ def queue_newsletter_message(scheduled_newsletter_message, at=None):
     ):
         if not at:
             if scheduled_newsletter_message.send_at_date:
-                at = scheduled_newsletter_message.send_at_date
                 # TODO: Use local time
                 # scheduled_newsletter_message.use_local_time
-                at = at.replace(
-                    hour=scheduled_newsletter_message.send_at_hour,
-                    minute=scheduled_newsletter_message.send_at_minute,
-                )
+                at = scheduled_newsletter_message.send_at_date
+                time = datetime.min.time()
+                at = datetime.combine(at, time)
+                if scheduled_newsletter_message.send_at_hour:
+                    at = at.replace(
+                        hour=scheduled_newsletter_message.send_at_hour,
+                    )
+                if scheduled_newsletter_message.send_at_minute:
+                    at = at.replace(
+                        minute=scheduled_newsletter_message.send_at_minute,
+                    )
             else:
                 at = timezone.now()
 
