@@ -16,7 +16,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
 from django.contrib.auth.signals import user_logged_in
-from django.urls import reverse
+from django_hosts.resolvers import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
 

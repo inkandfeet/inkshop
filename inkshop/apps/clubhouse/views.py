@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.utils import timezone
 from django.shortcuts import redirect
-from django.urls import reverse
+from django_hosts.resolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from annoying.decorators import render_to, ajax_request

@@ -3,7 +3,7 @@ import logging
 import json
 from freezegun import freeze_time
 
-from django.urls import reverse
+from django_hosts.resolvers import reverse
 from django.core import mail
 from django.conf import settings
 from django.test.utils import override_settings
