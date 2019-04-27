@@ -58,6 +58,9 @@ set_required_key("MAILGUN_SENDER_DOMAIN")  # i.e. mail.mydomain.com
 # AWS
 set_required_key("AWS_STORAGE_BUCKET_NAME")
 set_required_key("AWS_S3_HOST")
+set_required_key("AWS_ACCESS_KEY_ID")
+set_required_key("AWS_SECRET_ACCESS_KEY")
+
 
 # Database config
 set_required_key("POSTGRES_DB", "not set")
