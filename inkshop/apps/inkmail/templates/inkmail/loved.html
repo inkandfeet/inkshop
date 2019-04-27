@@ -4,6 +4,6 @@
 <body>
     <h1>Loved!!</h1>
     <p>&hearts;</p>
-    <img src="adorable.gif"/>
+    {% if om.message.reward_image %}<img src="{{ om.message.reward_image.url }}"/> {% endif %}
 </body>
 </html>
