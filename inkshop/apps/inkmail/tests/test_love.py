@@ -43,7 +43,7 @@ class TestLoveBasics(MailTestCase):
 
     def test_clicking_love_shows_correct_page(self):
         self.test_clicking_love_marks_as_loved()
-        self.assertIn("Loved!", self.loved_resp.content.decode('utf-8'))
+        self.assertIn("Love Received!", self.loved_resp.content.decode('utf-8'))
 
     @unittest.skip("Add a fallback so I can have this be a test again. :)")
     def test_clicking_love_shows_adorable_gif(self):
