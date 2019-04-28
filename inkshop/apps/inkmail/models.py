@@ -487,7 +487,7 @@ class OutgoingMessage(BaseModel):
                 # Or, you're subscribed.
                 or (
                     self.subscription
-                    and self.subscription.person.pk is self.person.pk
+                    and self.subscription.person.pk == self.person.pk
                     and self.subscription.double_opted_in
                     and not self.subscription.unsubscribed
                 )
@@ -612,7 +612,7 @@ class OutgoingMessage(BaseModel):
         else:
             if (
                 not self.subscription
-                or self.subscription.person.pk is not self.person.pk
+                or self.subscription.person.pk != self.person.pk
                 or not self.subscription.double_opted_in
                 or self.subscription.unsubscribed
                 or self.person.banned
