@@ -146,7 +146,7 @@ python3 manage.py import_ontraport_csv --subscribers subscribers.csv --hard_boun
 ## Current working list
 
 Next Week:
-
+- handle subscribes between scheduling and sending
 - delete flow finished
 - poll mailgun (or webhook) for hard bounces
 - add fallback gif

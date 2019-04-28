@@ -266,6 +266,10 @@ class ScheduledNewsletterMessage(HashidBaseModel):
         return self.newsletter.subscriptions.filter(double_opted_in=True, unsubscribed=False)
 
     @property
+    def num_outgoingmessages_success(self):
+        return self.outgoingmessage_set.filter(send_success=True).count()
+
+    @property
     def num_outgoingmessages_sent(self):
         return self.outgoingmessage_set.filter(attempt_complete=True).count()
 
