@@ -125,9 +125,9 @@ class Newsletter(HashidBaseModel):
             newsletter = Newsletter.objects.get(internal_name=newsletter_name)
 
         hashed_email = lookup_hash(email)
-        if Person.objects.filter(hashed_email=hashed_email):
-            if not overwrite:
-                return
+        person_exists = False
+        if Person.objects.filter(hashed_email=hashed_email).count() > 0:
+            person_exists = True
             p = Person.objects.get(hashed_email=hashed_email)
             if p.banned:
                 return
@@ -136,22 +136,23 @@ class Newsletter(HashidBaseModel):
                 hashed_email=hashed_email
             )
 
-        p.first_name = first_name
-        p.last_name = last_name
-        p.email = email
-        assert p.hashed_email == hashed_email
-        p.email_verified = double_opted_in
-        p.time_zone = time_zone
-        p.was_imported = True
-        p.was_imported_at = datetime.datetime.now(timezone.utc)
-        p.hard_bounced = hard_bounced
-        p.hard_bounced_at = hard_bounced_at
-        p.hard_bounced_reason = hard_bounced_reason
-        p.import_source = import_source
-        p.save()
+        if overwrite or not person_exists:
+            p.first_name = first_name
+            p.last_name = last_name
+            p.email = email
+            assert p.hashed_email == hashed_email
+            p.email_verified = double_opted_in
+            p.time_zone = time_zone
+            p.was_imported = True
+            p.was_imported_at = datetime.datetime.now(timezone.utc)
+            p.hard_bounced = hard_bounced
+            p.hard_bounced_at = hard_bounced_at
+            p.hard_bounced_reason = hard_bounced_reason
+            p.import_source = import_source
+            p.save()
 
         if newsletter:
-            if Subscription.objects.filter(person=p, newsletter=newsletter):
+            if Subscription.objects.filter(person=p, newsletter=newsletter).count() > 0:
                 if not overwrite:
                     return
                 s = Subscription.objects.get(person=p, newsletter=newsletter)
