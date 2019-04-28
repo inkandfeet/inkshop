@@ -7,7 +7,7 @@
 
     <ul>
     {% for m in scheduled_newsletter_messages %}
-    <li>  ( {{m.num_outgoingmessages_success}} success ) - {{m.num_outgoingmessages_sent}} / {{m.num_outgoingmessages_queued }}  <a href="{% url 'clubhouse:scheduled_newsletter_message' m.hashid %}">{{ m }}</a></li>
+    <li>  ( {{m.num_outgoingmessages_loved}} &hearts; ) ( {{m.num_outgoingmessages_success}} success ) - {{m.num_outgoingmessages_sent}} / {{m.num_outgoingmessages_queued }}  <a href="{% url 'clubhouse:scheduled_newsletter_message' m.hashid %}">{{ m }}</a></li>
     {% endfor %}
     </ul>
 {% endblock %}

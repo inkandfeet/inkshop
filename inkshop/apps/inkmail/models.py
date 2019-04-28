@@ -274,6 +274,10 @@ class ScheduledNewsletterMessage(HashidBaseModel):
         return self.outgoingmessage_set.filter(attempt_complete=True).count()
 
     @property
+    def num_outgoingmessages_loved(self):
+        return self.outgoingmessage_set.filter(loved=True).count()
+
+    @property
     def num_outgoingmessages_queued(self):
         return self.outgoingmessage_set.count()
 
