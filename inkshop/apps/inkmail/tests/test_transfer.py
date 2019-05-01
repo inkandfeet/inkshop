@@ -28,7 +28,7 @@ class TestPostSubscribes(MockRequestsTestCase):
         name = Factory.rand_name()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             {
                 'f': name,
@@ -44,7 +44,7 @@ class TestPostSubscribes(MockRequestsTestCase):
         name = Factory.rand_name()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             {
                 'f': name,
@@ -70,7 +70,7 @@ class TestPostSubscribes(MockRequestsTestCase):
         email = Factory.rand_email()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             {
                 'e': email,
@@ -95,7 +95,7 @@ class TestPostSubscribes(MockRequestsTestCase):
         name = Factory.rand_name()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             {
                 'f': name,
@@ -112,7 +112,7 @@ class TestPostSubscribes(MockRequestsTestCase):
         name = Factory.rand_name()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             {
                 'f': name,
@@ -130,7 +130,7 @@ class TestPostSubscribes(MockRequestsTestCase):
         email = Factory.rand_email()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             {
                 'f': name,
@@ -155,7 +155,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         name = Factory.rand_name()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             json.dumps({
                 'f': name,
@@ -176,7 +176,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         name = Factory.rand_name()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             json.dumps({
                 'f': name,
@@ -207,7 +207,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         email = Factory.rand_email()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             json.dumps({
                 'e': email,
@@ -237,7 +237,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         name = Factory.rand_name()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             json.dumps({
                 'f': name,
@@ -259,7 +259,7 @@ class TestAjaxSubscribes(MockRequestsTestCase):
         name = Factory.rand_name()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             json.dumps({
                 'f': name,
@@ -290,7 +290,7 @@ class TestConfirmEmail(MockRequestsTestCase):
         name = Factory.rand_name()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             {
                 'f': name,
@@ -329,7 +329,7 @@ class TestWelcomeEmail(MockRequestsTestCase):
         name = Factory.rand_name()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             {
                 'f': name,
@@ -372,7 +372,7 @@ class TestHistoricalEvent(MockRequestsTestCase):
         name = Factory.rand_name()
         response = self.get(
             reverse(
-                'inkmail:transfer_subscription', self.newsletter.hashid,
+                'inkmail:transfer_subscription', args=(self.newsletter.hashid,),
             ),
             {
                 'f': name,
