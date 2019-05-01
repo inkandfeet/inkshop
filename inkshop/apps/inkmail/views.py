@@ -143,6 +143,70 @@ def confirm_subscription(request, opt_in_key):
     return locals()
 
 
+@render_to("inkmail/email_confirmation.html")
+def transfer_subscription(request, transfer_code):
+    # This is a special link for users to opt-in from an existing newsletter.
+    s = None
+    if "e" in request.GET:
+        hashed_email = lookup_hash(request.GET["e"].replace(" ", "+"))
+        if Newsletter.objects.filter(hashid=transfer_code).count():
+            n = Newsletter.objects.get(hashid=transfer_code)
+
+            if Person.objects.filter(hashed_email=hashed_email).count() > 0:
+                p = Person.objects.get(hashed_email=hashed_email)
+                if "f" in request.GET:
+                    p.first_name = request.GET["f"]
+            else:
+                p = Person.objects.create(
+                    hashed_email=hashed_email,
+                )
+                p.email = request.GET["e"].replace(" ", "+")
+                if "f" in request.GET:
+                    p.first_name = request.GET["f"]
+            p.save()
+
+            s, created = Subscription.objects.get_or_create(
+                person=p,
+                newsletter=n,
+            )
+            if created or s.unsubscribed:
+                s.subscribed_at = timezone.now()
+                s.unsubscribed = False
+                s.unsubscribed_at = None
+
+                s.subscription_url = "transfer-subscription"
+                s.subscribed_from_ip, _ = get_client_ip(request)
+                s.save()
+
+            already_double_opted_in = True
+            if not s.double_opted_in:
+                already_double_opted_in = False
+                s.double_opted_in = True
+                s.double_opted_in_at = timezone.now()
+                s.save()
+
+            p = s.person
+            p.email_verified = True
+            p.save()
+            email_confirmed = True
+
+        if not already_double_opted_in:
+            send_subscription_welcome.delay(s.pk)
+
+    if s is not None:
+        s = Subscription.objects.get(pk=s.pk)
+        HistoricalEvent.log(
+            person=p,
+            event_type="transfer-subscription",
+            subscription=s,
+            newsletter=s.newsletter,
+        )
+    else:
+        return HttpResponse(status=422)
+
+    return locals()
+
+
 @render_to("inkmail/unsubscribed.html")
 def unsubscribe(request, unsubscribe_key):
     om = OutgoingMessage.objects.get(unsubscribe_hash=unsubscribe_key)

@@ -101,6 +101,13 @@ class Newsletter(HashidBaseModel):
     def full_from_email(self):
         return '%s <%s>' % (self.from_name, self.from_email)
 
+    @property
+    def transfer_subscription_url(self):
+        return "%s%s" % (
+            settings.MAIL_BASE_URL,
+            reverse("inkmail:transfer_subscription", args=(self.hashid, ), host='mail'),
+        )
+
     @classmethod
     def import_subscriber(
         cls,
