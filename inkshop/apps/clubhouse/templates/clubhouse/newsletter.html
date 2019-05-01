@@ -3,6 +3,7 @@
     <h1>Newsletter {{n}}</h1>
     <p>&hearts;</p>
     {% if saved %}Saved{% endif %}
+    <p>Transfer Subscription URL: <code>{{ n.transfer_subscription_url }}?e=EMAIL&f=FIRSTNAME</code>
     <form method="POST" enctype="multipart/form-data" action=".">
         {% csrf_token %}
         {{ form.as_p }}
