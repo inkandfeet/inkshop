@@ -103,10 +103,16 @@ class Newsletter(HashidBaseModel):
 
     @property
     def transfer_subscription_url(self):
-        return "%s%s" % (
-            settings.MAIL_BASE_URL,
-            reverse("inkmail:transfer_subscription", args=(self.hashid, ), host='mail'),
-        )
+        try:
+            return "%s%s" % (
+                settings.MAIL_BASE_URL,
+                reverse("inkmail:transfer_subscription", args=(self.hashid, ), host='mail'),
+            )
+        except:
+            return "%s%s" % (
+                settings.MAIL_BASE_URL,
+                "mail/transfer_subscription/%s/" % self.hashid,
+            )
 
     @classmethod
     def import_subscriber(
