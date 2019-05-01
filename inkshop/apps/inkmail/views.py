@@ -148,7 +148,7 @@ def transfer_subscription(request, transfer_code):
     # This is a special link for users to opt-in from an existing newsletter.
     s = None
     if "e" in request.GET and "f" in request.GET:
-        hashed_email = lookup_hash(request.GET['e'])
+        hashed_email = lookup_hash(request.GET["e"].replace(" ", "+"))
         if Newsletter.objects.filter(hashid=transfer_code).count():
             n = Newsletter.objects.get(hashid=transfer_code)
 
@@ -160,7 +160,7 @@ def transfer_subscription(request, transfer_code):
                 p = Person.objects.create(
                     hashed_email=hashed_email,
                 )
-                p.email = request.GET["e"]
+                p.email = request.GET["e"].replace(" ", "+")
                 if "f" in request.GET:
                     p.first_name = request.GET["f"]
             p.save()
