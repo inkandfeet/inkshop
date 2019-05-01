@@ -30,7 +30,7 @@ class TestPostSubscribes(MockRequestsTestCase):
             reverse(
                 'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
             ),
-            {
+            params={
                 'f': name,
                 'e': email,
                 # 'newsletter': self.newsletter.internal_name,
@@ -46,7 +46,7 @@ class TestPostSubscribes(MockRequestsTestCase):
             reverse(
                 'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
             ),
-            {
+            params={
                 'f': name,
                 'e': email,
                 # 'newsletter': self.newsletter.internal_name,
@@ -99,7 +99,7 @@ class TestPostSubscribes(MockRequestsTestCase):
             reverse(
                 'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
             ),
-            {
+            params={
                 'f': name,
                 'e': email,
             },
@@ -116,7 +116,7 @@ class TestPostSubscribes(MockRequestsTestCase):
             reverse(
                 'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
             ),
-            {
+            params={
                 'f': name,
                 # 'e': email,
                 # 'newsletter': self.newsletter.internal_name,
@@ -134,7 +134,7 @@ class TestPostSubscribes(MockRequestsTestCase):
             reverse(
                 'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
             ),
-            {
+            params={
                 'f': name,
                 'e': email,
                 # 'newsletter': self.newsletter.internal_name,
@@ -160,7 +160,7 @@ class TestWelcomeEmail(MockRequestsTestCase):
             reverse(
                 'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
             ),
-            {
+            params={
                 'f': name,
                 'e': email,
                 # 'newsletter': self.newsletter.internal_name,
@@ -199,7 +199,7 @@ class TestHistoricalEvent(MockRequestsTestCase):
             reverse(
                 'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
             ),
-            {
+            params={
                 'f': name,
                 'e': email,
                 # 'newsletter': self.newsletter.internal_name,
