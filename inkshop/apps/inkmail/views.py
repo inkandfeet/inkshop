@@ -147,7 +147,7 @@ def confirm_subscription(request, opt_in_key):
 def transfer_subscription(request, transfer_code):
     # This is a special link for users to opt-in from an existing newsletter.
     s = None
-    if "e" in request.GET and "f" in request.GET:
+    if "e" in request.GET:
         hashed_email = lookup_hash(request.GET["e"].replace(" ", "+"))
         if Newsletter.objects.filter(hashid=transfer_code).count():
             n = Newsletter.objects.get(hashid=transfer_code)
@@ -193,7 +193,7 @@ def transfer_subscription(request, transfer_code):
         if not already_double_opted_in:
             send_subscription_welcome.delay(s.pk)
 
-    if s:
+    if s is not None:
         s = Subscription.objects.get(pk=s.pk)
         HistoricalEvent.log(
             person=p,

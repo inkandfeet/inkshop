@@ -30,7 +30,7 @@ class TestPostSubscribes(MockRequestsTestCase):
             reverse(
                 'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
             ),
-            params={
+            {
                 'f': name,
                 'e': email,
                 # 'newsletter': self.newsletter.internal_name,
@@ -46,7 +46,7 @@ class TestPostSubscribes(MockRequestsTestCase):
             reverse(
                 'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
             ),
-            params={
+            {
                 'f': name,
                 'e': email,
                 # 'newsletter': self.newsletter.internal_name,
@@ -92,51 +92,15 @@ class TestPostSubscribes(MockRequestsTestCase):
         self.assertEquals(s.newsletter.name, self.newsletter.name)
         self.assertEquals(s.subscribed_from_ip, self._source_ip)
 
-    def test_newsletter_required(self):
-        email = Factory.rand_email()
-        name = Factory.rand_name()
-        response = self.get(
-            reverse(
-                'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
-            ),
-            params={
-                'f': name,
-                'e': email,
-            },
-        )
-
-        self.assertEquals(response.status_code, 422)
-
-        self.assertEquals(Person.objects.count(), 0)
-        self.assertEquals(Subscription.objects.count(), 0)
-
     def test_email_required(self):
         name = Factory.rand_name()
         response = self.get(
             reverse(
                 'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
             ),
-            params={
+            {
                 'f': name,
                 # 'e': email,
-                # 'newsletter': self.newsletter.internal_name,
-            },
-        )
-
-        self.assertEquals(response.status_code, 422)
-
-        self.assertEquals(Person.objects.count(), 0)
-        self.assertEquals(Subscription.objects.count(), 0)
-
-        name = Factory.rand_name()
-        email = Factory.rand_email()
-        response = self.get(
-            reverse(
-                'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
-            ),
-            params={
-                'f': name,
-                'e': email,
                 # 'newsletter': self.newsletter.internal_name,
             },
         )
@@ -160,7 +124,7 @@ class TestWelcomeEmail(MockRequestsTestCase):
             reverse(
                 'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
             ),
-            params={
+            {
                 'f': name,
                 'e': email,
                 # 'newsletter': self.newsletter.internal_name,
@@ -174,11 +138,11 @@ class TestWelcomeEmail(MockRequestsTestCase):
         om = OutgoingMessage.objects.all()[0]
         self.assertIn(
             om.render_email_string(self.newsletter.welcome_message.body_text_unrendered),
-            mail.outbox[1].alternatives[0][0]
+            mail.outbox[0].alternatives[0][0]
         )
         self.assertIn(
             om.render_email_string(self.newsletter.welcome_message.body_text_unrendered, plain_text=True),
-            mail.outbox[1].body
+            mail.outbox[0].body
         )
         self.assertEquals(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], email)
@@ -199,7 +163,7 @@ class TestHistoricalEvent(MockRequestsTestCase):
             reverse(
                 'inkmail:transfer_subscription', kwargs={"transfer_code": self.newsletter.hashid, },
             ),
-            params={
+            {
                 'f': name,
                 'e': email,
                 # 'newsletter': self.newsletter.internal_name,

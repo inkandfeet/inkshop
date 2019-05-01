@@ -61,7 +61,7 @@ class MockRequestsTestCase(TestCase):
 
     def get(self, *args, **kwargs):
         self._source_ip = Factory.rand_ip()
-        return self.client.post(HTTP_X_FORWARDED_FOR=self._source_ip, *args, **kwargs)
+        return self.client.get(HTTP_X_FORWARDED_FOR=self._source_ip, *args, **kwargs)
 
     def assertHistoricalEventDataEquality(self, he, **kwargs):  # noqa
         instance_data, event_data = HistoricalEvent.expand_kwargs_to_instance_and_event_data(**kwargs)

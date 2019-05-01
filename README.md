@@ -157,6 +157,8 @@ Next Week:
 
 
 ## Open threads the architecture isn't decided on yet.
+- Repackage for production w/ Docker? https://github.com/caktus/dockerfile_post/
+- How are replies in app handled?  [Prior art](https://medium.com/issacaption/using-a-custom-domain-in-gmail-for-free-with-mailgun-and-sendgrid-2c54e681f378)
 - Structure for GDPR dump.  JSON?  Zip?
 - Structure for full-system export/import.  JSON?  Zip?
 - Import flow for people who don't have double-opt-in records.
