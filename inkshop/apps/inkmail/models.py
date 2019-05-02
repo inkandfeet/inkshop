@@ -111,7 +111,7 @@ class Newsletter(HashidBaseModel):
         except:
             return "%s%s" % (
                 settings.MAIL_BASE_URL,
-                "mail/transfer_subscription/%s/" % self.hashid,
+                "/mail/transfer-subscription/%s/" % self.hashid,
             )
 
     @classmethod
