@@ -25,3 +25,69 @@ class TestPostTemplateRendering(MockRequestsTestCase):
         rendered = self.post.rendered
         self.assertNotEquals(self.post, None)
         self.assertNotEquals(rendered, None)
+
+    def test_full_field_post_renders(self):
+        t = Factory.template()
+        self.post = Factory.post(
+            template=t,
+        )
+        rendered = self.post.rendered
+        self.assertEquals(rendered, """<!doctype html >
+<html itemscope itemtype="http://schema.org/CreativeWork" class="" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>%(title)s</title>
+    <meta name="description" content="%(description)s">
+
+
+    <!-- Open Graph data -->
+    <meta property="og:title" content="%(title)s" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="" />
+    <meta property="og:image" content="https://inkandfeet.com/" />
+    <meta property="og:description" content="%(description)s" />
+    <meta property="og:site_name" content="" />
+    <link rel="canonical" href="" />
+    <meta property="article:published_time" content="" />
+    <meta property="article:modified_time" content="" />
+    <meta property="article:section" content="Writing" />
+    <meta property="article:tag" content="Writing" />
+
+    <!-- Schema.org markup for Google+ -->
+    <meta itemprop="name" content="%(title)s">
+    <meta itemprop="description" content="%(description)s">
+    <meta itemprop="author" content="">
+    <meta itemprop="provider" content="">
+
+
+    <link rel="shortcut icon" href="https://inkandfeet.com/img/icon128.png">
+    %(css)s
+
+
+    <script>
+        window.inkshop = window.inkshop || {};
+        window.inkshop.page_url = "";
+        window.inkshop.site_data_url = "";
+        window.inkshop.site_data;
+    </script>
+</head>
+
+<body >
+    %(nav)s
+    <p>%(content)s</p>
+
+    %(footer)s
+    %(js)s
+</body>
+</html>""" % {
+            "title": self.post.title,
+            "description": self.post.description,
+            "nav": self.post.template.nav,
+            "content": self.post.raw_markdown,
+            "footer": self.post.template.footer,
+            "css": self.post.template.css,
+            "js": self.post.template.js,
+            "body_override": self.post.template.body_override,
+        })

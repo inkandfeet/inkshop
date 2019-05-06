@@ -17,6 +17,7 @@ from django.utils.text import slugify
 from django.template import Context
 from django.template import Template as DjangoTemplate
 from django.template.loader import render_to_string, get_template
+from django.utils.html import mark_safe
 from utils.helpers import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
@@ -86,7 +87,7 @@ class Page(HashidBaseModel):
 
         c = Context(context)
         content_template = DjangoTemplate(self.source_text)
-        context["content"] = content_template.render(c).encode("utf-8").decode()
+        context["content"] = mark_safe(content_template.render(c).encode("utf-8").decode())
 
         return t.render(context)
 
@@ -141,7 +142,7 @@ class Post(HashidBaseModel):
         rendered_string = rendered_string.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
 
         content_template = DjangoTemplate(rendered_string)
-        context["content"] = content_template.render(c).encode("utf-8").decode()
+        context["content"] = mark_safe(content_template.render(c).encode("utf-8").decode())
 
         return t.render(context)
 
