@@ -2,6 +2,7 @@
 {% block content %}
     <h1>All Pages</h1>
     <p>&hearts;</p>
+    <a href="{% url 'clubhouse:create_page' %}">Create New</a>
     <ul>
     {% for p in pages %}
     <li>    <a href="{% url 'clubhouse:page' p.hashid %}">{{ p }}</a></li>

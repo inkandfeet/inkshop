@@ -25,8 +25,10 @@ def page_or_post(request, page_slug):
             try:
                 post = Post.objects.get(slug__iexact=page_slug)
                 content = post.rendered
-            except:
-                raise Http404("Page does not exist")
+            except Exception as e:
+                if not settings.DEBUG:
+                    raise Http404("Page does not exist")
+                raise
 
     response = HttpResponse(content)
     response['Content-Length'] = len(content)

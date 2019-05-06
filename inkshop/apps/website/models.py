@@ -52,6 +52,9 @@ class Template(HashidBaseModel):
             "everything_override": self.everything_override,
         }
 
+    def __str__(self):
+        return self.name
+
 
 class Page(HashidBaseModel):
     name = models.CharField(max_length=254, unique=True)

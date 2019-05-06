@@ -191,11 +191,17 @@ def scheduled_newsletter_message_queued(request, hashid):
     return locals()
 
 
+@login_required
+def create_template(request):
+    t = Template.objects.create()
+    return redirect(reverse('clubhouse:template', kwargs={"hashid": t.hashid, }, host='clubhouse'))
+
+
 @render_to("clubhouse/templates.html")
 @login_required
 def templates(request):
     page_name = "templates"
-    templates = template.objects.all()
+    templates = Template.objects.all()
     return locals()
 
 
@@ -213,6 +219,12 @@ def template(request, hashid):
     else:
         form = TemplateForm(instance=template)
     return locals()
+
+
+@login_required
+def create_page(request):
+    p = Page.objects.create()
+    return redirect(reverse('clubhouse:page', kwargs={"hashid": p.hashid, }, host='clubhouse'))
 
 
 @render_to("clubhouse/pages.html")
@@ -239,6 +251,12 @@ def page(request, hashid):
     return locals()
 
 
+@login_required
+def create_post(request):
+    p = Post.objects.create()
+    return redirect(reverse('clubhouse:post', kwargs={"hashid": p.hashid, }, host='clubhouse'))
+
+
 @render_to("clubhouse/posts.html")
 @login_required
 def posts(request):
@@ -259,5 +277,5 @@ def post(request, hashid):
             form.save()
             saved = True
     else:
-        form = PostForm(instance=page)
+        form = PostForm(instance=post)
     return locals()

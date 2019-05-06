@@ -2,6 +2,7 @@
 {% block content %}
     <h1>All Templates</h1>
     <p>&hearts;</p>
+    <a href="{% url 'clubhouse:create_template' %}">Create New</a>
     <ul>
     {% for t in templates %}
     <li>    <a href="{% url 'clubhouse:template' t.hashid %}">{{ t }}</a></li>

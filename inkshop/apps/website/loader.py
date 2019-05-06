@@ -1,12 +1,13 @@
 from django.template import Origin, TemplateDoesNotExist
 from django.template.loaders.base import Loader as BaseLoader
+from django.conf import settings
 
 from website.models import Template
 
 TEMPLATE_CACHE = {}
 TEMPLATE_CACHE_UPDATED_AT = None
 
-TEMPLATE_NORMAL = """{%% extends "base.html" %%}
+TEMPLATE_NORMAL = """{%% extends "base.html" %%}{%% load static %%}
 {%% block nav %%}%(nav)s{%% endblock %%}
 {%% block content %%}{{ content }}{%% endblock %%}
 {%% block footer %%}%(footer)s{%% endblock %%}
@@ -14,13 +15,13 @@ TEMPLATE_NORMAL = """{%% extends "base.html" %%}
 {%% block js %%}%(js)s{%% endblock %%}
 """
 
-TEMPLATE_WITH_BODY_OVERRIDE = """{%% extends "base.html" %%}
+TEMPLATE_WITH_BODY_OVERRIDE = """{%% extends "base.html" %%}{%% load static %%}
 {%% block body %%}%(body_override)s{%% endblock %%}
 {%% block css %%}%(css)s{%% endblock %%}
 {%% block js %%}%(js)s{%% endblock %%}
 """
 
-TEMPLATE_WITH_EVERYTHING_OVERRIDE = """{%% extends "base.html" %%}
+TEMPLATE_WITH_EVERYTHING_OVERRIDE = """{%% extends "base.html" %%}{%% load static %%}
 {%% block everything_override %%}%(everything_override)s{%% endblock %%}
 """
 
@@ -35,6 +36,8 @@ class Loader(BaseLoader):
         )
 
     def get_contents(self, origin, **kwargs):
+        if settings.DEBUG:
+            TEMPLATE_CACHE = {}  # noqa 
         if origin.template_name not in TEMPLATE_CACHE.keys():
             kwarg_context = None
             if "context" in kwargs:
