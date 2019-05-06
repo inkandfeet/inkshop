@@ -24,6 +24,8 @@ from inkmail.forms import ScheduledNewsletterMessageForm, MessageForm, OutgoingM
 from inkmail.forms import NewsletterForm, SubscriptionForm, OrganizationForm
 from inkmail.helpers import queue_message, queue_newsletter_message
 from clubhouse.models import StaffMember
+from website.models import Template, Page, Post
+from website.forms import TemplateForm, PageForm, PostForm
 
 
 @render_to("clubhouse/dashboard.html")
@@ -186,4 +188,76 @@ def scheduled_newsletter_message_queued(request, hashid):
     snm = ScheduledNewsletterMessage.objects.get(hashid=hashid)
     queue_newsletter_message.delay(snm.hashid)
 
+    return locals()
+
+
+@render_to("clubhouse/templates.html")
+@login_required
+def templates(request):
+    page_name = "templates"
+    templates = template.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/template.html")
+@login_required
+def template(request, hashid):
+    page_name = "templates"
+    template = Template.objects.get(hashid=hashid)
+    saved = False
+    if request.method == "POST":
+        form = TemplateForm(request.POST, request.FILES, instance=template)
+        if form.is_valid():
+            form.save()
+            saved = True
+    else:
+        form = TemplateForm(instance=template)
+    return locals()
+
+
+@render_to("clubhouse/pages.html")
+@login_required
+def pages(request):
+    page_name = "pages"
+    pages = page.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/page.html")
+@login_required
+def page(request, hashid):
+    page_name = "pages"
+    page = Page.objects.get(hashid=hashid)
+    saved = False
+    if request.method == "POST":
+        form = PageForm(request.POST, request.FILES, instance=page)
+        if form.is_valid():
+            form.save()
+            saved = True
+    else:
+        form = PageForm(instance=page)
+    return locals()
+
+
+@render_to("clubhouse/posts.html")
+@login_required
+def posts(request):
+    post_name = "posts"
+    posts = post.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/post.html")
+@login_required
+def post(request, hashid):
+    post_name = "posts"
+    post = Post.objects.get(hashid=hashid)
+    saved = False
+    if request.method == "POST":
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            saved = True
+    else:
+        form = PostForm(instance=page)
     return locals()

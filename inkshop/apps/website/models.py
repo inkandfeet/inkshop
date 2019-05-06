@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+import mistune
 import logging
 import random
 import time
@@ -12,24 +13,21 @@ from tempfile import NamedTemporaryFile
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.utils.text import slugify
+from django.template import Context
+from django.template import Template as DjangoTemplate
+from django.template.loader import render_to_string, get_template
 from utils.helpers import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
 
-from utils.models import BaseModel
+from inkmail.models import Organization
+from utils.models import HashidBaseModel
+
+markdown = mistune.Markdown()
 
 
-class Page(BaseModel):
-    slug = models.CharField(max_length=254)
-    hash_id = models.CharField(max_length=254)
-    title = models.CharField(max_length=254)
-    description = models.CharField(max_length=254, blank=True, null=True)
-    keywords = models.CharField(max_length=254, blank=True, null=True)
-    source_text = models.TextField(blank=True, null=True)
-    rendered_html = models.TextField(blank=True, null=True)
-
-
-class Template(BaseModel):
+class Template(HashidBaseModel):
     name = models.CharField(max_length=254, unique=True)
 
     nav = models.TextField(blank=True, null=True)
@@ -39,6 +37,7 @@ class Template(BaseModel):
     js = models.TextField(blank=True, null=True)
 
     body_override = models.TextField(blank=True, null=True, verbose_name="Body (will overwrite all other fields).")
+    everything_override = models.TextField(blank=True, null=True, verbose_name="Entire page (will override everything else)")
 
     @cached_property
     def context(self):
@@ -49,10 +48,50 @@ class Template(BaseModel):
             "css": self.css,
             "js": self.js,
             "body_override": self.body_override,
+            "everything_override": self.everything_override,
         }
 
 
-class Post(BaseModel):
+class Page(HashidBaseModel):
+    name = models.CharField(max_length=254, unique=True)
+    slug = models.CharField(max_length=254)
+    title = models.CharField(max_length=254)
+    description = models.CharField(max_length=254, blank=True, null=True)
+    keywords = models.CharField(max_length=254, blank=True, null=True)
+    template = models.ForeignKey(Template, blank=True, null=True, on_delete=models.SET_NULL)
+    source_text = models.TextField(blank=True, null=True)
+    rendered_html = models.TextField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.name and not self.slug:
+            self.slug = slugify(self.name)
+        super(Page, self).save(*args, **kwargs)
+
+    @cached_property
+    def rendered(self,):
+        t = get_template(self.template.name)
+
+        o = Organization.get()
+        context = self.template.context.copy()
+        context.update(**{
+            "organization_address": o.address,
+            "organization_name": o.name,
+            "name": self.name,
+            "source_text": self.source_text,
+            "slug": self.slug,
+            "title": self.title,
+            "description": self.description,
+            "keywords": self.keywords,
+        })
+
+        c = Context(context)
+        content_template = DjangoTemplate(self.source_text)
+        context["content"] = content_template.render(c).encode("utf-8").decode()
+
+        return t.render(context)
+
+
+class Post(HashidBaseModel):
     name = models.CharField(max_length=254)
     raw_markdown = models.TextField(blank=True, null=True)
     slug = models.CharField(max_length=1024)
@@ -62,7 +101,6 @@ class Post(BaseModel):
     publish_date = models.DateTimeField(blank=True, null=True)
     published = models.BooleanField(default=False)
     private = models.BooleanField(default=False)
-
     context = models.TextField(blank=True, null=True)  # For location, etc.
 
     header_image = models.ImageField(
@@ -71,6 +109,41 @@ class Post(BaseModel):
         blank=True,
         null=True,
     )
+
+    def save(self, *args, **kwargs):
+        if self.name and not self.slug:
+            self.slug = slugify(self.name)
+        super(Post, self).save(*args, **kwargs)
+
+    @cached_property
+    def rendered(self,):
+        t = get_template(self.template.name)
+
+        o = Organization.get()
+        context = self.template.context.copy()
+        context.update(**{
+            "organization_address": o.address,
+            "organization_name": o.name,
+            "name": self.name,
+            "raw_markdown": self.raw_markdown,
+            "slug": self.slug,
+            "title": self.title,
+            "description": self.description,
+            "publish_date": self.publish_date,
+            "published": self.published,
+            "private": self.private,
+            "context": self.context,
+        })
+
+        c = Context(context)
+        rendered_string = markdown(self.raw_markdown)
+        rendered_string = rendered_string.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
+        rendered_string = rendered_string.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
+
+        content_template = DjangoTemplate(rendered_string)
+        context["content"] = content_template.render(c).encode("utf-8").decode()
+
+        return t.render(context)
 
     # # related_piece_1: "letter-december-20-grateful"
     # posts:

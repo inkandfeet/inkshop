@@ -1,7 +1,6 @@
 {% extends "google_meta.html" %}
 
-{% block pre_meta %}
-<!doctype html >
+{% block pre_meta %}<!doctype html >
 <html itemscope itemtype="http://schema.org/CreativeWork" class="{% block html_extra_classes %}{% endblock %}" lang="en">
 <head>
     <meta charset="utf-8">
@@ -15,10 +14,9 @@
 
 {% block post_meta %}
     <link rel="shortcut icon" href="https://inkandfeet.com/img/icon128.png">
-    {% block css %}
-    {% endblock %}
+    {% block css %}{% endblock %}
 
-    {% block extra_head %}{% endblock %}
+{% block extra_head %}{% endblock %}
     {% block head_js %}<script>
         window.inkshop = window.inkshop || {};
         window.inkshop.page_url = "{{ url }}";
@@ -28,16 +26,12 @@
 </head>
 
 <body {% block body_extra %}{% endblock %}>
-    {% block body %}
-        {% block nav %}
-        {% endblock %}
-        {% block content %}
-        {% endblock content %}
-        {% block footer %}
-        {% endblock %}
-    {% endblock body %}
-    {% block js %}
+    {% block body %}{% block nav %}
     {% endblock %}
+    {% block content %}
+    {% endblock content %}
+    {% block footer %}
+    {% endblock %}{% endblock body %}
+    {% block js %}{% endblock %}
 </body>
-</html>
-{% endblock %}
+</html>{% endblock %}

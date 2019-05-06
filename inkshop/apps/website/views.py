@@ -8,3 +8,7 @@ from annoying.decorators import render_to, ajax_request
 @render_to("website/home.html")
 def home(request):
     return locals()
+
+
+def page_or_post(request, page_slug):
+    return locals()

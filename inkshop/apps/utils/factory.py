@@ -14,7 +14,7 @@ fake = Faker()
 
 from people.models import Person
 from inkmail.models import Newsletter, Subscription, Message, ScheduledNewsletterMessage, Organization
-from website.models import Template
+from website.models import Template, Page, Post
 
 
 class DjangoFunctionalFactory:
@@ -611,14 +611,45 @@ class Factory(DjangoFunctionalFactory):
 
         options = {
             "name": "%s.html" % cls.rand_str(include_emoji=False),
-            "nav": cls.rand_str(),
-            "content": cls.rand_str(),
-            "footer": cls.rand_str(),
-            "css": cls.rand_str(),
-            "js": cls.rand_str(),
+            "nav": cls.rand_text(),
+            "content": cls.rand_text(),
+            "footer": cls.rand_text(),
+            "css": cls.rand_text(),
+            "js": cls.rand_text(),
             # "body_override": cls.rand_str(),
         }
         options.update(kwargs)
 
         t = Template.objects.create(**options)
         return t
+
+    @classmethod
+    def page(cls, *args, **kwargs):
+        cls.organization()
+
+        options = {
+            "name": cls.rand_text(),
+            "template": cls.template(),
+            "title": cls.rand_text(),
+            "description": cls.rand_text(),
+            "keywords": ",".join([cls.rand_str() for i in range(0, cls.rand_int(end=10))]),
+            "source_text": cls.rand_text(),
+        }
+        options.update(kwargs)
+        p = Page.objects.create(**options)
+        return p
+
+    @classmethod
+    def post(cls, *args, **kwargs):
+        cls.organization()
+
+        options = {
+            "name": cls.rand_text(),
+            "template": cls.template(),
+            "title": cls.rand_text(),
+            "description": cls.rand_text(),
+            "raw_markdown": cls.rand_text(),
+        }
+        options.update(kwargs)
+        p = Post.objects.create(**options)
+        return p
