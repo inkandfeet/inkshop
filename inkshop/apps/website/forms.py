@@ -1,6 +1,6 @@
 import logging
 from django.forms import ModelForm, CharField, TextInput
-from website.models import Template, Page, Post
+from website.models import Template, Page, Post, Resource
 from django.forms import modelformset_factory
 
 
@@ -48,4 +48,15 @@ class PostForm(ModelForm):
             "published",
             "private",
             "context",
+        ]
+
+
+class ResourceForm(ModelForm):
+    class Meta:
+        model = Resource
+        fields = [
+            "name",
+            "binary_file",
+            "text_file",
+            "mime_type",
         ]

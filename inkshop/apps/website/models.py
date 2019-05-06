@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+import magic
 import mistune
 import logging
 import random
@@ -54,6 +55,49 @@ class Template(HashidBaseModel):
 
     def __str__(self):
         return self.name
+
+
+class Resource(HashidBaseModel):
+    name = models.CharField(max_length=254)
+
+    binary_file = models.FileField(blank=True, null=True)
+    text_file = models.TextField(blank=True, null=True)
+    mime_type = models.CharField(max_length=255, blank=True, null=True)
+    # size = models.IntegerField(blank=True, null=True)
+
+    @cached_property
+    def content(self):
+        if self.text_file:
+            return self.text_file
+        elif self.binary_file:
+            return self.binary_file
+        return ""
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        super(Resource, self).save(*args, **kwargs)
+        needs_resave = False
+
+        if not self.name:
+            needs_resave = True
+            if self.binary_file:
+                self.name = self.binary_file.name
+            else:
+                self.name = "Unnamed file %s" % self.hashid
+
+        if not self.mime_type:
+            if self.binary_file:
+                with self.binary_file.open() as f:
+                    self.mime_type = magic.from_buffer(f.read(), mime=True)
+                needs_resave = True
+            elif self.text_file:
+                self.mime_type = magic.from_buffer(self.text_file, mime=True)
+                needs_resave = True
+
+        if needs_resave:
+            self.save()
 
 
 class Page(HashidBaseModel):

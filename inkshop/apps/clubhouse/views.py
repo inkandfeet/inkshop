@@ -24,8 +24,8 @@ from inkmail.forms import ScheduledNewsletterMessageForm, MessageForm, OutgoingM
 from inkmail.forms import NewsletterForm, SubscriptionForm, OrganizationForm
 from inkmail.helpers import queue_message, queue_newsletter_message
 from clubhouse.models import StaffMember
-from website.models import Template, Page, Post
-from website.forms import TemplateForm, PageForm, PostForm
+from website.models import Template, Page, Post, Resource
+from website.forms import TemplateForm, PageForm, PostForm, ResourceForm
 
 
 @render_to("clubhouse/dashboard.html")
@@ -60,6 +60,8 @@ def message(request, hashid):
         if form.is_valid():
             form.save()
             saved = True
+            message = Message.objects.get(hashid=hashid)
+            form = MessageForm(instance=message)
     else:
         form = MessageForm(instance=message)
     return locals()
@@ -116,6 +118,8 @@ def newsletter(request, hashid):
         if form.is_valid():
             form.save()
             saved = True
+            n = Newsletter.objects.get(hashid=hashid)
+            form = NewsletterForm(instance=n)
     else:
         form = NewsletterForm(instance=n)
     return locals()
@@ -137,6 +141,8 @@ def organization(request):
         if form.is_valid():
             form.save()
             saved = True
+            o = Organization.get()
+            form = OrganizationForm(instance=o)
     else:
         form = OrganizationForm(instance=o)
 
@@ -168,6 +174,8 @@ def scheduled_newsletter_message(request, hashid):
         if form.is_valid():
             form.save()
             saved = True
+            snm = ScheduledNewsletterMessage.objects.get(hashid=hashid)
+            form = ScheduledNewsletterMessageForm(instance=snm)
     else:
         form = ScheduledNewsletterMessageForm(instance=snm)
     return locals()
@@ -216,6 +224,8 @@ def template(request, hashid):
         if form.is_valid():
             form.save()
             saved = True
+            template = Template.objects.get(hashid=hashid)
+            form = TemplateForm(instance=template)
     else:
         form = TemplateForm(instance=template)
     return locals()
@@ -246,6 +256,8 @@ def page(request, hashid):
         if form.is_valid():
             form.save()
             saved = True
+            page = Page.objects.get(hashid=hashid)
+            form = PageForm(instance=page)
     else:
         form = PageForm(instance=page)
     return locals()
@@ -276,6 +288,40 @@ def post(request, hashid):
         if form.is_valid():
             form.save()
             saved = True
+            post = Post.objects.get(hashid=hashid)
+            form = PostForm(instance=post)
     else:
         form = PostForm(instance=post)
+    return locals()
+
+
+@login_required
+def create_resource(request):
+    p = Resource.objects.create()
+    return redirect(reverse('clubhouse:resource', kwargs={"hashid": p.hashid, }, host='clubhouse'))
+
+
+@render_to("clubhouse/resources.html")
+@login_required
+def resources(request):
+    resource_name = "resources"
+    resources = Resource.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/resource.html")
+@login_required
+def resource(request, hashid):
+    resource_name = "resources"
+    resource = Resource.objects.get(hashid=hashid)
+    saved = False
+    if request.method == "POST":
+        form = ResourceForm(request.POST, request.FILES, instance=resource)
+        if form.is_valid():
+            form.save()
+            saved = True
+            resource = Resource.objects.get(hashid=hashid)
+            form = ResourceForm(instance=resource)
+    else:
+        form = ResourceForm(instance=resource)
     return locals()

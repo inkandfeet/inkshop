@@ -4,9 +4,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, Http404
 
 from annoying.decorators import render_to, ajax_request
-from website.models import Page, Post
+from website.models import Page, Post, Resource
 
 CACHED_PAGES = {}
+CACHED_RESOURCES = {}
+CACHABLE_RESOURCE_TYPES = [
+
+]
 
 
 @render_to("website/home.html")
@@ -25,11 +29,32 @@ def page_or_post(request, page_slug):
             try:
                 post = Post.objects.get(slug__iexact=page_slug)
                 content = post.rendered
-            except Exception as e:
+            except Exception:
                 if not settings.DEBUG:
                     raise Http404("Page does not exist")
                 raise
+        CACHED_PAGES[page_slug] = content
 
     response = HttpResponse(content)
     response['Content-Length'] = len(content)
+    return response
+
+
+def resource(request, resource_slug):
+    if resource_slug in CACHED_RESOURCES:
+        content = CACHED_RESOURCES[resource_slug]
+    else:
+        try:
+            resource = Resource.objects.get(name__iexact=resource_slug)
+            content = resource.content
+        except:
+            if not settings.DEBUG:
+                raise Http404("File does not exist")
+            raise
+
+    response = HttpResponse(content)
+    response['Content-Length'] = len(content)
+    if resource.mime_type:
+        response['Content-Type'] = resource.mime_type
+
     return response
