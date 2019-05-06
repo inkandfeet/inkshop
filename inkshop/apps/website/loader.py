@@ -36,6 +36,7 @@ class Loader(BaseLoader):
         )
 
     def get_contents(self, origin, **kwargs):
+        global TEMPLATE_CACHE
         if settings.DEBUG:
             TEMPLATE_CACHE = {}  # noqa 
         if origin.template_name not in TEMPLATE_CACHE.keys():
