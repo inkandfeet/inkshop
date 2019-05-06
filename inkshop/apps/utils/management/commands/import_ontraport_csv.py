@@ -120,7 +120,7 @@ class Command(BaseCommand):
                         # Stupid ontraport's invented US-centric timezones
                         # date_portion = " ".join(row[58].split(" ")[:-1])
                         # tz_portion = row[58].split(" ")[-1]
-                        subscribed_at = parse(row[58], tzinfos=us_tzinfos)
+                        subscribed_at = datetime.datetime.combine(parse(row[58], tzinfos=us_tzinfos), datetime.time())
                         # subscribed_at = datetime.datetime.strptime(row[58], "%m-%d-%Y %H:%M %p")
 
                         subscribe_ip = row[62]
