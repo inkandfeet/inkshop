@@ -30,8 +30,26 @@ class Page(BaseModel):
 
 
 class Template(BaseModel):
-    name = models.CharField(max_length=254)
-    raw_html = models.TextField(blank=True, null=True)
+    name = models.CharField(max_length=254, unique=True)
+
+    nav = models.TextField(blank=True, null=True)
+    content = models.TextField(blank=True, null=True)
+    footer = models.TextField(blank=True, null=True)
+    css = models.TextField(blank=True, null=True)
+    js = models.TextField(blank=True, null=True)
+
+    body_override = models.TextField(blank=True, null=True, verbose_name="Body (will overwrite all other fields).")
+
+    @cached_property
+    def context(self):
+        return {
+            "nav": self.nav,
+            "content": self.content,
+            "footer": self.footer,
+            "css": self.css,
+            "js": self.js,
+            "body_override": self.body_override,
+        }
 
 
 class Post(BaseModel):
@@ -40,7 +58,7 @@ class Post(BaseModel):
     slug = models.CharField(max_length=1024)
     title = models.CharField(max_length=254)
     description = models.CharField(max_length=254, blank=True, null=True)
-    template = models.ForeignKey(Template, blank=True, null=True)
+    template = models.ForeignKey(Template, blank=True, null=True, on_delete=models.SET_NULL)
     publish_date = models.DateTimeField(blank=True, null=True)
     published = models.BooleanField(default=False)
     private = models.BooleanField(default=False)

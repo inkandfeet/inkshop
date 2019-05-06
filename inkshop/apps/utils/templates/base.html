@@ -28,13 +28,14 @@
 </head>
 
 <body {% block body_extra %}{% endblock %}>
-    {% block nav %}
-    {% endblock %}
-    {% block content %}
-      {% block footer %}
-      {% endblock %}
-    {% endblock content %}
-
+    {% block body %}
+        {% block nav %}
+        {% endblock %}
+        {% block content %}
+        {% endblock content %}
+        {% block footer %}
+        {% endblock %}
+    {% endblock body %}
     {% block js %}
     {% endblock %}
 </body>
