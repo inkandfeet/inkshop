@@ -8,8 +8,8 @@ from django.conf import settings
 from django.views.static import serve
 
 urlpatterns = [
-    url(r'^website/', include(('website.urls', 'website'), namespace="website")),
     url(r'^mail/', include(('inkmail.urls', 'inkmail'), namespace="inkmail")),
+    url(r'^website/', include(('website.urls', 'website'), namespace="website")),
 
     url(r'^admin/password_reset/$', auth_views.PasswordResetView.as_view(), name='admin_password_reset'),
     url(r'^admin/password_reset/done/$', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),

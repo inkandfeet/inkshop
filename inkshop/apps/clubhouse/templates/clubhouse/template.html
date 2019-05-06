@@ -1,0 +1,11 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>Template {{t}}</h1>
+    <p>&hearts;</p>
+    {% if saved %}Saved{% endif %}
+    <form method="POST" enctype="multipart/form-data" action=".">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit">
+    </form>
+{% endblock %}

@@ -219,7 +219,7 @@ def template(request, hashid):
 @login_required
 def pages(request):
     page_name = "pages"
-    pages = page.objects.all()
+    pages = Page.objects.all()
     return locals()
 
 
@@ -243,7 +243,7 @@ def page(request, hashid):
 @login_required
 def posts(request):
     post_name = "posts"
-    posts = post.objects.all()
+    posts = Post.objects.all()
     return locals()
 
 
