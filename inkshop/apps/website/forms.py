@@ -14,6 +14,7 @@ class TemplateForm(ModelForm):
             "footer",
             "css",
             "js",
+            "html_extra_classes",
             "body_override",
             "everything_override",
         ]

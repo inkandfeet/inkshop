@@ -9,13 +9,15 @@ TEMPLATE_CACHE_UPDATED_AT = None
 
 TEMPLATE_NORMAL = """{%% extends "base.html" %%}{%% load static %%}
 {%% block nav %%}%(nav)s{%% endblock %%}
-{%% block content %%}{{ content }}{%% endblock %%}
+{%% block content %%}%(content)s{%% endblock %%}
+{%% block html_extra_classes %%}%(html_extra_classes)s{%% endblock %%}
 {%% block footer %%}%(footer)s{%% endblock %%}
 {%% block css %%}%(css)s{%% endblock %%}
 {%% block js %%}%(js)s{%% endblock %%}
 """
 
 TEMPLATE_WITH_BODY_OVERRIDE = """{%% extends "base.html" %%}{%% load static %%}
+{%% block html_extra_classes %%}%(html_extra_classes)s{%% endblock %%}
 {%% block body %%}%(body_override)s{%% endblock %%}
 {%% block css %%}%(css)s{%% endblock %%}
 {%% block js %%}%(js)s{%% endblock %%}
@@ -39,7 +41,7 @@ class Loader(BaseLoader):
         global TEMPLATE_CACHE
         if settings.DEBUG:
             TEMPLATE_CACHE = {}  # noqa 
-        if origin.template_name not in TEMPLATE_CACHE.keys():
+        if True or origin.template_name not in TEMPLATE_CACHE.keys():
             kwarg_context = None
             if "context" in kwargs:
                 kwarg_context = kwargs["context"].copy()
@@ -61,6 +63,7 @@ class Loader(BaseLoader):
             else:
                 template_string = TEMPLATE_NORMAL % context
 
-            TEMPLATE_CACHE[origin.template_name] = template_string
+            return template_string
+            # TEMPLATE_CACHE[origin.template_name] = template_string
 
-        return TEMPLATE_CACHE[origin.template_name]
+        # return TEMPLATE_CACHE[origin.template_name]

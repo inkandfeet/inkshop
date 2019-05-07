@@ -33,7 +33,7 @@ class TestPostTemplateRendering(MockRequestsTestCase):
         )
         rendered = self.post.rendered
         self.assertEquals(rendered, """<!doctype html >
-<html itemscope itemtype="http://schema.org/CreativeWork" class="" lang="en">
+<html itemscope itemtype="http://schema.org/CreativeWork" class="%(html_extra_classes)s" lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -89,5 +89,6 @@ class TestPostTemplateRendering(MockRequestsTestCase):
             "footer": self.post.template.footer,
             "css": self.post.template.css,
             "js": self.post.template.js,
+            "html_extra_classes": self.post.template.html_extra_classes,
             "body_override": self.post.template.body_override,
         })

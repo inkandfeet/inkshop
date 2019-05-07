@@ -42,6 +42,7 @@ class TestPostTemplateRendering(MockRequestsTestCase):
         self.assertIn(self.post.raw_markdown, resp_content)
         self.assertIn(self.post.template.footer, resp_content)
         self.assertIn(self.post.template.css, resp_content)
+        self.assertIn(self.post.template.html_extra_classes, resp_content)
         self.assertIn(self.post.template.js, resp_content)
         if self.post.template.body_override:
             self.assertIn(self.post.template.body_override, resp_content)
@@ -71,6 +72,7 @@ class TestPageTemplateRendering(MockRequestsTestCase):
         self.assertIn(self.page.source_text, resp_content)
         self.assertIn(self.page.template.footer, resp_content)
         self.assertIn(self.page.template.css, resp_content)
+        self.assertIn(self.page.template.html_extra_classes, resp_content)
         self.assertIn(self.page.template.js, resp_content)
         if self.page.template.body_override:
             self.assertIn(self.page.template.body_override, resp_content)

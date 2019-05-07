@@ -45,7 +45,7 @@ class TestPageTemplateRendering(MockRequestsTestCase):
         )
         rendered = self.page.rendered
         self.assertEquals(rendered, """<!doctype html >
-<html itemscope itemtype="http://schema.org/CreativeWork" class="" lang="en">
+<html itemscope itemtype="http://schema.org/CreativeWork" class="%(html_extra_classes)s" lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -95,6 +95,7 @@ class TestPageTemplateRendering(MockRequestsTestCase):
             "description": self.page.description,
             "css": self.page.template.css,
             "js": self.page.template.js,
+            "html_extra_classes": self.page.template.html_extra_classes,
             "body_override": self.page.template.body_override,
         })
 
@@ -105,7 +106,7 @@ class TestPageTemplateRendering(MockRequestsTestCase):
         )
         rendered = self.page.rendered
         self.assertEquals(rendered, """<!doctype html >
-<html itemscope itemtype="http://schema.org/CreativeWork" class="" lang="en">
+<html itemscope itemtype="http://schema.org/CreativeWork" class="%(html_extra_classes)s" lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -160,5 +161,6 @@ class TestPageTemplateRendering(MockRequestsTestCase):
             "footer": self.page.template.footer,
             "css": self.page.template.css,
             "js": self.page.template.js,
+            "html_extra_classes": self.page.template.html_extra_classes,
             "body_override": self.page.template.body_override,
         })

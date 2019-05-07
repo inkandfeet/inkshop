@@ -37,6 +37,7 @@ class Template(HashidBaseModel):
     footer = models.TextField(blank=True, null=True)
     css = models.TextField(blank=True, null=True)
     js = models.TextField(blank=True, null=True)
+    html_extra_classes = models.CharField(max_length=255, blank=True, null=True)
 
     body_override = models.TextField(blank=True, null=True, verbose_name="Body (will overwrite all other fields).")
     everything_override = models.TextField(blank=True, null=True, verbose_name="Entire page (will override everything else)")
@@ -49,6 +50,7 @@ class Template(HashidBaseModel):
             "footer": self.footer,
             "css": self.css,
             "js": self.js,
+            "html_extra_classes": self.html_extra_classes,
             "body_override": self.body_override,
             "everything_override": self.everything_override,
         }
@@ -65,7 +67,8 @@ class Resource(HashidBaseModel):
     mime_type = models.CharField(max_length=255, blank=True, null=True)
     # size = models.IntegerField(blank=True, null=True)
 
-    @cached_property
+    # @cached_property
+    @property
     def content(self):
         if self.text_file:
             return self.text_file
@@ -115,7 +118,8 @@ class Page(HashidBaseModel):
             self.slug = slugify(self.name)
         super(Page, self).save(*args, **kwargs)
 
-    @cached_property
+    # @cached_property
+    @property
     def rendered(self,):
         t = get_template(self.template.name)
 
@@ -132,9 +136,9 @@ class Page(HashidBaseModel):
             "keywords": self.keywords,
         })
 
-        c = Context(context)
-        content_template = DjangoTemplate(self.source_text)
-        context["content"] = mark_safe(content_template.render(c).encode("utf-8").decode())
+        # c = Context(context)
+        # content_template = DjangoTemplate(self.source_text)
+        # context["content"] = mark_safe(content_template.render(c).encode("utf-8").decode())
 
         return t.render(context)
 
@@ -189,7 +193,7 @@ class Post(HashidBaseModel):
         rendered_string = rendered_string.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
 
         content_template = DjangoTemplate(rendered_string)
-        context["content"] = mark_safe(content_template.render(c).encode("utf-8").decode())
+        context["piece_html"] = mark_safe(content_template.render(c).encode("utf-8").decode())
 
         return t.render(context)
 

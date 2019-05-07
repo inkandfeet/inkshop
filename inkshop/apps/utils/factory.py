@@ -616,6 +616,7 @@ class Factory(DjangoFunctionalFactory):
             "footer": cls.rand_text(),
             "css": cls.rand_text(),
             "js": cls.rand_text(),
+            "html_extra_classes": cls.rand_text(),
             # "body_override": cls.rand_str(),
         }
         options.update(kwargs)

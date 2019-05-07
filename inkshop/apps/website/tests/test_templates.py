@@ -38,6 +38,7 @@ class TestTemplateLoader(MockRequestsTestCase):
         self.assertIn(self.template.footer, rendered)
         self.assertIn(self.template.css, rendered)
         self.assertIn(self.template.js, rendered)
+        self.assertIn(self.template.html_extra_classes, rendered)
 
     def test_template_body_override_works(self):
         self.template = Factory.template(body_override=Factory.rand_text())

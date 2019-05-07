@@ -1,3 +1,4 @@
+import logging
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
@@ -41,8 +42,11 @@ def page_or_post(request, page_slug):
 
 
 def resource(request, resource_slug):
+    if settings.DEBUG:
+        CACHED_RESOURCES = {}  # noqa
+
     if resource_slug in CACHED_RESOURCES:
-        content = CACHED_RESOURCES[resource_slug]
+        return CACHED_RESOURCES[resource_slug]
     else:
         try:
             resource = Resource.objects.get(name__iexact=resource_slug)
@@ -52,9 +56,12 @@ def resource(request, resource_slug):
                 raise Http404("File does not exist")
             raise
 
-    response = HttpResponse(content)
-    response['Content-Length'] = len(content)
     if resource.mime_type:
+        response = HttpResponse(content, content_type=resource.mime_type)
         response['Content-Type'] = resource.mime_type
+    else:
+        response = HttpResponse(content)
+    response['Content-Length'] = len(content)
 
+    CACHED_RESOURCES[resource_slug] = response
     return response
