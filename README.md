@@ -42,7 +42,7 @@ Engaged subscription, built on active, positive consent and auto-unsubscribing.
 Get amazing deliverability and response by sending emails only to people who have shown you that they're interested and want to keep hearing from you.
 
 **Fast.**<br/>
-Without all the bulk of tracking software, your site renders _fast_.  On mobile and desktop.
+Built around the very best practices, and without all the bulk of tracking software, your site renders _fast_.  Like you won't see the screen refresh fast.  On mobile and desktop.
 
 **Complete.**<br/>
 One of the big trends has been having a specialized system for everything, and plugging them into each other.  But that means your and your customer's data is spread out in a dozen places you can't control.  Inkshop bucks that trend, and puts everything you need in one user-friendly place.
