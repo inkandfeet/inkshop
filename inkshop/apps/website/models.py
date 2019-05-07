@@ -25,6 +25,7 @@ from django.utils import timezone
 
 from inkmail.models import Organization
 from utils.models import HashidBaseModel
+from utils.encryption import file_hash
 
 markdown = mistune.Markdown()
 
@@ -62,10 +63,11 @@ class Template(HashidBaseModel):
 class Resource(HashidBaseModel):
     name = models.CharField(max_length=254)
 
-    binary_file = models.FileField(blank=True, null=True)
+    binary_file = models.FileField(blank=True, null=True, upload_to="resources")
     text_file = models.TextField(blank=True, null=True)
     mime_type = models.CharField(max_length=255, blank=True, null=True)
-    # size = models.IntegerField(blank=True, null=True)
+    hashed_filename = models.CharField(max_length=320, blank=True, null=True, db_index=True)
+    content_size = models.IntegerField(blank=True, null=True)
 
     # @cached_property
     @property
@@ -76,10 +78,24 @@ class Resource(HashidBaseModel):
             return self.binary_file
         return ""
 
+    @property
+    def raw_content(self):
+        if self.text_file:
+            return self.text_file
+        elif self.binary_file:
+            self.binary_file.open()
+            c = self.binary_file.read()
+            self.binary_file.close()
+            return c
+        return ""
+
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
+        old_resource = None
+        if self.pk:
+            old_resource = Resource.objects.get(pk=self.pk)
         super(Resource, self).save(*args, **kwargs)
         needs_resave = False
 
@@ -91,12 +107,19 @@ class Resource(HashidBaseModel):
                 self.name = "Unnamed file %s" % self.hashid
 
         if not self.mime_type:
-            if self.binary_file:
-                with self.binary_file.open() as f:
-                    self.mime_type = magic.from_buffer(f.read(), mime=True)
+            if self.text_file or self.binary_file:
+                self.mime_type = magic.from_buffer(self.raw_content, mime=True)
                 needs_resave = True
-            elif self.text_file:
-                self.mime_type = magic.from_buffer(self.text_file, mime=True)
+
+        if old_resource:
+            split_name = self.name.split(".")
+            split_name.insert(-1, file_hash(self.raw_content))
+            self.hashed_filename = ".".join(split_name)
+            self.content_size = len(self.raw_content)
+            if (
+                self.hashed_filename != old_resource.hashed_filename
+                or self.content_size != old_resource.content_size
+            ):
                 needs_resave = True
 
         if needs_resave:

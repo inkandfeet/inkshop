@@ -90,6 +90,12 @@ def lookup_hash(s):
     return h.hexdigest()
 
 
+def file_hash(contents):
+    if hasattr(contents, "encode"):
+        return hashlib.md5(contents.encode('utf-8')).hexdigest()[:9]
+    return hashlib.md5(contents).hexdigest()[:9]
+
+
 def create_unique_hashid(pk, cls, field, hash_length=12):
     # from utils.factory import Factory
     potential_hash = None

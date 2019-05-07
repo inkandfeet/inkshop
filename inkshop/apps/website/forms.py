@@ -60,4 +60,6 @@ class ResourceForm(ModelForm):
             "binary_file",
             "text_file",
             "mime_type",
+            "hashed_filename",
+            "content_size",
         ]

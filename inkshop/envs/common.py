@@ -88,11 +88,11 @@ TEMPLATES = [
         'DIRS': [],
         'OPTIONS': {
             'loaders': [
-                # ('django.template.loaders.cached.Loader', [
+                ('django.template.loaders.cached.Loader', [
                     'django.template.loaders.filesystem.Loader',
                     'django.template.loaders.app_directories.Loader',
                     'website.loader.Loader',
-                # ]),
+                ]),
             ],
             'context_processors': [
                 'django.template.context_processors.debug',
