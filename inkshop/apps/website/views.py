@@ -49,13 +49,13 @@ def page_or_post(request, page_slug=None):
         try:
             page = Page.objects.get(slug__iexact=page_slug)
             content = page.rendered
-        except:
+        except Page.DoesNotExist:
             try:
                 post = Post.objects.get(slug__iexact=page_slug)
                 content = post.rendered
-            except Exception:
-                if not settings.DEBUG:
-                    raise Http404("Page does not exist")
+            except Post.DoesNotExist:
+                # if not settings.DEBUG:
+                #     raise Http404("Page does not exist")
                 raise
         CACHED_PAGES[page_slug] = content
 

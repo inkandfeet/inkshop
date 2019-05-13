@@ -165,3 +165,4 @@ Next Week:
 - Structure for full-system export/import.  JSON?  Zip?
 - Import flow for people who don't have double-opt-in records.
 - Editor / cleanup in clubhouse.  Look at https://alloyeditor.com/
+- Implement filtering, to make sure no data escapes: https://docs.djangoproject.com/en/1.11/howto/error-reporting/#filtering-error-reports
