@@ -19,5 +19,6 @@ else:
         host(r'dots', 'inkshop.host_urls.dots', name='dots'),
         host(r'clubhouse', 'inkshop.host_urls.clubhouse', name='clubhouse'),
         host(r'mail', 'inkshop.host_urls.mail', name='mail'),
+        host(r'draft', 'inkshop.host_urls.website', name='draft'),
         host(r'website', 'inkshop.host_urls.website', name='website'),
     )

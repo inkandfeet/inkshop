@@ -30,7 +30,7 @@ def home(request):
     return locals()
 
 
-def page_or_post(request, page_slug):
+def page_or_post(request, page_slug=None):
     if settings.DEBUG and not settings.TEST_MODE:
         global CACHED_PAGES
         CACHED_PAGES = {}

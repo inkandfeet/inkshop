@@ -76,3 +76,49 @@ class TestPageTemplateRendering(MockRequestsTestCase):
         self.assertIn(self.page.template.js, resp_content)
         if self.page.template.body_override:
             self.assertIn(self.page.template.body_override, resp_content)
+
+
+class TestPageRouting(MockRequestsTestCase):
+
+    def test_normal_page_renders(self):
+        t = Factory.template(content='{{rendered_page_html|safe}}')
+        self.page = Factory.page(
+            template=t,
+        )
+        url = reverse('website:page_or_post', kwargs={"page_slug": self.page.slug, },)
+        response = self.get(url)
+        self.assertEquals(response.status_code, 200)
+
+    def test_root_page_renders(self):
+        t = Factory.template(content='{{rendered_page_html|safe}}')
+        self.page = Factory.page(
+            template=t,
+            root_page=True,
+            slug='',
+        )
+        url = reverse('website:root_page_or_post')
+        response = self.get(url)
+        self.assertEquals(response.status_code, 200)
+
+
+class TestPostRouting(MockRequestsTestCase):
+
+    def test_normal_page_renders(self):
+        t = Factory.template(content='{{rendered_page_html|safe}}')
+        self.post = Factory.post(
+            template=t,
+        )
+        url = reverse('website:page_or_post', kwargs={"page_slug": self.post.slug, },)
+        response = self.get(url)
+        self.assertEquals(response.status_code, 200)
+
+    def test_root_post_renders(self):
+        t = Factory.template(content='{{rendered_post_html|safe}}')
+        self.post = Factory.post(
+            template=t,
+            root_page=True,
+            slug='',
+        )
+        url = reverse('website:root_page_or_post')
+        response = self.get(url)
+        self.assertEquals(response.status_code, 200)
