@@ -18,7 +18,9 @@ django-localflavor
 django-redis-cache
 django-storages
 Django
+extraction
 Faker
+fake-useragent
 flake8
 freezegun
 gunicorn
@@ -28,6 +30,7 @@ html5lib
 ipython
 kombu>=3.0.30
 jwt
+lxml
 mistune
 mock
 Pillow
@@ -35,6 +38,7 @@ piprot
 polytester>=1.2.0
 psycopg2
 pytz
+python-magic
 PyYAML>=4.2b1
 slimit
 sorl-thumbnail

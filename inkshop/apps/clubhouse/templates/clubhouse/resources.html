@@ -1,0 +1,11 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>All Resources</h1>
+    <p>&hearts;</p>
+    <a href="{% url 'clubhouse:create_resource' %}">Create New</a>
+    <ul>
+    {% for r in resources %}
+    <li> <a href="{% url 'clubhouse:resource' r.hashid %}">{{ r.name }} ({{r.mime_type}})</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

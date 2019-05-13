@@ -1,10 +1,10 @@
 {% extends "opengraph_meta.html" %}
 {% block pre_meta %}{{ block.super }}{% endblock %}
 {% block meta %}{{block.super}}
-    <!-- Schema.org markup for Google+ --> 
-    <meta itemprop="name" content="{% block title %}{{ title }}{% endblock %}"> 
-    <meta itemprop="description" content="{% block description %}{{ description }}{% endblock %}"> 
-    <meta itemprop="author" content="{{ author }}"> 
+    <!-- Schema.org markup for Google+ -->
+    <meta itemprop="name" content="{% block title %}{{ title }}{% endblock %}">
+    <meta itemprop="description" content="{% block description %}{{ description }}{% endblock %}">
+    <meta itemprop="author" content="{{ author }}">
     <meta itemprop="provider" content="{{ site_name }}">
 {% endblock %}
 {% block post_meta %}{{ block.super }}{% endblock %}

@@ -1,16 +1,16 @@
-{% block pre_meta %}{{ block.super }}{% endblock %}
+{% block everything_override %}{% block pre_meta %}{{ block.super }}{% endblock %}
 {% block meta %}{{ block.super }}
-    <!-- Open Graph data --> 
-    <meta property="og:title" content="{% block title %}{{ title }}{% endblock %}" /> 
-    <meta property="og:type" content="article" /> 
+    <!-- Open Graph data -->
+    <meta property="og:title" content="{% block title %}{{ title }}{% endblock %}" />
+    <meta property="og:type" content="article" />
     <meta property="og:url" content="{{ canonical_url }}" />
-    {% block og_image %}<meta property="og:image" content="{% if resources_url %}{{resources_url}}/{% else %}{% if static_url %}{{ static_url }}{% else %}https://inkandfeet.com/{% endif %}{% endif %}{{ social_image }}" />{% endblock %}
-    <meta property="og:description" content="{% block description %}{{ description }}{% endblock %}" /> 
-    <meta property="og:site_name" content="{{ site_name }}" /> 
+    {% block og_image %}<meta property="og:image" content="{% if resources_url %}{{resources_url}}/{% else %}{% if static_url %}{{ static_url }}{% endif %}{% endif %}{{ social_image }}" />{% endblock %}
+    <meta property="og:description" content="{% block description %}{{ description }}{% endblock %}" />
+    <meta property="og:site_name" content="{{ site_name }}" />
     <link rel="canonical" href="{{ canonical_url }}" />
-    <meta property="article:published_time" content="{{published_date|date:"c"}}" /> 
-    <meta property="article:modified_time" content="{{updated_date|date:"c"}}" /> 
-    <meta property="article:section" content="Writing" /> 
-    <meta property="article:tag" content="Writing" /> 
+    <meta property="article:published_time" content="{{published_date|date:"c"}}" />
+    <meta property="article:modified_time" content="{{updated_date|date:"c"}}" />
+    <meta property="article:section" content="Writing" />
+    <meta property="article:tag" content="Writing" />
 {% endblock %}
-{% block post_meta %}{{ block.super }}{% endblock %}
+{% block post_meta %}{{ block.super }}{% endblock %}{% endblock everything_override %}
