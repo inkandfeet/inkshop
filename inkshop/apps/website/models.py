@@ -8,6 +8,7 @@ import logging
 import random
 import requests
 import time
+from fake_useragent import UserAgent
 import uuid
 from base64 import b64encode
 from io import BytesIO
@@ -32,6 +33,7 @@ from utils.models import HashidBaseModel
 from utils.encryption import file_hash
 
 markdown = mistune.Markdown()
+ua = UserAgent()
 
 
 class Template(HashidBaseModel):
@@ -256,8 +258,8 @@ class Post(HashidBaseModel):
 
 
 class Link(HashidBaseModel):
-    name = models.CharField(max_length=254)
-    slug = models.CharField(max_length=1024)
+    name = models.CharField(max_length=254, blank=True, null=True)
+    slug = models.CharField(max_length=1024, blank=True, null=True)
     target_url = models.TextField(blank=True, null=True)
 
     title = models.CharField(max_length=1024, blank=True, null=True)
@@ -281,26 +283,31 @@ class Link(HashidBaseModel):
     destination_description = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if not self.name:
-            self.name = "Unnamed link %s" % self.hashid
         if self.name and not self.slug:
             self.slug = slugify(self.name)
         super(Link, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def fetch_metadata_from_target(self):
         try:
-            r = requests.get(self.target_url)
+            headers = {'User-Agent': str(ua.chrome)}
+            r = requests.get(self.target_url, headers=headers)
             content = r.text
             extracted = extraction.Extractor().extract(content, source_url=self.target_url)
             changed = False
             if extracted.title:
                 self.destination_title = extracted.title
+                if not self.name:
+                    self.name = extracted.title
+                if not self.title:
+                    self.title = extracted.title
                 changed = True
             if extracted.description:
                 self.destination_description = extracted.description
+                if not self.description:
+                    self.description = extracted.description
                 changed = True
             if extracted.images:
                 found_image = False

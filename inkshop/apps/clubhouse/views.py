@@ -331,10 +331,7 @@ def resource(request, hashid):
 
 @login_required
 def create_link(request):
-    print("create link")
     l = Link.objects.create()
-    print(l)
-    print(l.pk)
 
     return redirect(reverse('clubhouse:link', kwargs={"hashid": l.hashid, }, host='clubhouse'))
 

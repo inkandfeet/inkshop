@@ -69,9 +69,9 @@ class LinkForm(ModelForm):
     class Meta:
         model = Link
         fields = [
+            "target_url",
             "name",
             "slug",
-            "target_url",
             "title",
             "description",
             "publish_date",

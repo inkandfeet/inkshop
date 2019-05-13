@@ -20,6 +20,7 @@ django-storages
 Django
 extraction
 Faker
+fake-useragent
 flake8
 freezegun
 gunicorn
