@@ -39,7 +39,7 @@ class Loader(BaseLoader):
 
     def get_contents(self, origin, **kwargs):
         global TEMPLATE_CACHE
-        if settings.DEBUG:
+        if settings.DEBUG or (hasattr(settings, "TEST_MODE") and settings.TEST_MODE):
             TEMPLATE_CACHE = {}  # noqa 
         if True or origin.template_name not in TEMPLATE_CACHE.keys():
             kwarg_context = None
