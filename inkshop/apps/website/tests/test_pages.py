@@ -58,7 +58,7 @@ class TestPageTemplateRendering(MockRequestsTestCase):
     <meta property="og:title" content="%(title)s" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="" />
-    <meta property="og:image" content="https://inkandfeet.com/" />
+    <meta property="og:image" content="" />
     <meta property="og:description" content="%(description)s" />
     <meta property="og:site_name" content="" />
     <link rel="canonical" href="" />
@@ -118,7 +118,7 @@ class TestPageTemplateRendering(MockRequestsTestCase):
     <meta property="og:title" content="%(title)s" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="" />
-    <meta property="og:image" content="https://inkandfeet.com/" />
+    <meta property="og:image" content="" />
     <meta property="og:description" content="%(description)s" />
     <meta property="og:site_name" content="" />
     <link rel="canonical" href="" />
