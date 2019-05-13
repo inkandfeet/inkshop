@@ -34,10 +34,10 @@ def page_or_post(request, page_slug=None):
     print("page_or_post")
     print(page_slug)
     global CACHED_PAGES
+    global RESOURCE_HASHES
     if settings.DEBUG and not settings.TEST_MODE:
         CACHED_PAGES = {}  # noqa
 
-    global RESOURCE_HASHES
     if len(RESOURCE_HASHES.keys()) == 0:
         for r in list(Resource.objects.all()):
             RESOURCE_HASHES[r.name] = r.hashed_filename
@@ -54,8 +54,8 @@ def page_or_post(request, page_slug=None):
                 post = Post.objects.get(slug__iexact=page_slug)
                 content = post.rendered
             except Post.DoesNotExist:
-                # if not settings.DEBUG:
-                #     raise Http404("Page does not exist")
+                if not settings.DEBUG:
+                    raise Http404("Page does not exist")
                 raise
         CACHED_PAGES[page_slug] = content
 
@@ -68,6 +68,7 @@ def page_or_post(request, page_slug=None):
 
 def resource(request, resource_slug):
     global RESOURCE_HASHES
+    global CACHED_RESOURCES
     if len(RESOURCE_HASHES.keys()) == 0:
         for r in list(Resource.objects.all()):
             RESOURCE_HASHES[r.name] = r.hashed_filename
