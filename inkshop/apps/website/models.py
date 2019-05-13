@@ -173,6 +173,8 @@ class Page(HashidBaseModel):
             "description": self.description,
             "keywords": self.keywords,
             "links": Link.objects.all().order_by("-publish_date", "-created_at"),
+            "pages": Page.objects.all().order_by("-created_at"),
+            "posts": Post.objects.all().order_by("-publish_date", "-created_at"),
         })
 
         c = Context(context)
@@ -235,6 +237,8 @@ class Post(HashidBaseModel):
             "private": self.private,
             "context": self.context,
             "links": Link.objects.all().order_by("-publish_date", "-created_at"),
+            "pages": Page.objects.all().order_by("-created_at"),
+            "posts": Post.objects.all().order_by("-publish_date", "-created_at"),
         })
 
         c = Context(context)
