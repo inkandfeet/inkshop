@@ -24,7 +24,7 @@ When it's at 1.0, this project will let you:
 - Test different versions of content on your site
 - Share posts to social media
 - Protect your sanity against trolls and abusive people
-- Export and backup every bit of data in the system.  Import it back again
+- Export and backup every bit of data in the system.  Import it back again.
 
 It won't ever let you:
 - Spam people who haven't fully consented to receive your mailings
@@ -69,8 +69,6 @@ I'll be moving from a setup with:
 - Digital product sales managed by Ontraport and Teachery
 
 
-The project _just_ got started, on April 15 2019.   Mailing list is the first thing to build. Target for basic mailing list was April 28, 2019, and it's been hit.
-
 Right now, it handles:
 - Subscribe
 - Create mailing lists
@@ -79,6 +77,10 @@ Right now, it handles:
 - Unsubscribe
 - Love and positive consent
 - Receive replies
+- Create pages and posts
+- Build templates for your website
+- Add links (with thumbnails)
+- Host static site resources
 
 
 ## Bootstrapping
