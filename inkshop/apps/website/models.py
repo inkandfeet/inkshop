@@ -138,6 +138,7 @@ class Page(HashidBaseModel):
     root_page = models.BooleanField(default=False)
     title = models.CharField(max_length=1024)
     description = models.CharField(max_length=1024, blank=True, null=True)
+    section = models.CharField(max_length=254, blank=True, null=True)
     keywords = models.CharField(max_length=254, blank=True, null=True)
     template = models.ForeignKey(Template, blank=True, null=True, on_delete=models.SET_NULL)
     source_text = models.TextField(blank=True, null=True)
@@ -164,6 +165,8 @@ class Page(HashidBaseModel):
             "organization_address": o.address,
             "organization_name": o.name,
             "name": self.name,
+            "page_name": self.name,
+            "section": self.section,
             "source_text": self.source_text,
             "slug": self.slug,
             "title": self.title,
@@ -186,7 +189,9 @@ class Post(HashidBaseModel):
     root_page = models.BooleanField(default=False)
     title = models.CharField(max_length=1024)
     description = models.CharField(max_length=1024, blank=True, null=True)
+    keywords = models.CharField(max_length=254, blank=True, null=True)
     template = models.ForeignKey(Template, blank=True, null=True, on_delete=models.SET_NULL)
+    section = models.CharField(max_length=254, blank=True, null=True)
     publish_date = models.DateTimeField(blank=True, null=True)
     published = models.BooleanField(default=False)
     private = models.BooleanField(default=False)
@@ -219,6 +224,8 @@ class Post(HashidBaseModel):
             "organization_address": o.address,
             "organization_name": o.name,
             "name": self.name,
+            "page_name": self.name,
+            "section": self.section,
             "raw_markdown": self.raw_markdown,
             "slug": self.slug,
             "title": self.title,

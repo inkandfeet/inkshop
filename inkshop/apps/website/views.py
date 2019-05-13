@@ -31,8 +31,6 @@ def home(request):
 
 
 def page_or_post(request, page_slug=None):
-    print("page_or_post")
-    print(page_slug)
     global CACHED_PAGES
     global RESOURCE_HASHES
     if settings.DEBUG and not settings.TEST_MODE:
