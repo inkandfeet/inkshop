@@ -74,7 +74,6 @@ class TestPageTemplateRendering(MockRequestsTestCase):
     <meta itemprop="provider" content="">
 
 
-    <link rel="shortcut icon" href="https://inkandfeet.com/img/icon128.png">
     %(css)s
 
 
@@ -100,12 +99,12 @@ class TestPageTemplateRendering(MockRequestsTestCase):
         })
 
     def test_full_field_page_renders(self):
-        t = Factory.template()
+        t = Factory.template(content='{{rendered_page_html|safe}}')
         self.page = Factory.page(
             template=t,
         )
         rendered = self.page.rendered
-        self.assertEquals(rendered, """<!doctype html >
+        expected_render = """<!doctype html >
 <html itemscope itemtype="http://schema.org/CreativeWork" class="%(html_extra_classes)s" lang="en">
 <head>
     <meta charset="utf-8">
@@ -135,7 +134,6 @@ class TestPageTemplateRendering(MockRequestsTestCase):
     <meta itemprop="provider" content="">
 
 
-    <link rel="shortcut icon" href="https://inkandfeet.com/img/icon128.png">
     %(css)s
 
 
@@ -163,4 +161,5 @@ class TestPageTemplateRendering(MockRequestsTestCase):
             "js": self.page.template.js,
             "html_extra_classes": self.page.template.html_extra_classes,
             "body_override": self.page.template.body_override,
-        })
+        }
+        self.assertEquals(rendered, expected_render)

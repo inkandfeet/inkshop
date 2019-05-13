@@ -27,12 +27,12 @@ class TestPostTemplateRendering(MockRequestsTestCase):
         self.assertNotEquals(rendered, None)
 
     def test_full_field_post_renders(self):
-        t = Factory.template()
+        t = Factory.template(content='{{rendered_post_html|safe}}')
         self.post = Factory.post(
             template=t,
         )
         rendered = self.post.rendered
-        self.assertEquals(rendered, """<!doctype html >
+        expected_render = """<!doctype html >
 <html itemscope itemtype="http://schema.org/CreativeWork" class="%(html_extra_classes)s" lang="en">
 <head>
     <meta charset="utf-8">
@@ -62,7 +62,6 @@ class TestPostTemplateRendering(MockRequestsTestCase):
     <meta itemprop="provider" content="">
 
 
-    <link rel="shortcut icon" href="https://inkandfeet.com/img/icon128.png">
     %(css)s
 
 
@@ -91,4 +90,5 @@ class TestPostTemplateRendering(MockRequestsTestCase):
             "js": self.post.template.js,
             "html_extra_classes": self.post.template.html_extra_classes,
             "body_override": self.post.template.body_override,
-        })
+        }
+        self.assertEquals(rendered, expected_render)

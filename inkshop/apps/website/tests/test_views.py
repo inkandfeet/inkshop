@@ -27,7 +27,7 @@ class TestPostTemplateRendering(MockRequestsTestCase):
         self.assertNotEquals(rendered, None)
 
     def test_full_field_post_renders(self):
-        t = Factory.template()
+        t = Factory.template(content='{{rendered_post_html|safe}}')
         self.post = Factory.post(
             template=t,
         )
@@ -57,7 +57,7 @@ class TestPageTemplateRendering(MockRequestsTestCase):
         self.assertNotEquals(rendered, None)
 
     def test_full_field_page_renders(self):
-        t = Factory.template()
+        t = Factory.template(content='{{rendered_page_html|safe}}')
         self.page = Factory.page(
             template=t,
         )

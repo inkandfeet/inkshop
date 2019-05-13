@@ -169,7 +169,7 @@ class Page(HashidBaseModel):
 
         c = Context(context)
         content_template = DjangoTemplate(self.source_text)
-        context["rendered_page_content"] = mark_safe(content_template.render(c).encode("utf-8").decode())
+        context["rendered_page_html"] = mark_safe(content_template.render(c).encode("utf-8").decode())
 
         return t.render(context)
 
@@ -228,7 +228,7 @@ class Post(HashidBaseModel):
         rendered_string = rendered_string.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
 
         content_template = DjangoTemplate(rendered_string)
-        context["piece_html"] = mark_safe(content_template.render(c).encode("utf-8").decode())
+        context["rendered_post_html"] = mark_safe(content_template.render(c).encode("utf-8").decode())
 
         return t.render(context)
 

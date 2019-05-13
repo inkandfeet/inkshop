@@ -18,8 +18,11 @@ ALL_RESOURCES = []
 
 # Via https://stackoverflow.com/a/15448887/173933
 def multiple_replace(string, rep_dict):
-    pattern = re.compile("|".join([re.escape(k) for k in sorted(rep_dict, key=len, reverse=True)]), flags=re.DOTALL)
-    return pattern.sub(lambda x: rep_dict[x.group(0)], string)
+    if len(rep_dict.keys()) and string != "":
+        pattern = re.compile("|".join([re.escape(k) for k in sorted(rep_dict, key=len, reverse=True)]), flags=re.DOTALL)
+        return pattern.sub(lambda x: rep_dict[x.group(0)], string)
+    else:
+        return string
 
 
 @render_to("website/home.html")
@@ -28,7 +31,7 @@ def home(request):
 
 
 def page_or_post(request, page_slug):
-    if settings.DEBUG:
+    if settings.DEBUG and not settings.TEST_MODE:
         global CACHED_PAGES
         CACHED_PAGES = {}
 
