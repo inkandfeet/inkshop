@@ -134,7 +134,7 @@ class Resource(HashidBaseModel):
 
 class Page(HashidBaseModel):
     name = models.CharField(max_length=254, unique=True)
-    slug = models.CharField(max_length=254)
+    slug = models.CharField(max_length=254, blank=True, null=True)
     title = models.CharField(max_length=1024)
     description = models.CharField(max_length=1024, blank=True, null=True)
     keywords = models.CharField(max_length=254, blank=True, null=True)
@@ -179,7 +179,7 @@ class Page(HashidBaseModel):
 class Post(HashidBaseModel):
     name = models.CharField(max_length=254)
     raw_markdown = models.TextField(blank=True, null=True)
-    slug = models.CharField(max_length=1024)
+    slug = models.CharField(max_length=1024, blank=True, null=True)
     title = models.CharField(max_length=1024)
     description = models.CharField(max_length=1024, blank=True, null=True)
     template = models.ForeignKey(Template, blank=True, null=True, on_delete=models.SET_NULL)
