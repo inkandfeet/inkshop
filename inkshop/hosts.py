@@ -10,6 +10,7 @@ if hasattr(settings, "IS_LIVE") and settings.IS_LIVE:
         host(r'clubhouse', 'inkshop.host_urls.clubhouse', name='clubhouse'),
         host(r'mail', 'inkshop.host_urls.mail', name='mail'),
         host(r'draft', 'inkshop.host_urls.website', name='draft'),
+        host(r'root', 'inkshop.host_urls.website', name='root'),
     )
 else:
     host_patterns = patterns(
