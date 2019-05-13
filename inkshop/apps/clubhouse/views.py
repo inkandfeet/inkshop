@@ -24,8 +24,8 @@ from inkmail.forms import ScheduledNewsletterMessageForm, MessageForm, OutgoingM
 from inkmail.forms import NewsletterForm, SubscriptionForm, OrganizationForm
 from inkmail.helpers import queue_message, queue_newsletter_message
 from clubhouse.models import StaffMember
-from website.models import Template, Page, Post, Resource
-from website.forms import TemplateForm, PageForm, PostForm, ResourceForm
+from website.models import Template, Page, Post, Resource, Link
+from website.forms import TemplateForm, PageForm, PostForm, ResourceForm, LinkForm
 
 
 @render_to("clubhouse/dashboard.html")
@@ -250,6 +250,7 @@ def pages(request):
 def page(request, hashid):
     page_name = "pages"
     page = Page.objects.get(hashid=hashid)
+    links = Link.objects.all()
     saved = False
     if request.method == "POST":
         form = PageForm(request.POST, request.FILES, instance=page)
@@ -282,6 +283,7 @@ def posts(request):
 def post(request, hashid):
     post_name = "posts"
     post = Post.objects.get(hashid=hashid)
+    links = Link.objects.all()
     saved = False
     if request.method == "POST":
         form = PostForm(request.POST, request.FILES, instance=post)
@@ -324,4 +326,41 @@ def resource(request, hashid):
             form = ResourceForm(instance=resource)
     else:
         form = ResourceForm(instance=resource)
+    return locals()
+
+
+@login_required
+def create_link(request):
+    print("create link")
+    l = Link.objects.create()
+    print(l)
+    print(l.pk)
+
+    return redirect(reverse('clubhouse:link', kwargs={"hashid": l.hashid, }, host='clubhouse'))
+
+
+@render_to("clubhouse/links.html")
+@login_required
+def links(request):
+    link_name = "links"
+    links = Link.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/link.html")
+@login_required
+def link(request, hashid):
+    link_name = "links"
+    link = Link.objects.get(hashid=hashid)
+    saved = False
+    if request.method == "POST":
+        form = LinkForm(request.POST, request.FILES, instance=link)
+        if form.is_valid():
+            form.save()
+            saved = True
+            link = Link.objects.get(hashid=hashid)
+            link.fetch_metadata_from_target()
+            form = LinkForm(instance=link)
+    else:
+        form = LinkForm(instance=link)
     return locals()

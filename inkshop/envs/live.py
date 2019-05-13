@@ -17,7 +17,8 @@ SESSION_COOKIE_NAME = "%s_id" % INKSHOP_NAMESPACE
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 CORS_ORIGIN_WHITELIST = (
     INKSHOP_DOMAIN,
-    'localhost',
+    'http://localhost',
+    'https://localhost',
 )
 
 SESSION_COOKIE_SECURE = True

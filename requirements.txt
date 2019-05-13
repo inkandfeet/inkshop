@@ -17,6 +17,7 @@ django-localflavor==2.1
 django-redis-cache==2.0.0
 django-storages==1.7.1
 Django==2.2
+extraction==0.3
 Faker==1.0.5
 flake8==3.7.7
 freezegun==0.3.11
@@ -27,6 +28,7 @@ html5lib==1.0.1
 ipython==7.4.0
 kombu==4.5.0
 jwt==0.6.1
+lxml==4.3.3
 mistune==0.8.4
 mock==2.0.0
 Pillow==6.0.0

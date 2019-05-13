@@ -143,7 +143,8 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 CORS_ORIGIN_WHITELIST = (
     INKSHOP_BASE_URL,
-    'localhost',
+    'http://localhost',
+    'https://localhost',
 )
 CORS_ORIGIN_ALLOW_ALL = True
 

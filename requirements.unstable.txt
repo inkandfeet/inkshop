@@ -18,6 +18,7 @@ django-localflavor
 django-redis-cache
 django-storages
 Django
+extraction
 Faker
 flake8
 freezegun
@@ -28,6 +29,7 @@ html5lib
 ipython
 kombu>=3.0.30
 jwt
+lxml
 mistune
 mock
 Pillow

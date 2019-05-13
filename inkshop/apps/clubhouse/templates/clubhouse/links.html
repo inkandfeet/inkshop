@@ -1,0 +1,11 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>All Links</h1>
+    <p>&hearts;</p>
+    <a href="{% url 'clubhouse:create_link' %}">Create New</a>
+    <ul>
+    {% for l in links %}
+    <li> <a href="{% url 'clubhouse:link' l.hashid %}">{{ l.slug }} -> {{l.target_url}}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

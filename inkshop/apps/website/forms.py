@@ -1,6 +1,6 @@
 import logging
 from django.forms import ModelForm, CharField, TextInput
-from website.models import Template, Page, Post, Resource
+from website.models import Template, Page, Post, Resource, Link
 from django.forms import modelformset_factory
 
 
@@ -62,4 +62,23 @@ class ResourceForm(ModelForm):
             "mime_type",
             "hashed_filename",
             "content_size",
+        ]
+
+
+class LinkForm(ModelForm):
+    class Meta:
+        model = Link
+        fields = [
+            "name",
+            "slug",
+            "target_url",
+            "title",
+            "description",
+            "publish_date",
+            "published",
+            "private",
+            "thumbnail_image_source",
+            "thumbnail_image",
+            "destination_title",
+            "destination_description",
         ]

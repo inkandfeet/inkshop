@@ -28,6 +28,10 @@ def home(request):
 
 
 def page_or_post(request, page_slug):
+    if settings.DEBUG:
+        global CACHED_PAGES
+        CACHED_PAGES = {}
+
     global RESOURCE_HASHES
     if len(RESOURCE_HASHES.keys()) == 0:
         for r in list(Resource.objects.all()):

@@ -1,9 +1,12 @@
 import datetime
+import extraction
 import hashlib
 import magic
 import mistune
+import io
 import logging
 import random
+import requests
 import time
 import uuid
 from base64 import b64encode
@@ -14,6 +17,7 @@ from tempfile import NamedTemporaryFile
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.files.base import ContentFile
 from django.utils.text import slugify
 from django.template import Context
 from django.template import Template as DjangoTemplate
@@ -129,8 +133,8 @@ class Resource(HashidBaseModel):
 class Page(HashidBaseModel):
     name = models.CharField(max_length=254, unique=True)
     slug = models.CharField(max_length=254)
-    title = models.CharField(max_length=254)
-    description = models.CharField(max_length=254, blank=True, null=True)
+    title = models.CharField(max_length=1024)
+    description = models.CharField(max_length=1024, blank=True, null=True)
     keywords = models.CharField(max_length=254, blank=True, null=True)
     template = models.ForeignKey(Template, blank=True, null=True, on_delete=models.SET_NULL)
     source_text = models.TextField(blank=True, null=True)
@@ -140,6 +144,9 @@ class Page(HashidBaseModel):
         if self.name and not self.slug:
             self.slug = slugify(self.name)
         super(Page, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
     # @cached_property
     @property
@@ -157,11 +164,12 @@ class Page(HashidBaseModel):
             "title": self.title,
             "description": self.description,
             "keywords": self.keywords,
+            "links": Link.objects.all(),
         })
 
-        # c = Context(context)
-        # content_template = DjangoTemplate(self.source_text)
-        # context["content"] = mark_safe(content_template.render(c).encode("utf-8").decode())
+        c = Context(context)
+        content_template = DjangoTemplate(self.source_text)
+        context["rendered_page_content"] = mark_safe(content_template.render(c).encode("utf-8").decode())
 
         return t.render(context)
 
@@ -170,8 +178,8 @@ class Post(HashidBaseModel):
     name = models.CharField(max_length=254)
     raw_markdown = models.TextField(blank=True, null=True)
     slug = models.CharField(max_length=1024)
-    title = models.CharField(max_length=254)
-    description = models.CharField(max_length=254, blank=True, null=True)
+    title = models.CharField(max_length=1024)
+    description = models.CharField(max_length=1024, blank=True, null=True)
     template = models.ForeignKey(Template, blank=True, null=True, on_delete=models.SET_NULL)
     publish_date = models.DateTimeField(blank=True, null=True)
     published = models.BooleanField(default=False)
@@ -185,13 +193,16 @@ class Post(HashidBaseModel):
         null=True,
     )
 
+    def __str__(self):
+        return self.name
+
     def save(self, *args, **kwargs):
         if self.name and not self.slug:
             self.slug = slugify(self.name)
         super(Post, self).save(*args, **kwargs)
 
-    @cached_property
-    def rendered(self,):
+    @property
+    def rendered(self):
         t = get_template(self.template.name)
 
         o = Organization.get()
@@ -208,6 +219,7 @@ class Post(HashidBaseModel):
             "published": self.published,
             "private": self.private,
             "context": self.context,
+            "links": Link.objects.all(),
         })
 
         c = Context(context)
@@ -241,3 +253,92 @@ class Post(HashidBaseModel):
     #     content: The best thing I saw this week was the story of where some of our favorite board games come from. https://www.youtube.com/watch?v=ZzACrQevj6k  # noqa 
     #     publication_plus_days: 4
     #     time: 07:00
+
+
+class Link(HashidBaseModel):
+    name = models.CharField(max_length=254)
+    slug = models.CharField(max_length=1024)
+    target_url = models.TextField(blank=True, null=True)
+
+    title = models.CharField(max_length=1024, blank=True, null=True)
+    description = models.CharField(max_length=1024, blank=True, null=True)
+    publish_date = models.DateTimeField(blank=True, null=True)
+    published = models.BooleanField(default=False)
+    private = models.BooleanField(default=False)
+    thumbnail_image_source = models.ImageField(
+        verbose_name="Thumbnail Source",
+        upload_to='link-images-source',
+        blank=True,
+        null=True,
+    )
+    thumbnail_image = models.ImageField(
+        verbose_name="Thumbnail",
+        upload_to='link-images',
+        blank=True,
+        null=True,
+    )
+    destination_title = models.TextField(blank=True, null=True)
+    destination_description = models.TextField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.name:
+            self.name = "Unnamed link %s" % self.hashid
+        if self.name and not self.slug:
+            self.slug = slugify(self.name)
+        super(Link, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+    def fetch_metadata_from_target(self):
+        try:
+            r = requests.get(self.target_url)
+            content = r.text
+            extracted = extraction.Extractor().extract(content, source_url=self.target_url)
+            changed = False
+            if extracted.title:
+                self.destination_title = extracted.title
+                changed = True
+            if extracted.description:
+                self.destination_description = extracted.description
+                changed = True
+            if extracted.images:
+                found_image = False
+                now = timezone.now()
+                for i in extracted.images:
+                    try:
+                        print(i)
+                        image_request = requests.get(i)
+                        source = Image.open(io.BytesIO(image_request.content))
+                        thumb = ImageOps.fit(source, (400, 300), Image.ANTIALIAS, 0, (0.5, 0.5))
+                        thumb_buffer = BytesIO()
+                        thumb.save(thumb_buffer, format="PNG", quality=60)
+                        thumb_buffer.seek(0)
+
+                        self.thumbnail_image_source.save(
+                            "%s%s-source.jpg" % (
+                                self.hashid,
+                                now
+                            ),
+                            ContentFile(image_request.content)
+                        )
+                        self.thumbnail_image.save(
+                            "%s%s-thumb.jpg" % (
+                                self.hashid,
+                                now
+                            ),
+                            ContentFile(thumb_buffer.getvalue())
+                        )
+                        found_image = True
+                        break
+                    except:
+                        import traceback
+                        traceback.print_exc()
+                        pass
+
+                if found_image:
+                    changed = True
+            if changed:
+                self.save()
+        except:
+            pass
