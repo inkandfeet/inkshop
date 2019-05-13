@@ -9,7 +9,7 @@ if hasattr(settings, "IS_LIVE") and settings.IS_LIVE:
         host(r'dots', 'inkshop.host_urls.dots', name='dots'),
         host(r'clubhouse', 'inkshop.host_urls.clubhouse', name='clubhouse'),
         host(r'mail', 'inkshop.host_urls.mail', name='mail'),
-        host(r'draft', 'inkshop.host_urls.website', name='draft'),
+        host(r'draft', 'inkshop.host_urls.draft', name='draft'),
         host(r'root', 'inkshop.host_urls.website', name='root'),
     )
 else:
