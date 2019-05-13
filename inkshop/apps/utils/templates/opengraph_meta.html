@@ -4,7 +4,7 @@
     <meta property="og:title" content="{% block title %}{{ title }}{% endblock %}" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="{{ canonical_url }}" />
-    {% block og_image %}<meta property="og:image" content="{% if resources_url %}{{resources_url}}/{% else %}{% if static_url %}{{ static_url }}{% else %}https://inkandfeet.com/{% endif %}{% endif %}{{ social_image }}" />{% endblock %}
+    {% block og_image %}<meta property="og:image" content="{% if resources_url %}{{resources_url}}/{% else %}{% if static_url %}{{ static_url }}{% endif %}{% endif %}{{ social_image }}" />{% endblock %}
     <meta property="og:description" content="{% block description %}{{ description }}{% endblock %}" />
     <meta property="og:site_name" content="{{ site_name }}" />
     <link rel="canonical" href="{{ canonical_url }}" />
