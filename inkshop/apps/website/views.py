@@ -31,9 +31,10 @@ def home(request):
 
 
 def page_or_post(request, page_slug=None):
+    print("page_or_post")
+    print(page_slug)
     if settings.DEBUG and not settings.TEST_MODE:
-        global CACHED_PAGES
-        CACHED_PAGES = {}
+        CACHED_PAGES = {}  # noqa
 
     global RESOURCE_HASHES
     if len(RESOURCE_HASHES.keys()) == 0:
@@ -76,7 +77,7 @@ def resource(request, resource_slug):
             return HttpResponseNotModified()
 
     found_hashed = False
-    if settings.DEBUG:
+    if settings.DEBUG and not settings.TEST_MODE:
         CACHED_RESOURCES = {}  # noqa
 
     if resource_slug in CACHED_RESOURCES:
