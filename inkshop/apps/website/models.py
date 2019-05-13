@@ -135,6 +135,7 @@ class Resource(HashidBaseModel):
 class Page(HashidBaseModel):
     name = models.CharField(max_length=254, unique=True)
     slug = models.CharField(max_length=254, blank=True, null=True)
+    root_page = models.BooleanField(default=False)
     title = models.CharField(max_length=1024)
     description = models.CharField(max_length=1024, blank=True, null=True)
     keywords = models.CharField(max_length=254, blank=True, null=True)
@@ -143,8 +144,10 @@ class Page(HashidBaseModel):
     rendered_html = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if self.name and self.slug is None:
+        if self.name and not self.slug:
             self.slug = slugify(self.name)
+        if self.root_page:
+            self.slug = ""
         super(Page, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -180,6 +183,7 @@ class Post(HashidBaseModel):
     name = models.CharField(max_length=254)
     raw_markdown = models.TextField(blank=True, null=True)
     slug = models.CharField(max_length=1024, blank=True, null=True)
+    root_page = models.BooleanField(default=False)
     title = models.CharField(max_length=1024)
     description = models.CharField(max_length=1024, blank=True, null=True)
     template = models.ForeignKey(Template, blank=True, null=True, on_delete=models.SET_NULL)
@@ -199,6 +203,8 @@ class Post(HashidBaseModel):
         return self.name
 
     def save(self, *args, **kwargs):
+        if self.root_page:
+            self.slug = ""
         if self.name and self.slug is None:
             self.slug = slugify(self.name)
         super(Post, self).save(*args, **kwargs)

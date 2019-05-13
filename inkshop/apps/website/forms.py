@@ -26,6 +26,7 @@ class PageForm(ModelForm):
         fields = [
             "name",
             "slug",
+            "root_page",
             "title",
             "description",
             "keywords",
@@ -42,6 +43,7 @@ class PostForm(ModelForm):
             "name",
             "raw_markdown",
             "slug",
+            "root_page",
             "title",
             "description",
             "template",
