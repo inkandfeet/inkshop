@@ -143,7 +143,7 @@ class Page(HashidBaseModel):
     rendered_html = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if self.name and not self.slug:
+        if self.name and self.slug is None:
             self.slug = slugify(self.name)
         super(Page, self).save(*args, **kwargs)
 
@@ -199,7 +199,7 @@ class Post(HashidBaseModel):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.name and not self.slug:
+        if self.name and self.slug is None:
             self.slug = slugify(self.name)
         super(Post, self).save(*args, **kwargs)
 

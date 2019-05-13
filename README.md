@@ -1,7 +1,7 @@
 
 # Inkshop is about people.
 
-It's an all-in-one system for businesses and organizations that do things the right way.  Battieries are included - manage your website, mailing list, store, and reporting all in one.  It's free.
+It's an all-in-one system for businesses and organizations that do things the right way.  Batteries are included - manage your website, mailing list, store, and reporting all in one.  It's free.
 
 There are tons of good systems out there.  Inkshop sticks out because it's people-focused.  It treats you, your customers, and your visitors like people, not data points.
 
