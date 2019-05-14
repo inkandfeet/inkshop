@@ -148,6 +148,7 @@ python3 manage.py import_ontraport_csv --subscribers subscribers.csv --hard_boun
 ## Current working list
 
 Next Week:
+- move sitemap.xml from dynamic to built-in thing.
 - handle subscribes between scheduling and sending
 - delete flow finished
 - poll mailgun (or webhook) for hard bounces
@@ -166,3 +167,5 @@ Next Week:
 - Import flow for people who don't have double-opt-in records.
 - Editor / cleanup in clubhouse.  Look at https://alloyeditor.com/
 - Implement filtering, to make sure no data escapes: https://docs.djangoproject.com/en/1.11/howto/error-reporting/#filtering-error-reports
+
+- https://pythonhosted.org/python-geoip/
