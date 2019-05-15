@@ -30,6 +30,13 @@ def home(request):
     return locals()
 
 
+@render_to("website/sitemap.xml")
+def sitemap(request):
+    pages = Page.objects.all().order_by("-created_at")
+    posts = Post.objects.all().order_by("-publish_date", "-created_at")
+    return locals()
+
+
 def page_or_post(request, page_slug=None):
     global CACHED_PAGES
     global RESOURCE_HASHES
