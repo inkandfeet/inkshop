@@ -142,6 +142,8 @@ class Page(HashidBaseModel):
     keywords = models.CharField(max_length=254, blank=True, null=True)
     template = models.ForeignKey(Template, blank=True, null=True, on_delete=models.SET_NULL)
     source_text = models.TextField(blank=True, null=True)
+    published = models.BooleanField(default=True)
+    private = models.BooleanField(default=False)
     rendered_html = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):

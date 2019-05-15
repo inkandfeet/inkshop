@@ -32,8 +32,8 @@ def home(request):
 
 @render_to("website/sitemap.xml")
 def sitemap(request):
-    pages = Page.objects.all().order_by("-created_at")
-    posts = Post.objects.all().order_by("-publish_date", "-created_at")
+    pages = Page.objects.filter(published=True, private=False).order_by("-created_at")
+    posts = Post.objects.filter(published=True, private=False).order_by("-publish_date", "-created_at")
     return locals()
 
 
