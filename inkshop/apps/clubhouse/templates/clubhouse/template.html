@@ -8,4 +8,5 @@
         {{ form.as_p }}
         <input type="submit">
     </form>
+    <a href="{% url 'clubhouse:delete_template' template.hashid %}">Delete template</a>
 {% endblock %}
