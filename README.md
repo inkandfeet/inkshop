@@ -147,20 +147,36 @@ python3 manage.py import_ontraport_csv --subscribers subscribers.csv --hard_boun
 
 ## Current working list
 
-Next Week:
-- move sitemap.xml from dynamic to built-in thing.
-- handle subscribes between scheduling and sending
-- delete flow finished
-- poll mailgun (or webhook) for hard bounces
-- add fallback gif
-- scale down workers
-- Move all inkmail helpers to tasks?  Think about abstraction this.
-- Auto-delete any un-clicked confirmations after 7 days.
-- Handle if people click them later, make sure we never delete people who were already subscribed, etc.
+Next Small Projects:
+- Clubhouse enhancements
+    - It is the ugliest site in the history of humanity.  Full of heart, but not design or style.  Clean it up.
+    - handle subscribes between scheduling and sending (aka queueing outgoingmessages should just hold until the send time.)
+    - Delete pages/posts/resources
+    - delete account flow finished
+- Website enhancements
+    - LESS support
+    - move sitemap.xml from dynamic to built-in thing.
+- Inkmail enhancements
+    - poll mailgun (or webhook) for hard bounces
+    - add fallback reward gif
+    - Move all inkmail helpers to tasks?  Think about abstraction this.
+    - Auto-delete any un-clicked confirmations after 7 days.
+    - Handle if people click them later, make sure we never delete people who were already subscribed, etc.
+    - GDPR/Data export
+
+Big Projects:
+- Vault
+    - Full system data export/import
+    - Encrypted backups
+    - Object history?
+    - Personal data export
+- Inkdots
+- Inkmail - handle replies through the system, allow lookup in gmail.
+- Deployment/hosting
 
 
 ## Open threads the architecture isn't decided on yet.
-- Repackage for production w/ Docker? https://github.com/caktus/dockerfile_post/
+- Repackage for production w/ Docker/self-hosting?  [See this issue](https://github.com/inkandfeet/inkshop/issues/7)  https://github.com/caktus/dockerfile_post/
 - How are replies in app handled?  [Prior art](https://medium.com/issacaption/using-a-custom-domain-in-gmail-for-free-with-mailgun-and-sendgrid-2c54e681f378)
 - Structure for GDPR dump.  JSON?  Zip?
 - Structure for full-system export/import.  JSON?  Zip?
