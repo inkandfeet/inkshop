@@ -32,6 +32,8 @@ class PageForm(ModelForm):
             "keywords",
             "section",
             "template",
+            "published",
+            "private",
             "source_text",
             "rendered_html",
         ]

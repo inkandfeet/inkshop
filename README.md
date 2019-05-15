@@ -155,7 +155,6 @@ Next Small Projects:
     - delete account flow finished
 - Website enhancements
     - LESS support
-    - move sitemap.xml from dynamic to built-in thing.
 - Inkmail enhancements
     - poll mailgun (or webhook) for hard bounces
     - add fallback reward gif
