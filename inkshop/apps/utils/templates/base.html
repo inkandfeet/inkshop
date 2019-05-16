@@ -7,8 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title>{% block title %}{{ title }}{% endblock %}</title>
-    <meta name="description" content="{% block description %}{{ description }}{% endblock %}">
-    {% if organization and organization.favicon %}<link rel="shortcut icon" href="{{ RESOURCES_URL }}{{organization.favicon.name}}">{% endif %}
+    <meta name="description" content="{% block description %}{{ description }}{% endblock %}">{% if organization and organization.favicon %}
+    <link rel="shortcut icon" href="{{ RESOURCES_URL }}{{organization.favicon.name}}">{% endif %}
 {% endblock %}
 
 {% block meta %}{{block.super}}{% endblock %}

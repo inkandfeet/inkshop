@@ -78,6 +78,7 @@ def page_or_post(request, page_slug=None):
     response['Content-Length'] = len(content)
     return response
 
+
 def resource(request, resource_slug):
     global RESOURCE_HASHES
     global CACHED_RESOURCES
