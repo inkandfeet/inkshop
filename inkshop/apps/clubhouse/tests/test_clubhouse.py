@@ -13,7 +13,7 @@ from utils.test_helpers import MailTestCase
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, encrypt, decrypt
 import mock
 import unittest
-from history.models import HistoricalEvent
+from archves.models import HistoricalEvent
 
 
 class TestClubhouseLoads(MailTestCase):

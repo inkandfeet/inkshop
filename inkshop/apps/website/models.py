@@ -164,6 +164,7 @@ class Page(HashidBaseModel):
         o = Organization.get()
         context = self.template.context.copy()
         context.update(**{
+            "organization": o,
             "organization_address": o.address,
             "organization_name": o.name,
             "name": self.name,
@@ -177,6 +178,7 @@ class Page(HashidBaseModel):
             "links": Link.objects.all().order_by("-publish_date", "-created_at"),
             "pages": Page.objects.all().order_by("-created_at"),
             "posts": Post.objects.all().order_by("-publish_date", "-created_at"),
+            "RESOURCES_URL": settings.RESOURCES_URL
         })
 
         c = Context(context)
@@ -225,6 +227,7 @@ class Post(HashidBaseModel):
         o = Organization.get()
         context = self.template.context.copy()
         context.update(**{
+            "organization": o,
             "organization_address": o.address,
             "organization_name": o.name,
             "name": self.name,
@@ -241,6 +244,7 @@ class Post(HashidBaseModel):
             "links": Link.objects.all().order_by("-publish_date", "-created_at"),
             "pages": Page.objects.all().order_by("-created_at"),
             "posts": Post.objects.all().order_by("-publish_date", "-created_at"),
+            "RESOURCES_URL": settings.RESOURCES_URL
         })
 
         c = Context(context)

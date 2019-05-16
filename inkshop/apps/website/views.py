@@ -6,6 +6,7 @@ from django.http import HttpResponse, Http404, HttpResponseNotModified
 
 from annoying.decorators import render_to, ajax_request
 from django.template.loader import render_to_string
+from inkmail.models import Organization
 from website.models import Page, Post, Resource
 
 CACHED_PAGES = {}
@@ -76,7 +77,6 @@ def page_or_post(request, page_slug=None):
     response = HttpResponse(content)
     response['Content-Length'] = len(content)
     return response
-
 
 def resource(request, resource_slug):
     global RESOURCE_HASHES
