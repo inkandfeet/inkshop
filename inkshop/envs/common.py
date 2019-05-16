@@ -58,6 +58,7 @@ MAIL_BASE_URL = "https://%s" % MAIL_DOMAIN
 DRAFT_BASE_URL = "https://%s" % DRAFT_DOMAIN
 LOVE_BASE_URL = "https://%s" % LOVE_DOMAIN
 DOTS_BASE_URL = "https://%s" % DOTS_DOMAIN
+RESOURCES_URL = "./static/"
 
 APPEND_SLASH = True
 

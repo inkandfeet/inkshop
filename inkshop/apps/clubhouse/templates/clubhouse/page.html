@@ -8,4 +8,6 @@
         {{ form.as_p }}
         <input type="submit">
     </form>
+
+    <a href="{% url 'clubhouse:delete_page' page.hashid %}">Delete Page</a>
 {% endblock %}

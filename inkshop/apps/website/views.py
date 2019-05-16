@@ -5,6 +5,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, Http404, HttpResponseNotModified
 
 from annoying.decorators import render_to, ajax_request
+from django.template.loader import render_to_string
+from inkmail.models import Organization
 from website.models import Page, Post, Resource
 
 CACHED_PAGES = {}
@@ -28,6 +30,19 @@ def multiple_replace(string, rep_dict):
 @render_to("website/home.html")
 def home(request):
     return locals()
+
+
+def sitemap(request):
+    if request.is_secure:
+        domain = "https://%s/" % request.META['HTTP_HOST']
+    else:
+        domain = "http://%s/" % request.META['HTTP_HOST']
+
+    pages = Page.objects.filter(published=True, private=False).order_by("-created_at")
+    posts = Post.objects.filter(published=True, private=False).order_by("-publish_date", "-created_at")
+    content_type = "text/xml"
+    content = render_to_string("website/sitemap.xml", locals())
+    return HttpResponse(content, content_type="text/xml")
 
 
 def page_or_post(request, page_slug=None):

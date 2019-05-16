@@ -109,4 +109,5 @@ class OrganizationForm(ModelForm):
             "name",
             "address",
             "transactional_footer",
+            "favicon",
         ]

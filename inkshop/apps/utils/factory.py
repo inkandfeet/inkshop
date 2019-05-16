@@ -610,7 +610,7 @@ class Factory(DjangoFunctionalFactory):
         cls.organization()
 
         options = {
-            "name": "%s.html" % cls.rand_str(include_emoji=False),
+            "name": "%s.html" % cls.rand_str(length=10, include_emoji=False),
             "nav": cls.rand_text(),
             "content": cls.rand_text(),
             "footer": cls.rand_text(),

@@ -1,12 +1,12 @@
 {% extends "clubhouse/base.html" %}{% load static %}
 {% block content %}
-    <h1>Link {{link}}</h1>
+    <h1>DELETE template {{template}}?</h1>
     <p>&hearts;</p>
     {% if saved %}Saved{% endif %}
     <form method="POST" enctype="multipart/form-data" action=".">
         {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit">
+        <input type="hidden" name="delete" value="DO_DELETE"/>
+        <a href="{% url 'clubhouse:template' template.hashid %}">Cancel</a>
+        <input type="submit" value="YES, DELETE">
     </form>
-    <a href="{% url 'clubhouse:delete_link' link.hashid %}">Delete link</a>
 {% endblock %}

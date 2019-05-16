@@ -52,6 +52,12 @@ class Person(HashidBaseModel):
 
     personal_contact = models.BooleanField(default=False)
 
+    @classmethod
+    def get_by_email(cls, email):
+        if cls.objects.filter(hashed_email=lookup_hash(email)).count() > 0:
+            return cls.objects.get(hashed_email=lookup_hash(email))
+        return None
+
     @property
     def email(self):
         if not hasattr(self, "_decrypted_email"):
@@ -101,7 +107,7 @@ class Person(HashidBaseModel):
             self.save()
             HistoricalEvent.log(person=self, event_type="mark_troll")
 
-    def hard_bounce(self, reason=None, bouncing_message=None):
+    def hard_bounce(self, reason=None, bouncing_message=None, raw_mailgun_data={}):
         from archives.models import HistoricalEvent
         if not self.hard_bounced:
             self.hard_bounced = True
@@ -109,7 +115,13 @@ class Person(HashidBaseModel):
             self.hard_bounced_reason = reason
             self.hard_bounced_message = bouncing_message
             self.save()
-            HistoricalEvent.log(person=self, event_type="mark_hard_bounce", reason=reason, message=bouncing_message)
+            HistoricalEvent.log(
+                person=self,
+                event_type="mark_hard_bounce",
+                reason=reason,
+                message=bouncing_message,
+                raw_mailgun_data=raw_mailgun_data,
+            )
 
     def gdpr_dump(self):
         raise NotImplementedError("Haven't implemented GPDR dump yet")

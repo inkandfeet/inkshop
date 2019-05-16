@@ -142,6 +142,8 @@ class Page(HashidBaseModel):
     keywords = models.CharField(max_length=254, blank=True, null=True)
     template = models.ForeignKey(Template, blank=True, null=True, on_delete=models.SET_NULL)
     source_text = models.TextField(blank=True, null=True)
+    published = models.BooleanField(default=True)
+    private = models.BooleanField(default=False)
     rendered_html = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
@@ -162,6 +164,7 @@ class Page(HashidBaseModel):
         o = Organization.get()
         context = self.template.context.copy()
         context.update(**{
+            "organization": o,
             "organization_address": o.address,
             "organization_name": o.name,
             "name": self.name,
@@ -175,6 +178,7 @@ class Page(HashidBaseModel):
             "links": Link.objects.all().order_by("-publish_date", "-created_at"),
             "pages": Page.objects.all().order_by("-created_at"),
             "posts": Post.objects.all().order_by("-publish_date", "-created_at"),
+            "RESOURCES_URL": settings.RESOURCES_URL
         })
 
         c = Context(context)
@@ -223,6 +227,7 @@ class Post(HashidBaseModel):
         o = Organization.get()
         context = self.template.context.copy()
         context.update(**{
+            "organization": o,
             "organization_address": o.address,
             "organization_name": o.name,
             "name": self.name,
@@ -239,6 +244,7 @@ class Post(HashidBaseModel):
             "links": Link.objects.all().order_by("-publish_date", "-created_at"),
             "pages": Page.objects.all().order_by("-created_at"),
             "posts": Post.objects.all().order_by("-publish_date", "-created_at"),
+            "RESOURCES_URL": settings.RESOURCES_URL
         })
 
         c = Context(context)

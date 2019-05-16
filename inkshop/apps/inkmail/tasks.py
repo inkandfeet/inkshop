@@ -9,7 +9,7 @@ from django.core.mail import send_mail as django_send_mail
 from celery.task import task, periodic_task
 from django.utils import timezone
 from inkmail.helpers import queue_transactional_message, queue_message
-from inkmail.models import Subscription, OutgoingMessage
+from inkmail.models import Subscription, OutgoingMessage, Person, Message
 
 
 @periodic_task(run_every=datetime.timedelta(seconds=5), expires=10)
@@ -60,3 +60,88 @@ def process_outgoing_message_queue():
 def send_outgoing_message(om_pk):
     om = OutgoingMessage.objects.get(pk=om_pk)
     om.send()
+
+
+@periodic_task(run_every=datetime.timedelta(minutes=5), expires=1200)
+def check_for_unsubscribes():
+    if settings.hasattr(settings, "IS_LIVE") and settings.IS_LIVE:
+        base_mailgun_url = "https://api.mailgun.net/v3/%s/" % (
+            settings.MAILGUN_SENDER_DOMAIN,
+        )
+        events_api_url = "%sevents" % base_mailgun_url
+
+        # event_query_data = {
+        #     "event": "unsubscribed",
+        # }
+        # r = requests.get(events_api_url, auth=("api", settings.MAILGUN_API_KEY), params=event_query_data)
+        # data = json.loads(r.content)
+
+        # print("Unsubscribes")
+        # for e in data["items"]:
+        #     print(e)
+
+        # event_query_data = {"event": "rejected", }
+        # r = requests.get(events_api_url, auth=("api", settings.MAILGUN_API_KEY), params=event_query_data)
+        # data = json.loads(r.content)
+        # print("rejected")
+        # for e in data["items"]:
+        #     print(e)
+
+        event_query_data = {"event": "complained", }
+        r = requests.get(events_api_url, auth=("api", settings.MAILGUN_API_KEY), params=event_query_data)
+        data = json.loads(r.content)
+        # print("complained")
+        for e in data["items"]:
+            try:
+                email = e["recipient"]
+                p = Person.get_by_email(email)
+                # reason = e["delivery-status"]["message"]
+                reason = "complained"
+                try:
+                    bouncing_message = Message.objects.get(subject=e["messsage"]["subject"])
+                except:
+                    bouncing_message = None
+                # print("hard bounce: %s %s %s for %s" % (
+                #     email,
+                #     reason,
+                #     bouncing_message,
+                #     p,
+                # ))
+                p.hard_bounce(reason=reason, bouncing_message=bouncing_message, raw_mailgun_data=e)
+            except:
+                # print(e)
+                import traceback
+                traceback.print_exc()
+                pass
+
+        event_query_data = {"event": "failed", }
+        r = requests.get(events_api_url, auth=("api", settings.MAILGUN_API_KEY), params=event_query_data)
+        data = json.loads(r.content)
+        # print("failed")
+        for e in data["items"]:
+            try:
+                if "severity" in e and e["severity"] == "permanent":
+                    email = e["recipient"]
+                    p = Person.get_by_email(email)
+                    reason = e["delivery-status"]["message"]
+                    try:
+                        bouncing_message = Message.objects.get(subject=e["messsage"]["subject"])
+                    except:
+                        bouncing_message = None
+                    if not reason:
+                        reason = e["delivery-status"]["description"]
+                    # print("permanent fail: %s %s %s for %s" % (
+                    #     email,
+                    #     reason,
+                    #     bouncing_message,
+                    #     p,
+                    # ))
+                    p.hard_bounce(reason=reason, bouncing_message=bouncing_message, raw_mailgun_data=e)
+                else:
+                    # print("%s - temporary" % email)
+                    pass
+            except:
+                # print(e)
+                import traceback
+                traceback.print_exc()
+                pass

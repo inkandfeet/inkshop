@@ -13,9 +13,10 @@ from utils.test_helpers import MailTestCase
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, encrypt, decrypt
 import mock
 import unittest
-from history.models import HistoricalEvent
+from archives.models import HistoricalEvent
 
 
+@unittest.skip("Add these once the clubhouse UI stabilizes")
 class TestClubhouseLoads(MailTestCase):
 
     def setUp(self, *args, **kwargs):

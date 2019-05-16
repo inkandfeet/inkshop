@@ -40,6 +40,7 @@ class Organization(BaseModel):
     name = models.CharField(max_length=254, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     transactional_footer = models.TextField(blank=True, null=True)
+    favicon = models.ForeignKey('website.Resource', blank=True, null=True, on_delete=models.SET_NULL)
 
     @classmethod
     def get(cls):

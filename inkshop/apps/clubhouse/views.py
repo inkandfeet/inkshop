@@ -26,6 +26,7 @@ from inkmail.helpers import queue_message, queue_newsletter_message
 from clubhouse.models import StaffMember
 from website.models import Template, Page, Post, Resource, Link
 from website.forms import TemplateForm, PageForm, PostForm, ResourceForm, LinkForm
+from utils.encryption import lookup_hash
 
 
 @render_to("clubhouse/dashboard.html")
@@ -71,7 +72,11 @@ def message(request, hashid):
 @login_required
 def people(request):
     page_name = "people"
-    people = Person.objects.all()
+    if request.method == "GET" and "q" in request.GET:
+        hashed_email = lookup_hash(request.GET["q"])
+        people = Person.objects.filter(hashed_email=lookup_hash)
+    else:
+        people = Person.objects.all()[:30]
     return locals()
 
 
@@ -231,6 +236,17 @@ def template(request, hashid):
     return locals()
 
 
+@render_to("clubhouse/template_delete.html")
+@login_required
+def delete_template(request, hashid):
+    template = Template.objects.get(hashid=hashid)
+    if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
+        template.delete()
+
+        return redirect(reverse('clubhouse:templates', host='clubhouse'))
+    return locals()
+
+
 @login_required
 def create_page(request):
     p = Page.objects.create()
@@ -261,6 +277,17 @@ def page(request, hashid):
             form = PageForm(instance=page)
     else:
         form = PageForm(instance=page)
+    return locals()
+
+
+@render_to("clubhouse/page_delete.html")
+@login_required
+def delete_page(request, hashid):
+    page = Page.objects.get(hashid=hashid)
+    if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
+        page.delete()
+
+        return redirect(reverse('clubhouse:pages', host='clubhouse'))
     return locals()
 
 
@@ -297,6 +324,17 @@ def post(request, hashid):
     return locals()
 
 
+@render_to("clubhouse/post_delete.html")
+@login_required
+def delete_post(request, hashid):
+    post = Post.objects.get(hashid=hashid)
+    if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
+        post.delete()
+
+        return redirect(reverse('clubhouse:posts', host='clubhouse'))
+    return locals()
+
+
 @login_required
 def create_resource(request):
     p = Resource.objects.create()
@@ -326,6 +364,17 @@ def resource(request, hashid):
             form = ResourceForm(instance=resource)
     else:
         form = ResourceForm(instance=resource)
+    return locals()
+
+
+@render_to("clubhouse/resource_delete.html")
+@login_required
+def delete_resource(request, hashid):
+    resource = Resource.objects.get(hashid=hashid)
+    if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
+        resource.delete()
+
+        return redirect(reverse('clubhouse:resources', host='clubhouse'))
     return locals()
 
 
@@ -360,4 +409,15 @@ def link(request, hashid):
             form = LinkForm(instance=link)
     else:
         form = LinkForm(instance=link)
+    return locals()
+
+
+@render_to("clubhouse/link_delete.html")
+@login_required
+def delete_link(request, hashid):
+    link = Link.objects.get(hashid=hashid)
+    if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
+        link.delete()
+
+        return redirect(reverse('clubhouse:links', host='clubhouse'))
     return locals()
