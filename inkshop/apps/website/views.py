@@ -29,6 +29,7 @@ def multiple_replace(string, rep_dict):
 
 @render_to("website/home.html")
 def home(request):
+    o = Organization.get()
     return locals()
 
 

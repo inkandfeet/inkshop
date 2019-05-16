@@ -32,12 +32,14 @@ from utils.encryption import lookup_hash
 @render_to("clubhouse/dashboard.html")
 @login_required
 def dashboard(request):
+    o = Organization.get()
     page_name = "dashboard"
     return locals()
 
 
 @login_required
 def create_message(request):
+    # o = Organization.get()
     m = Message.objects.create()
     return redirect(reverse('clubhouse:message', kwargs={"hashid": m.hashid, }, host='clubhouse'))
 
@@ -45,6 +47,7 @@ def create_message(request):
 @render_to("clubhouse/messages.html")
 @login_required
 def messages(request):
+    o = Organization.get()
     page_name = "messages"
     messages = Message.objects.all()
     return locals()
@@ -53,6 +56,7 @@ def messages(request):
 @render_to("clubhouse/message.html")
 @login_required
 def message(request, hashid):
+    o = Organization.get()
     page_name = "messages"
     message = Message.objects.get(hashid=hashid)
     saved = False
@@ -71,6 +75,7 @@ def message(request, hashid):
 @render_to("clubhouse/people.html")
 @login_required
 def people(request):
+    o = Organization.get()
     page_name = "people"
     if request.method == "GET" and "q" in request.GET:
         hashed_email = lookup_hash(request.GET["q"])
@@ -83,6 +88,7 @@ def people(request):
 @render_to("clubhouse/person.html")
 @login_required
 def person(request, hashid):
+    o = Organization.get()
     page_name = "people"
     p = Person.objects.get(hashid=hashid)
     return locals()
@@ -91,6 +97,7 @@ def person(request, hashid):
 @render_to("clubhouse/subscriptions.html")
 @login_required
 def subscriptions(request):
+    o = Organization.get()
     page_name = "subscriptions"
     subscriptions = Subscription.objects.all()
     return locals()
@@ -99,6 +106,7 @@ def subscriptions(request):
 @render_to("clubhouse/subscription.html")
 @login_required
 def subscription(request, hashid):
+    o = Organization.get()
     page_name = "subscriptions"
     s = Subscription.objects.get(hashid=hashid)
     return locals()
@@ -107,6 +115,7 @@ def subscription(request, hashid):
 @render_to("clubhouse/newsletters.html")
 @login_required
 def newsletters(request):
+    o = Organization.get()
     page_name = "newsletters"
     newsletters = Newsletter.objects.all()
     return locals()
@@ -115,6 +124,7 @@ def newsletters(request):
 @render_to("clubhouse/newsletter.html")
 @login_required
 def newsletter(request, hashid):
+    o = Organization.get()
     page_name = "newsletters"
     saved = False
     n = Newsletter.objects.get(hashid=hashid)
@@ -132,6 +142,7 @@ def newsletter(request, hashid):
 
 @login_required
 def create_newsletter(request):
+    # o = Organization.get()
     n = Newsletter.objects.create()
     return redirect(reverse('clubhouse:newsletter', kwargs={"hashid": n.hashid, }, host='clubhouse'))
 
@@ -139,6 +150,7 @@ def create_newsletter(request):
 @render_to("clubhouse/organization.html")
 @login_required
 def organization(request):
+    o = Organization.get()
     page_name = "organization"
     o = Organization.get()
     if request.method == "POST":
@@ -156,6 +168,7 @@ def organization(request):
 
 @login_required
 def create_scheduled_newsletter_message(request):
+    # o = Organization.get()
     snm = ScheduledNewsletterMessage.objects.create()
     return redirect(reverse('clubhouse:scheduled_newsletter_message', kwargs={"hashid": snm.hashid, }, host='clubhouse'))
 
@@ -163,6 +176,7 @@ def create_scheduled_newsletter_message(request):
 @render_to("clubhouse/scheduled_newsletter_messages.html")
 @login_required
 def scheduled_newsletter_messages(request):
+    o = Organization.get()
     page_name = "scheduled_newsletter_messages"
     scheduled_newsletter_messages = ScheduledNewsletterMessage.objects.all()
     return locals()
@@ -171,6 +185,7 @@ def scheduled_newsletter_messages(request):
 @render_to("clubhouse/scheduled_newsletter_message.html")
 @login_required
 def scheduled_newsletter_message(request, hashid):
+    o = Organization.get()
     now = timezone.now()
     page_name = "scheduled_newsletter_messages"
     snm = ScheduledNewsletterMessage.objects.get(hashid=hashid)
@@ -189,6 +204,7 @@ def scheduled_newsletter_message(request, hashid):
 @render_to("clubhouse/scheduled_newsletter_message_confirm_queue.html")
 @login_required
 def scheduled_newsletter_message_confirm_queue(request, hashid):
+    o = Organization.get()
     page_name = "scheduled_newsletter_messages"
     snm = ScheduledNewsletterMessage.objects.get(hashid=hashid)
     return locals()
@@ -197,6 +213,7 @@ def scheduled_newsletter_message_confirm_queue(request, hashid):
 @render_to("clubhouse/scheduled_newsletter_message_queued.html")
 @login_required
 def scheduled_newsletter_message_queued(request, hashid):
+    o = Organization.get()
     page_name = "scheduled_newsletter_messages"
     snm = ScheduledNewsletterMessage.objects.get(hashid=hashid)
     queue_newsletter_message.delay(snm.hashid)
@@ -206,6 +223,7 @@ def scheduled_newsletter_message_queued(request, hashid):
 
 @login_required
 def create_template(request):
+    # o = Organization.get()
     t = Template.objects.create()
     return redirect(reverse('clubhouse:template', kwargs={"hashid": t.hashid, }, host='clubhouse'))
 
@@ -213,6 +231,7 @@ def create_template(request):
 @render_to("clubhouse/templates.html")
 @login_required
 def templates(request):
+    o = Organization.get()
     page_name = "templates"
     templates = Template.objects.all()
     return locals()
@@ -221,6 +240,7 @@ def templates(request):
 @render_to("clubhouse/template.html")
 @login_required
 def template(request, hashid):
+    o = Organization.get()
     page_name = "templates"
     template = Template.objects.get(hashid=hashid)
     saved = False
@@ -239,6 +259,7 @@ def template(request, hashid):
 @render_to("clubhouse/template_delete.html")
 @login_required
 def delete_template(request, hashid):
+    o = Organization.get()
     template = Template.objects.get(hashid=hashid)
     if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
         template.delete()
@@ -249,6 +270,7 @@ def delete_template(request, hashid):
 
 @login_required
 def create_page(request):
+    # o = Organization.get()
     p = Page.objects.create()
     return redirect(reverse('clubhouse:page', kwargs={"hashid": p.hashid, }, host='clubhouse'))
 
@@ -256,6 +278,7 @@ def create_page(request):
 @render_to("clubhouse/pages.html")
 @login_required
 def pages(request):
+    o = Organization.get()
     page_name = "pages"
     pages = Page.objects.all()
     return locals()
@@ -264,6 +287,7 @@ def pages(request):
 @render_to("clubhouse/page.html")
 @login_required
 def page(request, hashid):
+    o = Organization.get()
     page_name = "pages"
     page = Page.objects.get(hashid=hashid)
     links = Link.objects.all()
@@ -283,6 +307,7 @@ def page(request, hashid):
 @render_to("clubhouse/page_delete.html")
 @login_required
 def delete_page(request, hashid):
+    o = Organization.get()
     page = Page.objects.get(hashid=hashid)
     if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
         page.delete()
@@ -293,6 +318,7 @@ def delete_page(request, hashid):
 
 @login_required
 def create_post(request):
+    # o = Organization.get()
     p = Post.objects.create()
     return redirect(reverse('clubhouse:post', kwargs={"hashid": p.hashid, }, host='clubhouse'))
 
@@ -300,6 +326,7 @@ def create_post(request):
 @render_to("clubhouse/posts.html")
 @login_required
 def posts(request):
+    o = Organization.get()
     post_name = "posts"
     posts = Post.objects.all()
     return locals()
@@ -308,6 +335,7 @@ def posts(request):
 @render_to("clubhouse/post.html")
 @login_required
 def post(request, hashid):
+    o = Organization.get()
     post_name = "posts"
     post = Post.objects.get(hashid=hashid)
     links = Link.objects.all()
@@ -327,6 +355,7 @@ def post(request, hashid):
 @render_to("clubhouse/post_delete.html")
 @login_required
 def delete_post(request, hashid):
+    o = Organization.get()
     post = Post.objects.get(hashid=hashid)
     if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
         post.delete()
@@ -337,6 +366,7 @@ def delete_post(request, hashid):
 
 @login_required
 def create_resource(request):
+    # o = Organization.get()
     p = Resource.objects.create()
     return redirect(reverse('clubhouse:resource', kwargs={"hashid": p.hashid, }, host='clubhouse'))
 
@@ -344,6 +374,7 @@ def create_resource(request):
 @render_to("clubhouse/resources.html")
 @login_required
 def resources(request):
+    o = Organization.get()
     resource_name = "resources"
     resources = Resource.objects.all()
     return locals()
@@ -352,6 +383,7 @@ def resources(request):
 @render_to("clubhouse/resource.html")
 @login_required
 def resource(request, hashid):
+    o = Organization.get()
     resource_name = "resources"
     resource = Resource.objects.get(hashid=hashid)
     saved = False
@@ -370,6 +402,7 @@ def resource(request, hashid):
 @render_to("clubhouse/resource_delete.html")
 @login_required
 def delete_resource(request, hashid):
+    o = Organization.get()
     resource = Resource.objects.get(hashid=hashid)
     if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
         resource.delete()
@@ -380,6 +413,7 @@ def delete_resource(request, hashid):
 
 @login_required
 def create_link(request):
+    # o = Organization.get()
     l = Link.objects.create()
 
     return redirect(reverse('clubhouse:link', kwargs={"hashid": l.hashid, }, host='clubhouse'))
@@ -388,6 +422,7 @@ def create_link(request):
 @render_to("clubhouse/links.html")
 @login_required
 def links(request):
+    o = Organization.get()
     link_name = "links"
     links = Link.objects.all()
     return locals()
@@ -396,6 +431,7 @@ def links(request):
 @render_to("clubhouse/link.html")
 @login_required
 def link(request, hashid):
+    o = Organization.get()
     link_name = "links"
     link = Link.objects.get(hashid=hashid)
     saved = False
@@ -415,6 +451,7 @@ def link(request, hashid):
 @render_to("clubhouse/link_delete.html")
 @login_required
 def delete_link(request, hashid):
+    o = Organization.get()
     link = Link.objects.get(hashid=hashid)
     if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
         link.delete()

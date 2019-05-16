@@ -11,10 +11,12 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from annoying.decorators import render_to, ajax_request
+from inkmail.models import Organization
 
 from django.db import IntegrityError
 
 
 @render_to("inkdots/home.html")
 def home(request):
+    o = Organization.get()
     return locals()

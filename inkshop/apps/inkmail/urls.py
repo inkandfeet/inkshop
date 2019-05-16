@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from . import views
+from website import views as website_views
 
 urlpatterns = [
     url(r'^$', views.home, name='home'),
@@ -18,4 +19,5 @@ urlpatterns = [
     url(r'^unsubscribe/(?P<unsubscribe_key>[0-9A-Za-z_\-]+)/$', views.unsubscribe, name='unsubscribe'),
     url(r'^delete-account/(?P<delete_key>[0-9A-Za-z_\-]+)/$', views.delete_account, name='delete_account'),
     url(r'^love/(?P<love_hash>[0-9A-Za-z_\-]+)/$', views.love_message, name='love_message'),
+    url(r'^favicon.ico$', website_views.favicon, name='favicon'),
 ]

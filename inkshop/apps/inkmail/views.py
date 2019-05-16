@@ -15,7 +15,7 @@ from annoying.decorators import render_to, ajax_request
 from ipware import get_client_ip
 
 from archives.models import HistoricalEvent
-from inkmail.models import Newsletter, Subscription, OutgoingMessage
+from inkmail.models import Newsletter, Subscription, OutgoingMessage, Organization
 from inkmail.tasks import send_subscription_confirmation, send_subscription_welcome
 from people.models import Person
 from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt, lookup_hash, f
@@ -23,12 +23,14 @@ from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt,
 
 @render_to("inkmail/home.html")
 def home(request):
+    o = Organization.get()
     return locals()
 
 
 @csrf_exempt
 @render_to("inkmail/subscribe.html")
 def subscribe(request):
+    o = Organization.get()
     s = None
     if request.is_ajax():
         ajax_response = {
@@ -116,6 +118,7 @@ def subscribe(request):
 
 @render_to("inkmail/email_confirmation.html")
 def confirm_subscription(request, opt_in_key):
+    o = Organization.get()
     s = Subscription.objects.get(opt_in_key=opt_in_key)
     already_double_opted_in = True
     if not s.double_opted_in:
@@ -145,6 +148,7 @@ def confirm_subscription(request, opt_in_key):
 
 @render_to("inkmail/email_confirmation.html")
 def transfer_subscription(request, transfer_code):
+    o = Organization.get()
     # This is a special link for users to opt-in from an existing newsletter.
     s = None
     if "e" in request.GET:
@@ -209,6 +213,7 @@ def transfer_subscription(request, transfer_code):
 
 @render_to("inkmail/unsubscribed.html")
 def unsubscribe(request, unsubscribe_key):
+    o = Organization.get()
     om = OutgoingMessage.objects.get(unsubscribe_hash=unsubscribe_key)
     if om.subscription:
         om.subscription.unsubscribe()
@@ -224,6 +229,7 @@ def unsubscribe(request, unsubscribe_key):
 
 @render_to("inkmail/delete_account_start.html")
 def delete_account(request, delete_key):
+    o = Organization.get()
     om = OutgoingMessage.objects.get(delete_hash=delete_key)
     # if om.subscription:
     #     om.subscription.unsubscribe()
@@ -239,6 +245,7 @@ def delete_account(request, delete_key):
 
 @render_to("inkmail/loved.html")
 def love_message(request, love_hash):
+    o = Organization.get()
     om = OutgoingMessage.objects.get(love_hash=love_hash)
     om.loved = True
     om.loved_at = timezone.now()

@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from people import views
+from website import views as website_views
 
 urlpatterns = [
     url(r'^$', views.home, name='home'),
@@ -13,4 +14,5 @@ urlpatterns = [
     url(r'^auth/confirm-delete$', views.confirm_delete, name='confirm_delete'),
     url(r'^auth/confirm/(?P<email_key>[\w-]+)/?$', views.confirm_email, name='confirm_email'),
     url(r'^confirm-reset/(?P<email_key>[\w-]+)/$', views.confirm_reset, name='confirm_reset'),
+    url(r'^favicon.ico$', website_views.favicon, name='favicon'),
 ]

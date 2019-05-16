@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from clubhouse import views
+from website import views as website_views
 
 urlpatterns = [
     url(r'^$', views.dashboard, name='dashboard'),
@@ -56,4 +57,5 @@ urlpatterns = [
         views.scheduled_newsletter_message_queued,
         name='scheduled_newsletter_message_queued'
     ),
+    url(r'^favicon.ico$', website_views.favicon, name='favicon'),
 ]

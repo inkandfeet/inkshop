@@ -16,6 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from annoying.decorators import render_to, ajax_request
 from utils.factory import Factory
+from inkmail.models import Organization
 from people.models import Person
 
 
@@ -31,11 +32,13 @@ CORRECT_PASSWORD_STRING = "!!CORRECT!!InkshopSalt"
 
 @render_to("people/home.html")
 def home(request):
+    o = Organization.get()
     return locals()
 
 
 @render_to("people/email_confirmation.html")
 def confirm_email(request, email_key):
+    o = Organization.get()
     u = Person.objects.get(email_confirm_key=email_key)
     u.email_verified = True
     u.save()
