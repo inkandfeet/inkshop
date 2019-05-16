@@ -11,6 +11,7 @@ from . import views
 
 urlpatterns = [
     url(r'^sitemap.xml$', views.sitemap, name='sitemap'),
+    url(r'^favicon.ico$', views.favicon, name='favicon'),
     url(r'^static/(?P<resource_slug>.*)$', views.resource, name='resource'),
     url(r'^(?P<page_slug>.*)$', views.page_or_post, name='page_or_post'),
     url(r'^$', views.page_or_post, name='root_page_or_post'),

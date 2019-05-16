@@ -45,6 +45,13 @@ def sitemap(request):
     return HttpResponse(content, content_type="text/xml")
 
 
+def favicon(request):
+    o = Organization.get()
+    if o.favicon:
+        return resource(request, o.favicon.name)
+    raise Http404("File does not exist")
+
+
 def page_or_post(request, page_slug=None):
     global CACHED_PAGES
     global RESOURCE_HASHES
