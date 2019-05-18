@@ -12,7 +12,7 @@ from inkmail.helpers import queue_transactional_message, queue_message
 from inkmail.models import Subscription, OutgoingMessage, Person, Message
 
 
-@periodic_task(run_every=datetime.timedelta(seconds=5), expires=10)
+@periodic_task(run_every=datetime.timedelta(seconds=120), expires=10)
 def hello():
     message = "Hi at %s" % timezone.now()
     print(message)
@@ -64,7 +64,7 @@ def send_outgoing_message(om_pk):
 
 @periodic_task(run_every=datetime.timedelta(minutes=5), expires=1200)
 def check_for_unsubscribes():
-    if settings.hasattr(settings, "IS_LIVE") and settings.IS_LIVE:
+    if hasattr(settings, "IS_LIVE") and settings.IS_LIVE:
         base_mailgun_url = "https://api.mailgun.net/v3/%s/" % (
             settings.MAILGUN_SENDER_DOMAIN,
         )
