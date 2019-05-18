@@ -178,7 +178,7 @@ def create_scheduled_newsletter_message(request):
 def scheduled_newsletter_messages(request):
     o = Organization.get()
     page_name = "scheduled_newsletter_messages"
-    scheduled_newsletter_messages = ScheduledNewsletterMessage.objects.all()
+    scheduled_newsletter_messages = ScheduledNewsletterMessage.objects.all().order_by("-created_at")
     return locals()
 
 
