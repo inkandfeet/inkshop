@@ -8,7 +8,6 @@ import logging
 import random
 import requests
 import time
-from fake_useragent import UserAgent
 import uuid
 from base64 import b64encode
 from io import BytesIO
@@ -33,7 +32,14 @@ from utils.models import HashidBaseModel
 from utils.encryption import file_hash
 
 markdown = mistune.Markdown()
-ua = UserAgent()
+
+try:
+    # Amazingly, if the app for this is down, it crashes everything.
+    from fake_useragent import UserAgent
+    ua = UserAgent()
+    ua_chrome = ua.chrome
+except:
+    ua_chrome = "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11"
 
 
 class Template(HashidBaseModel):
@@ -315,7 +321,7 @@ class Link(HashidBaseModel):
 
     def fetch_metadata_from_target(self):
         try:
-            headers = {'User-Agent': str(ua.chrome)}
+            headers = {'User-Agent': str(ua_chrome)}
             r = requests.get(self.target_url, headers=headers)
             content = r.text
             extracted = extraction.Extractor().extract(content, source_url=self.target_url)
