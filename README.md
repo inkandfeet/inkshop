@@ -148,6 +148,10 @@ python3 manage.py import_ontraport_csv --subscribers subscribers.csv --hard_boun
 ## Current working list
 
 Next Small Projects:
+- Migrate my website over, so we can test in production
+    - Vault import (pages/posts/links)?
+    - Add robots.txt support
+    
 - Clubhouse enhancements
     - It is the ugliest site in the history of humanity.  Full of heart, but not design or style.  Clean it up.
     - handle subscribes between scheduling and sending (aka queueing outgoingmessages should just hold until the send time.)
