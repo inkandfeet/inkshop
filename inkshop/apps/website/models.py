@@ -283,6 +283,7 @@ class Post(HashidBaseModel):
 class Link(HashidBaseModel):
     name = models.CharField(max_length=254, blank=True, null=True)
     slug = models.CharField(max_length=1024, blank=True, null=True)
+    source_url = models.TextField(blank=True, null=True)
     target_url = models.TextField(blank=True, null=True)
 
     title = models.CharField(max_length=1024, blank=True, null=True)
@@ -308,6 +309,8 @@ class Link(HashidBaseModel):
     def save(self, *args, **kwargs):
         if self.name and not self.slug:
             self.slug = slugify(self.name)
+        if not self.target_url:
+            self.target_url = self.source_url
         super(Link, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -320,6 +323,9 @@ class Link(HashidBaseModel):
             content = r.text
             extracted = extraction.Extractor().extract(content, source_url=self.target_url)
             changed = False
+            if self.target_url != r.url:
+                self.target_url = r.url
+                changed = True
             if extracted.title:
                 self.destination_title = extracted.title
                 if not self.name:

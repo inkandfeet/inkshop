@@ -7,6 +7,7 @@ import logging
 import time
 
 from django.conf import settings
+from django.views.decorators.cache import never_cache
 from django.core.mail import mail_admins
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -38,10 +39,11 @@ def dashboard(request):
 
 
 @login_required
+@never_cache
 def create_message(request):
     # o = Organization.get()
     m = Message.objects.create()
-    return redirect(reverse('clubhouse:message', kwargs={"hashid": m.hashid, }, host='clubhouse'))
+    return redirect(reverse('clubhouse:message', kwargs={"hashid": m.hashid, }, host='clubhouse'), status_code=307)
 
 
 @render_to("clubhouse/messages.html")
@@ -141,10 +143,11 @@ def newsletter(request, hashid):
 
 
 @login_required
+@never_cache
 def create_newsletter(request):
     # o = Organization.get()
     n = Newsletter.objects.create()
-    return redirect(reverse('clubhouse:newsletter', kwargs={"hashid": n.hashid, }, host='clubhouse'))
+    return redirect(reverse('clubhouse:newsletter', kwargs={"hashid": n.hashid, }, host='clubhouse'), status_code=307)
 
 
 @render_to("clubhouse/organization.html")
@@ -167,10 +170,11 @@ def organization(request):
 
 
 @login_required
+@never_cache
 def create_scheduled_newsletter_message(request):
     # o = Organization.get()
     snm = ScheduledNewsletterMessage.objects.create()
-    return redirect(reverse('clubhouse:scheduled_newsletter_message', kwargs={"hashid": snm.hashid, }, host='clubhouse'))
+    return redirect(reverse('clubhouse:scheduled_newsletter_message', kwargs={"hashid": snm.hashid, }, host='clubhouse'), status_code=307)
 
 
 @render_to("clubhouse/scheduled_newsletter_messages.html")
@@ -222,10 +226,11 @@ def scheduled_newsletter_message_queued(request, hashid):
 
 
 @login_required
+@never_cache
 def create_template(request):
     # o = Organization.get()
     t = Template.objects.create()
-    return redirect(reverse('clubhouse:template', kwargs={"hashid": t.hashid, }, host='clubhouse'))
+    return redirect(reverse('clubhouse:template', kwargs={"hashid": t.hashid, }, host='clubhouse'), status_code=307)
 
 
 @render_to("clubhouse/templates.html")
@@ -264,15 +269,16 @@ def delete_template(request, hashid):
     if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
         template.delete()
 
-        return redirect(reverse('clubhouse:templates', host='clubhouse'))
+        return redirect(reverse('clubhouse:templates', host='clubhouse'), status_code=307)
     return locals()
 
 
 @login_required
+@never_cache
 def create_page(request):
     # o = Organization.get()
     p = Page.objects.create()
-    return redirect(reverse('clubhouse:page', kwargs={"hashid": p.hashid, }, host='clubhouse'))
+    return redirect(reverse('clubhouse:page', kwargs={"hashid": p.hashid, }, host='clubhouse'), status_code=307)
 
 
 @render_to("clubhouse/pages.html")
@@ -312,15 +318,16 @@ def delete_page(request, hashid):
     if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
         page.delete()
 
-        return redirect(reverse('clubhouse:pages', host='clubhouse'))
+        return redirect(reverse('clubhouse:pages', host='clubhouse'), status_code=307)
     return locals()
 
 
 @login_required
+@never_cache
 def create_post(request):
     # o = Organization.get()
     p = Post.objects.create()
-    return redirect(reverse('clubhouse:post', kwargs={"hashid": p.hashid, }, host='clubhouse'))
+    return redirect(reverse('clubhouse:post', kwargs={"hashid": p.hashid, }, host='clubhouse'), status_code=307)
 
 
 @render_to("clubhouse/posts.html")
@@ -360,15 +367,16 @@ def delete_post(request, hashid):
     if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
         post.delete()
 
-        return redirect(reverse('clubhouse:posts', host='clubhouse'))
+        return redirect(reverse('clubhouse:posts', host='clubhouse'), status_code=307)
     return locals()
 
 
 @login_required
+@never_cache
 def create_resource(request):
     # o = Organization.get()
     p = Resource.objects.create()
-    return redirect(reverse('clubhouse:resource', kwargs={"hashid": p.hashid, }, host='clubhouse'))
+    return redirect(reverse('clubhouse:resource', kwargs={"hashid": p.hashid, }, host='clubhouse'), status_code=307)
 
 
 @render_to("clubhouse/resources.html")
@@ -407,16 +415,17 @@ def delete_resource(request, hashid):
     if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
         resource.delete()
 
-        return redirect(reverse('clubhouse:resources', host='clubhouse'))
+        return redirect(reverse('clubhouse:resources', host='clubhouse'), status_code=307)
     return locals()
 
 
 @login_required
+@never_cache
 def create_link(request):
     # o = Organization.get()
     l = Link.objects.create()
 
-    return redirect(reverse('clubhouse:link', kwargs={"hashid": l.hashid, }, host='clubhouse'))
+    return redirect(reverse('clubhouse:link', kwargs={"hashid": l.hashid, }, host='clubhouse'), status_code=307)
 
 
 @render_to("clubhouse/links.html")
@@ -456,5 +465,5 @@ def delete_link(request, hashid):
     if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
         link.delete()
 
-        return redirect(reverse('clubhouse:links', host='clubhouse'))
+        return redirect(reverse('clubhouse:links', host='clubhouse'), status_code=307)
     return locals()
