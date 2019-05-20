@@ -10,6 +10,7 @@ from django.views.static import serve
 from . import views
 
 urlpatterns = [
+    url(r'^robots.txt$', views.robots, name='robots'),
     url(r'^sitemap.xml$', views.sitemap, name='sitemap'),
     url(r'^favicon.ico$', views.favicon, name='favicon'),
     url(r'^static/(?P<resource_slug>.*)$', views.resource, name='resource'),

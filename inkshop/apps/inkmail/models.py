@@ -41,6 +41,7 @@ class Organization(BaseModel):
     address = models.TextField(blank=True, null=True)
     transactional_footer = models.TextField(blank=True, null=True)
     favicon = models.ForeignKey('website.Resource', blank=True, null=True, on_delete=models.SET_NULL)
+    robots_txt = models.TextField(blank=True, null=True, default="User-agent: *\nAllow: /\n")
 
     @classmethod
     def get(cls):

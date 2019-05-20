@@ -43,7 +43,14 @@ def sitemap(request):
     posts = Post.objects.filter(published=True, private=False).order_by("-publish_date", "-created_at")
     content_type = "text/xml"
     content = render_to_string("website/sitemap.xml", locals())
-    return HttpResponse(content, content_type="text/xml")
+    return HttpResponse(content, content_type=content_type)
+
+
+def robots(request):
+    o = Organization.get()
+    if o.robots_txt:
+        return HttpResponse(o.robots_txt, content_type="text/plain")
+    raise Http404("File does not exist")
 
 
 def favicon(request):
