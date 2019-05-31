@@ -68,7 +68,7 @@ class Message(HashidBaseModel):
     transactional_no_unsubscribe_reason = models.CharField(max_length=254, blank=True, null=True)
 
     def __str__(self):
-        return "%s" % (self.name,)
+        return "%s: %s" % (self.name, self.subject)
 
 
 class Newsletter(HashidBaseModel):
