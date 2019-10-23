@@ -82,7 +82,7 @@ def user_authenticate(request):
 @ajax_request
 @csrf_exempt
 def firebase_user_create(request):
-    # Authenticates a widget visitor, and populates the data for them.
+    # Authenticates a user, and populates the data for them.
     resp = {
         "success": False,
     }
