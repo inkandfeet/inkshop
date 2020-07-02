@@ -431,7 +431,7 @@ class OutgoingMessage(BaseModel):
             # rendered_string = rendered_string.replace("\n", "<br>")
             # rendered_string = linebreaks(rendered_string)
         if not plain_text:
-            rendered_string = rendered_string.replace("<br><br>", "\n")
+            rendered_string = rendered_string.replace("<br><br>", "<br/>\n")
 
         if strip_linebreaks:
             rendered_string = rendered_string.replace("\n", "")
