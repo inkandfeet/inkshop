@@ -420,10 +420,10 @@ class OutgoingMessage(BaseModel):
         rendered_string = rendered_string.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
         rendered_string = rendered_string.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
 
-        if plain_text:
-            rendered_string = bleach.clean(rendered_string, tags=[], strip=True)
-        else:
-            rendered_string = bleach.clean(rendered_string, strip=True)
+        # if plain_text:
+        #     rendered_string = bleach.clean(rendered_string, tags=[], strip=True)
+        # else:
+        #     rendered_string = bleach.clean(rendered_string, strip=True)
 
         if not strip_linebreaks and not plain_text:
             rendered_string = rendered_string.replace("\r", "\n")
