@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
             if "organization" in data:
                 o = Organization.get()
-                for k, v in data["organization"]:
+                for k, v in data["organization"].items():
                     setattr(o, k, v)
                 o.save()
 
