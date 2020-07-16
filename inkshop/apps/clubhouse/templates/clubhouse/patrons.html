@@ -1,0 +1,22 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>All Patrons</h1>
+    <p>&hearts;</p>
+    <div>
+        {% if adding %}
+            {% if added %}Added successfully
+            {% else %}Email {{new_email}} not found.
+            {% endif %}
+        {% endif %}
+        <form action="." method="POST">
+            {% csrf_token %}
+            <input name="patron_email" type="email"/>
+            <input type="submit" value="Add"></form>
+        </form>
+    </div>
+    <ul>
+    {% for p in people %}
+    <li><a href="{% url 'clubhouse:person' p.hashid %}">{{ p }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

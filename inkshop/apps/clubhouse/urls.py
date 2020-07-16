@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^pages/new/$', views.create_page, name='create_page'),
     url(r'^page/(?P<hashid>[0-9A-Za-z_\-]+)/delete/$', views.delete_page, name='delete_page'),
     url(r'^page/(?P<hashid>[0-9A-Za-z_\-]+)/$', views.page, name='page'),
+    url(r'^patrons/$', views.patrons, name='patrons'),
     url(r'^templates/$', views.templates, name='templates'),
     url(r'^templates/new/$', views.create_template, name='create_template'),
     url(r'^template/(?P<hashid>[0-9A-Za-z_\-]+)/delete/$', views.delete_template, name='delete_template'),

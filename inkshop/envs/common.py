@@ -31,6 +31,7 @@ ANYMAIL = {
     "MAILGUN_SENDER_DOMAIN": MAILGUN_SENDER_DOMAIN,
 }
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DEV_SETUP = False
 SESSION_EXPIRES_AFTER_SECONDS = 30 * 60  # 30 minutes

@@ -94,6 +94,32 @@ def person(request, hashid):
     return locals()
 
 
+@render_to("clubhouse/patrons.html")
+@login_required
+def patrons(request):
+    o = Organization.get()
+    page_name = "patrons"
+    if request.method == "GET" and "q" in request.GET:
+        hashed_email = lookup_hash(request.GET["q"])
+        people = Person.objects.filter(hashed_email=lookup_hash, patron=True)
+    elif request.method == "POST":
+        adding = True
+        added = False
+        new_email = request.POST["patron_email"]
+        new_patron = Person.get_by_email(new_email)
+        print(new_patron)
+        if new_patron:
+            added = True
+            new_patron.patron = True
+            new_patron.save()
+        
+        people = Person.objects.filter(patron=True).all()
+    else:
+        people = Person.objects.filter(patron=True).all()
+    return locals()
+
+
+
 @render_to("clubhouse/subscriptions.html")
 @login_required
 def subscriptions(request):

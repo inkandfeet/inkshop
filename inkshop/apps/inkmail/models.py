@@ -385,6 +385,7 @@ class OutgoingMessage(BaseModel):
                 "first_name": self.person.first_name,
                 "last_name": self.person.last_name,
                 "email": self.person.email,
+                "patron": self.person.patron,
             })
         if self.subscription:
             context.update({

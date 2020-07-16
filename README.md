@@ -96,12 +96,13 @@ cp initial_data.yml.sample initial_data.yml
 # Edit initial_data.yml with your basic information.
 
 docker network create inkshop
-docker-compose up
 docker-compose run db bash
 $ createdb inkshop -h db -U $POSTGRES_USER
 
 # Load your initial data
+docker-compose run inkshop python3 manage.py migrate
 docker-compose run inkshop python3 manage.py load_initial_data
+docker-compose up
 
 ```
 
