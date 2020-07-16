@@ -107,7 +107,7 @@ def patrons(request):
         added = False
         new_email = request.POST["patron_email"]
         new_patron = Person.get_by_email(new_email)
-    
+
         if new_patron:
             added = True
             new_patron.patron = True
