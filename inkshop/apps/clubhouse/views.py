@@ -49,7 +49,7 @@ def create_message(request):
 def messages(request):
     o = Organization.get()
     page_name = "messages"
-    messages = Message.objects.all()
+    messages = Message.objects.all().order_by("-created_at")
     return locals()
 
 
@@ -107,7 +107,7 @@ def patrons(request):
         added = False
         new_email = request.POST["patron_email"]
         new_patron = Person.get_by_email(new_email)
-        print(new_patron)
+    
         if new_patron:
             added = True
             new_patron.patron = True

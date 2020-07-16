@@ -1,11 +1,11 @@
 {% extends "clubhouse/base.html" %}{% load static %}
 {% block content %}
     <h1>All Patrons</h1>
-    <p>&hearts; {{ people | length }}</p>
+    <p>{{ people | length }} &hearts;</p>
     <div>
         {% if adding %}
             {% if added %}Added successfully
-            {% else %}<span class="background: red">Email {{new_email}} not found.</span>
+            {% else %}<span style="background: red; padding: 8px; color: #FFF">Email {{new_email}} not found.</span>
             {% endif %}
         {% endif %}
         <form action="." method="POST">
