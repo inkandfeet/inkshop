@@ -112,12 +112,11 @@ def patrons(request):
             added = True
             new_patron.patron = True
             new_patron.save()
-        
+
         people = Person.objects.filter(patron=True).all()
     else:
         people = Person.objects.filter(patron=True).all()
     return locals()
-
 
 
 @render_to("clubhouse/subscriptions.html")
