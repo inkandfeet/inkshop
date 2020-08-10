@@ -54,3 +54,4 @@ postgres-data/*
 initial_data.yml
 import/*
 inkshop/import/*
+couchdb_data/*

@@ -1,0 +1,11 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>All Journeys</h1>
+    <p>&hearts;</p>
+    <a href="{% url 'clubhouse:create_journey' %}">Create New</a>
+    <ul>
+    {% for p in journeys %}
+    <li>    <a href="{% url 'clubhouse:journey' p.hashid %}">{{ p }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

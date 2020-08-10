@@ -20,11 +20,11 @@ from utils.helpers import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
 
-from utils.models import HashidBaseModel
+from utils.models import HashidBaseModel, HasJWTBaseModel
 from utils.encryption import encrypt, decrypt, lookup_hash
 
 
-class Person(HashidBaseModel):
+class Person(HasJWTBaseModel, HashidBaseModel):
     encrypted_first_name = models.CharField(max_length=4096, blank=True, null=True)
     encrypted_last_name = models.CharField(max_length=4096, blank=True, null=True)
     encrypted_email = models.CharField(unique=True, max_length=4096, blank=True, null=True,)
@@ -52,6 +52,9 @@ class Person(HashidBaseModel):
     never_contact_set_at = models.DateTimeField(blank=True, null=True)
 
     personal_contact = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.hashid
 
     @classmethod
     def get_by_email(cls, email):

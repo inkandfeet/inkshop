@@ -1,0 +1,13 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>Productpurchase {{productpurchase}}</h1>
+    <p>&hearts;</p>
+    {% if saved %}Saved{% endif %}
+    <form method="POST" enctype="multipart/form-data" action=".">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit">
+    </form>
+
+    <a href="{% url 'clubhouse:delete_productpurchase' productpurchase.hashid %}">Delete Productpurchase</a>
+{% endblock %}

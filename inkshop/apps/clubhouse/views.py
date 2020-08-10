@@ -23,6 +23,8 @@ from inkmail.models import Organization
 from inkmail.forms import ScheduledNewsletterMessageForm, MessageForm, OutgoingMessageForm
 from inkmail.forms import NewsletterForm, SubscriptionForm, OrganizationForm
 from inkmail.helpers import queue_message, queue_newsletter_message
+from products.models import Product, ProductPurchase, Purchase, Journey
+from products.forms import ProductForm, ProductPurchaseForm, PurchaseForm, JourneyForm
 from clubhouse.models import StaffMember
 from website.models import Template, Page, Post, Resource, Link
 from website.forms import TemplateForm, PageForm, PostForm, ResourceForm, LinkForm
@@ -482,4 +484,196 @@ def delete_link(request, hashid):
         link.delete()
 
         return redirect(reverse('clubhouse:links', host='clubhouse'))
+    return locals()
+
+
+@login_required
+def create_product(request):
+    # o = Organization.get()
+    p = Product.objects.create()
+    return redirect(reverse('clubhouse:product', kwargs={"hashid": p.hashid, }, host='clubhouse'))
+
+
+@render_to("clubhouse/products.html")
+@login_required
+def products(request):
+    o = Organization.get()
+    product_name = "products"
+    products = Product.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/product.html")
+@login_required
+def product(request, hashid):
+    o = Organization.get()
+    product_name = "products"
+    product = Product.objects.get(hashid=hashid)
+    links = Link.objects.all()
+    saved = False
+    if request.method == "POST":
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            saved = True
+            product = Product.objects.get(hashid=hashid)
+            form = ProductForm(instance=product)
+    else:
+        form = ProductForm(instance=product)
+    return locals()
+
+
+@render_to("clubhouse/product_delete.html")
+@login_required
+def delete_product(request, hashid):
+    o = Organization.get()
+    product = Product.objects.get(hashid=hashid)
+    if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
+        product.delete()
+
+        return redirect(reverse('clubhouse:products', host='clubhouse'))
+    return locals()
+
+
+@login_required
+def create_productpurchase(request):
+    # o = Organization.get()
+    p = ProductPurchase.objects.create()
+    return redirect(reverse('clubhouse:productpurchase', kwargs={"hashid": p.hashid, }, host='clubhouse'))
+
+
+@render_to("clubhouse/productpurchases.html")
+@login_required
+def productpurchases(request):
+    o = Organization.get()
+    productpurchase_name = "productpurchases"
+    productpurchases = ProductPurchase.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/productpurchase.html")
+@login_required
+def productpurchase(request, hashid):
+    o = Organization.get()
+    productpurchase_name = "productpurchases"
+    productpurchase = ProductPurchase.objects.get(hashid=hashid)
+    links = Link.objects.all()
+    saved = False
+    if request.method == "POST":
+        form = ProductPurchaseForm(request.POST, request.FILES, instance=productpurchase)
+        if form.is_valid():
+            form.save()
+            saved = True
+            productpurchase = ProductPurchase.objects.get(hashid=hashid)
+            form = ProductPurchaseForm(instance=productpurchase)
+    else:
+        form = ProductPurchaseForm(instance=productpurchase)
+    return locals()
+
+
+@render_to("clubhouse/productpurchase_delete.html")
+@login_required
+def delete_productpurchase(request, hashid):
+    o = Organization.get()
+    productpurchase = ProductPurchase.objects.get(hashid=hashid)
+    if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
+        productpurchase.delete()
+
+        return redirect(reverse('clubhouse:productpurchases', host='clubhouse'))
+    return locals()
+
+
+@login_required
+def create_purchase(request):
+    # o = Organization.get()
+    p = Purchase.objects.create()
+    return redirect(reverse('clubhouse:purchase', kwargs={"hashid": p.hashid, }, host='clubhouse'))
+
+
+@render_to("clubhouse/purchases.html")
+@login_required
+def purchases(request):
+    o = Organization.get()
+    purchase_name = "purchases"
+    purchases = Purchase.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/purchase.html")
+@login_required
+def purchase(request, hashid):
+    o = Organization.get()
+    purchase_name = "purchases"
+    purchase = Purchase.objects.get(hashid=hashid)
+    links = Link.objects.all()
+    saved = False
+    if request.method == "POST":
+        form = PurchaseForm(request.POST, request.FILES, instance=purchase)
+        if form.is_valid():
+            form.save()
+            saved = True
+            purchase = Purchase.objects.get(hashid=hashid)
+            form = PurchaseForm(instance=purchase)
+    else:
+        form = PurchaseForm(instance=purchase)
+    return locals()
+
+
+@render_to("clubhouse/purchase_delete.html")
+@login_required
+def delete_purchase(request, hashid):
+    o = Organization.get()
+    purchase = Purchase.objects.get(hashid=hashid)
+    if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
+        purchase.delete()
+
+        return redirect(reverse('clubhouse:purchases', host='clubhouse'))
+    return locals()
+
+
+@login_required
+def create_journey(request):
+    # o = Organization.get()
+    p = Journey.objects.create()
+    return redirect(reverse('clubhouse:journey', kwargs={"hashid": p.hashid, }, host='clubhouse'))
+
+
+@render_to("clubhouse/journeys.html")
+@login_required
+def journeys(request):
+    o = Organization.get()
+    journey_name = "journeys"
+    journeys = Journey.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/journey.html")
+@login_required
+def journey(request, hashid):
+    o = Organization.get()
+    journey_name = "journeys"
+    journey = Journey.objects.get(hashid=hashid)
+    links = Link.objects.all()
+    saved = False
+    if request.method == "POST":
+        form = JourneyForm(request.POST, request.FILES, instance=journey)
+        if form.is_valid():
+            form.save()
+            saved = True
+            journey = Journey.objects.get(hashid=hashid)
+            form = JourneyForm(instance=journey)
+    else:
+        form = JourneyForm(instance=journey)
+    return locals()
+
+
+@render_to("clubhouse/journey_delete.html")
+@login_required
+def delete_journey(request, hashid):
+    o = Organization.get()
+    journey = Journey.objects.get(hashid=hashid)
+    if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
+        journey.delete()
+
+        return redirect(reverse('clubhouse:journeys', host='clubhouse'))
     return locals()

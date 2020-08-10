@@ -45,6 +45,7 @@ MAIL_DOMAIN = "mail.%s" % INKSHOP_DOMAIN
 DRAFT_DOMAIN = "draft.%s" % INKSHOP_DOMAIN
 LOVE_DOMAIN = "love.%s" % INKSHOP_DOMAIN
 DOTS_DOMAIN = "dots.%s" % INKSHOP_DOMAIN
+PRODUCTS_DOMAIN = "courses.%s" % INKSHOP_DOMAIN
 
 ALLOWED_HOSTS = [
     INKSHOP_DOMAIN,
@@ -59,6 +60,7 @@ MAIL_BASE_URL = "https://%s" % MAIL_DOMAIN
 DRAFT_BASE_URL = "https://%s" % DRAFT_DOMAIN
 LOVE_BASE_URL = "https://%s" % LOVE_DOMAIN
 DOTS_BASE_URL = "https://%s" % DOTS_DOMAIN
+PRODUCTS_BASE_URL = "https://%s" % PRODUCTS_DOMAIN
 RESOURCES_URL = "./static/"
 
 APPEND_SLASH = True
@@ -81,6 +83,7 @@ INSTALLED_APPS = [
     'inkdots',
     'inkmail',
     'people',
+    'products',
     'website',
     'utils',
 ]

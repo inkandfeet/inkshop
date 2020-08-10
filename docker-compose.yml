@@ -48,6 +48,19 @@ services:
     container_name: inkshop_redis
     # restart: unless-stopped
 
+
+  # couchdb:
+  #   image: apache/couchdb:3
+  #   environment:
+  #     - COUCHDB_USER=${COUCHDB_USER}
+  #     - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+  #   ports:
+  #     - '5984:5984'
+  #     - '4369:4369'
+  #     - '9100:9100'
+  #   volumes:
+  #     - ./couchdb_data:/opt/couchdb/data
+
   # rabbitmq:
   #   image: rabbitmq
   #   env_file:
@@ -66,6 +79,7 @@ services:
     depends_on:
       - db
       - redis
+      # - couchdb
       # - rabbitmq
     volumes:
       - ./inkshop:/project/inkshop
