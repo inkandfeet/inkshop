@@ -53,7 +53,7 @@ class ProductPurchase(HashidBaseModel):
 
     def __str__(self):
         try:
-            return "Purchase of %s by %s on %s" % (self.product, self.person, self.created_at)
+            return "Purchase of %s by %s on %s" % (self.product, self.purchase.person, self.created_at)
         except:
             return "Purchase of unknown by unknown on %s" % (self.created_at, )
 

@@ -82,6 +82,7 @@ def journey(request, hashid):
 @render_to("products/day.html")
 @login_required
 def day(request, hashid):
+    consumer_str = Factory.rand_str(length=20, include_emoji=False)
     o = Organization.get()
     day = JourneyDay.objects.get(hashid=hashid)
     me = Person.objects.get(pk=request.user.pk)
@@ -91,23 +92,11 @@ def day(request, hashid):
     return locals()
 
 
-@render_to("products/chat.html")
-@login_required
-def chat(request):
-    o = Organization.get()
-    return locals()
-
-
-@render_to("products/room.html")
-@login_required
-def room(request, room_name):
-    o = Organization.get()
-    return locals()
-
-
 @render_to("products/today.html")
 @login_required
 def today(request):
+    # TODO: Make this redirect to today's day.
+    
     consumer_str = Factory.rand_str(length=20, include_emoji=False)
     if request.user.is_authenticated:
         me = Person.objects.get(pk=request.user.pk)
