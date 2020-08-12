@@ -9,6 +9,7 @@ class ProductForm(ModelForm):
         model = Product
         fields = [
             "name",
+            "number_of_days"
         ]
 
 
@@ -36,7 +37,6 @@ class JourneyForm(ModelForm):
     class Meta:
         model = Journey
         fields = [
-            "product",
             "productpurchase",
             "start_date",
         ]

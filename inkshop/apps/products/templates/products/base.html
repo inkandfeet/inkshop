@@ -1,0 +1,74 @@
+{% load compile_static %}{% load static %}<html>
+<head>
+  {% block head %} 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    {% block css %}
+    {# {% include 'material/includes/material_css.html' %} #}
+   <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" type="text/css" href="{% static "common/flags/flags.css" %}" >
+    <link rel="stylesheet" type="text/css" href="{% static "common/css/base.less"|compile %}" >
+    {# <link rel="stylesheet" type="text/css" href="{% static "dashboard/css/dashboard.less"|compile %}" > #}
+    {# <link rel="stylesheet" type="text/css" href="{% static "dashboard/css/today.less"|compile %}" > #}
+    {% endblock %}
+  {% endblock %}
+</head>
+<body class="">
+  {% block nav %}
+  <nav class="deep-orange darken-3">
+    <div class="nav-wrapper">
+      <a href="{% url 'products:home' %}" class="logo center">
+        
+      </a>
+        <ul id="nav-mobile" class="left hide-on-med-and-down">
+          {# <li {% block dashboard_nav_class %}{% endblock %} ><a href="{% url 'products:home' %}"><i class="material-icons left">show_chart</i> Summer 2020</a></li> #}
+          <li {% block today_nav_class %}{% endblock %} ><a href="{% url 'products:today' %}"><i class="material-icons left">wb_sunny</i> Today</a></li>
+          {# <li {% block week_nav_class %}{% endblock %} ><a href="{% url 'products:week' %}"><i class="material-icons left">view_week</i> This Week</a></li> #}
+          {# <li {% block month_nav_class %}{% endblock %} ><a href="{% url 'products:month' %}"><i class="material-icons left">today</i> This Month</a></li> #}
+        </ul>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+          <li>{{ me.hashid }} - {{me.email}}</li>
+          <li><a href="{% url 'products:logout' %}">Logout</a></li>
+        </ul>
+    </div>
+  </nav>
+
+  <ul class="sidenav" id="mobile-demo">
+    {# <li><a href="{% url 'products:home' %}">Summer 2020</a></li> #}
+    {# <li><a href="{% url 'products:today' %}">Today</a></li> #}
+    {# <li><a href="{% url 'products:week' %}">This Week</a></li> #}
+    {# <li><a href="{% url 'products:month' %}">This Month</a></li> #}
+    {# <li><a href="{% url 'products:logout' %}">Logout</a></li> #}
+  </ul>
+  {% endblock %}
+  {% block content %}
+
+  {% endblock %}
+  {% block script %}
+  <script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
+  {# {% include 'material/includes/material_js.html' %} #}
+
+    <!-- Compiled and minified JavaScript -->
+    <!-- <script src="{% static "common/js/sortable.js" %}"></script> -->
+    <script src="{% static "common/js/moment.min.js" %}"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>  
+    <script src="https://npmcdn.com/vue-sortable@latest"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+    <script src="{% static "common/js/vue-moment.min.js" %}"></script>
+    <script src="{% static "common/js/reconnecting-websocket.js" %}"></script>
+
+    </script>
+    
+    {% endblock %}
+</body>
+</html>

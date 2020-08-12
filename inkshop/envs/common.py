@@ -5,6 +5,10 @@ import re
 import sys
 from os.path import abspath, join, dirname
 from sys import path
+try:
+    from urllib.parse import urlparse
+except:
+    from urlparse import urlparse
 
 from .configure import *
 
@@ -64,9 +68,11 @@ PRODUCTS_BASE_URL = "https://%s" % PRODUCTS_DOMAIN
 RESOURCES_URL = "./static/"
 
 APPEND_SLASH = True
+SESSION_COOKIE_SECURE = True
 
 # Application definition
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -77,6 +83,7 @@ INSTALLED_APPS = [
     'compressor',
     'django_celery_beat',
     'django_celery_results',
+    'static_precompiler',
 
     'archives',
     'clubhouse',
@@ -146,6 +153,22 @@ ROOT_URLCONF = 'inkshop.urls'
 ROOT_HOSTCONF = 'inkshop.hosts'
 DEFAULT_HOST = 'root'
 SITE_ID = 1
+
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+BROKER_URL = 'redis://redis:6379/0'
+redis_url = urlparse(BROKER_URL)
+
+# Channels
+ASGI_APPLICATION = 'inkshop.routing.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "CONFIG": {
+            "hosts": [(redis_url.hostname, redis_url.port)],
+        },
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+    },
+}
 
 AUTH_USER_MODEL = 'clubhouse.StaffMember'
 
@@ -244,6 +267,8 @@ AUTHENTICATION_BACKENDS = [
 
 CELERY_BROKER_URL = 'redis://redis:6379/0'
 BROKER_URL = 'redis://redis:6379/0'
+redis_url = urlparse(BROKER_URL)
+
 
 CELERYBEAT_SCHEDULE = {}
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']

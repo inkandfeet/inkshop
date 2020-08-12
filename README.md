@@ -143,7 +143,7 @@ python3 manage.py import_ontraport_csv --subscribers subscribers.csv --hard_boun
 - Redis for caching and queuing.
 - Docker for encapsulation and dev ease.
 - Heroku for deployment.
-- Firebase for replicated, client-side storage.
+- Websockets for realtime, replicated, client-side storage.
 
 
 
