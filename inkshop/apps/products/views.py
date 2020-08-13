@@ -89,6 +89,10 @@ def day(request, hashid):
     if day.journey.productpurchase.purchase.person != me:
         return redirect(reverse('logout'))
 
+    data_store_url = "/ws/journey/%s/%s" % (
+        day.journey.hashid,
+        day.hashid,
+    )
     return locals()
 
 
@@ -96,7 +100,7 @@ def day(request, hashid):
 @login_required
 def today(request):
     # TODO: Make this redirect to today's day.
-    
+
     consumer_str = Factory.rand_str(length=20, include_emoji=False)
     if request.user.is_authenticated:
         me = Person.objects.get(pk=request.user.pk)

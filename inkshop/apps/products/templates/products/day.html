@@ -1,488 +1,60 @@
-{% extends "products/base.html" %}{% load static %}{% load json_filter %}
+{% extends "products/base.html" %}{% load static %}{% load json_filter %}{% load compile_static %}
 {% block today_nav_class %}class="active"{% endblock %}
 {% block script %}{{block.super}}
   <script>
       window.inkshop = window.inkshop || {};
-      window.inkshop.auth = window.inkshop.auth || {}
+      inkshop.urls = inkshop.urls || {}
+      inkshop.constants = inkshop.constants || {}
+      inkshop.data = inkshop.data || {}
 
-      inkshop.auth.logout = function() {
-        localStorage.removeItem('inkshop_logged_in');
-        document.location = document.location + "";
-      }
-      inkshop.auth.login = function() {
-        // Set tab-shared login.
-        localStorage.setItem('inkshop_logged_in', "true");
-        
-        // Check login via localStorage
-        setInterval(function(){
-        if (localStorage.getItem('inkshop_logged_in') != "true") {
-            logout();
-          }
-        }, 1000)
-        // Check login state for weird edge cases
-        setInterval(function(){
-          $.get("{% url "products:check_login" %}", {}, function(resp) {
-            if (resp.auth == false) {
-              logout();
-            }
-          });
-        }, 60000)
-      }
-      window.inkshop.auth.login();
-
-      inkshop.sockets = inkshop.sockets || {};
-      inkshop.sockets.daySocket = new ReconnectingWebSocket(
-          'wss://'
-          + window.location.host
-          + '/ws/journey/'
-          + '{{day.journey.hashid}}'
-          + '/'
-          + '{{day.hashid}}'
-      );
-
-      inkshop.sockets.daySocket.onmessage = function(e) {
-          const message = JSON.parse(e.data);
-          var data = message.data;
-
-          console.log(message)
-          console.log(message.type)
-          if (message.type == "unauthorized" && message.data.consumerguid == todayDataRef.consumerguid) {
-            // document.location.reload();
-            logout();
-          }
-
-          for (k in data) {
-            if (k != "consumerguid") {
-              app[k] = data[k];
-              todayDataRef[k] = data[k];
-            }
+      inkshop.constants.consumerguid = "{{consumer_str}}{% now "U" %}";
+      inkshop.urls.daySocket = "{{ data_store_url }}";
+      inkshop.urls.checkLogin = "{% url "products:check_login" %}";
+      
+      {% if day.data %}
+        inkshop.data.day = {{  day.data | safe }}
+      {% else %}
+        now = new Date();
+        inkshop.data.day = {
+          consumerguid: inkshop.constants.consumerguid,
+          message: 'Hello Vue!',
+            spoons: null,
+            find_myself: null,
+            like_to: null,
+            socketConnected: true,
+            today_tasks: [],
+            next_task: "",
+            notes_and_ideas: "",
+            habits: {{habits|json}},
+            goals: {{goals|json}},
+            first_name: "{{me.first_name}}",
+            startedToday: false,
+            startedReview: false,
+            startedLifePlanReview: false,
+            finishedReview: false,
+            moreHoursMakingShown: false,
+            one_thing_today: "",
+            one_thing_tasks: [],
+            oneThingDone: false,
+            oneThingCompleted: false,
+            next_one_thing_task: "",
+            phase_override: null,
+            finishedDailyReview: false,
+            now: now,
+            today_formatted: moment(now).format("dddd, MMMM Do"),
         }
-      };
-      inkshop.sockets.daySocket.onclose = function(e) {
-          console.log(e);
-          console.error('Chat socket closed unexpectedly');
-      };
+      {% endif %}
 
-
+      inkshop.sockets.initializeDaySocket();
   </script>
-<script type="text/javascript">
-  (function() {
-    window.todayData = {}
-    now = new Date();
-    {% if day.data %}
-    todayDataRef = {{  day.data | safe }}
-    {% else %}
-    todayDataRef = {
-      consumerguid: "{{consumer_str}}{% now "U" %}",
-      message: 'Hello Vue!',
-        spoons: null,
-        find_myself: null,
-        like_to: null,
-        socketConnected: true,
-        today_tasks: [],
-        next_task: "",
-        notes_and_ideas: "",
-        habits: {{habits|json}},
-        goals: {{goals|json}},
-        first_name: "{{me.first_name}}",
-        startedToday: false,
-        startedReview: false,
-        startedLifePlanReview: false,
-        finishedReview: false,
-        moreHoursMakingShown: false,
-        one_thing_today: "",
-        one_thing_tasks: [],
-        oneThingDone: false,
-        oneThingCompleted: false,
-        next_one_thing_task: "",
-        phase_override: null,
-        now: now,
-        today_formatted: moment(now).format("dddd, MMMM Do"),
-    }
-    {% endif %}
-    Vue.component('editable',{
-      template:'<span class="editable_field" contenteditable="true" @blur="update" v-html="content" v-on:keyup.enter="enterPressed"></span>',
-      props:['content'],
-      mounted:function(){
-        this.$el.innerText = this.content;
-      },
-      updated: function() {
-        // restoreSelection();
-      },
-      methods:{
-        update: function(event){
-          // saveSelection();
-          this.$emit('update', event.target.attributes.field_name.value, event.target.innerText);
-        },
-        enterPressed: function(event) {
-          event.target.blur();
-        }
-      }
-    });
+  <script src="{% static "products/js/vueCourseDay.js" %}"></script>
 
-    Vue.component('toggle-chip',{
-      template: {% verbatim %}'<div class="chip" v-bind:class="{\'active\': field}" @click="update"><i class="material-icons left" v-if="icon">{{icon}}</i><img v-bind:src="image" v-if="image"/>{{title}}</div>', {% endverbatim %}
-      props:['field_name', 'field', 'title', 'icon', 'on', 'image'],
-      mounted:function(){
-        console.log(this);
-      },
-      updated: function() {
-        // restoreSelection();
-      },
-      methods:{
-        update: function(event){
-          // saveSelection();
-          console.log(event)
-          console.log(this.field_name)
-          console.log(this.field)
-          this.$emit('update', this.field_name, !this.field);
-        },
-        enterPressed: function(event) {
-          event.target.blur();
-        },
-        toggleChip: function(event) {
-
-        }
-      }
-    });
-    Vue.component('yesnopair',{
-      template: {% verbatim %}'<div><a class="waves-effect btn-flat cyan lighten-5 toggleable_button" v-bind:class="{\'selected\': field === false}" @click="updateField(false)">{{no_label}}</a> <a class="waves-effect btn-flat cyan lighten-5 toggleable_button" v-bind:class="{\'selected\': field === true}" @click="updateField(true)">{{yes_label}}</a></div>', {% endverbatim %}
-      props:['field_name', 'field', 'on', 'yes_text', 'no_text'],
-      computed: {
-        yes_label: function() {
-          return this.yes_text || "Yes";
-        },
-        no_label: function() {
-          return this.no_text || "No";
-        }
-      },
-      updated: function() {
-        // restoreSelection();
-      },
-      methods:{
-        update: function(event){
-          this.$emit('update', this.field_name, !this.field);
-        },
-        enterPressed: function(event) {
-          event.target.blur();
-        },
-        updateField: function(bool) {
-          this.$emit('update', this.field_name, bool);
-        }
-      }
-    });
-
-    Vue.directive('sortable', {
-          inserted: function (el, binding) {
-          var sortable = new Sortable(el, binding.value || {});
-          }
-      });
-    window.app = new Vue({
-      el: '#app',
-      data: todayDataRef,
-     //  updated: function() {
-     //   if (!sortableCreated && this.today_tasks && this.today_tasks.length > 0) {
-      //  var el = document.getElementById('today_task_list');
-      //  window.sortable = Sortable.create(el, {
-      //    onEnd: function (evt) {
-      //      var itemEl = evt.item;  // dragged HTMLElement
-      //      evt.to;    // target list
-      //      evt.from;  // previous list
-      //      evt.oldIndex;  // element's old index within old parent
-      //      evt.newIndex;  // element's new index within new parent
-      //      // this.today_tasks[evt.oldIndex] = evt.newIndex;
-      //      console.log("evt.to");
-      //      console.log(evt.to);
-      //      var counter = 0;
-      //      var new_tasks = [];
-      //      var t;
-      //      evt.to.querySelectorAll("li").forEach(function(ele){
-      //        var d = ele.firstChild;
-      //        var previousIndex = d.attributes.index.value;
-      //        t = window.app.today_tasks[previousIndex];
-      //        t.order = counter;
-      //        new_tasks.push(t);
-      //        console.log(t.title + ": " + previousIndex + " -> " + counter);
-      //        counter ++;
-      //      }, false)
-      //      // window.sortable.destroy();
-      //      window.app.updateDataStore('today_tasks', new_tasks);
-      //      // sortableCreated = false;
-      //    },
-
-      //  });
-      //  sortableCreated = true;
-      // }
-     //  },
-      computed: {
-        phase: function() {
-          if (!this.startedToday) {
-            return "plan";
-          }
-          if (this.startedLifePlanReview) {
-            if (this.finishedDailyReview) {
-              return "relax;"
-            } else {
-              return "review";
-            }
-          }
-          return "do";
-        },
-        completed_tasks: function() {
-          var completed_list = [];
-          for (var i in this.one_thing_tasks) {
-            var t = this.one_thing_tasks[i];
-            if (t.complete) {
-              completed_list.push(t);
-            }
-          }
-          for (var i in this.today_tasks) {
-            var t = this.today_tasks[i];
-            if (t.complete) {
-              completed_list.push(t);
-            }
-          }
-          for (var i in this.habits) {
-            var t = this.habits[i];
-            if (t.complete) {
-              completed_list.push(t);
-            }
-          }
-          return completed_list
-        },
-        finishedLifePlanReview: function() {
-          return (
-            this.did_level_up_time !== null &&
-            this.did_sparkle !== null &&
-            this.did_hedonism !== null &&
-            (this.did_write_book == true || this.did_other_book !== null) &&
-            this.have_process_reflections !== null
-          )
-        }
-      },
-      methods: {
-      updateDataStore: function(field_name, value) {
-        console.log("updating " + field_name + " to " + value)
-        var d = {}
-        if (value || value === false || value === "") {
-          // Got a field/value combo
-          d[field_name] = value
-        } else {
-          var e = field_name;
-          d[e.target.attributes.field_name.value] = e.target.value
-        }
-        console.log(d)
-        for (k in d) {
-          var v = d[k]
-          console.log("k/v: " + k + " / " + v)
-          todayDataRef[k] = v
-          app[k] = v
-
-        }
-        console.log(todayDataRef)
-        inkshop.sockets.daySocket.send(JSON.stringify({
-            'consumerguid': todayDataRef.consumerguid,
-            'data': todayDataRef
-        }));
-        console.log(todayDataRef)
-      },
-      updateAndSave: function(field_name, value) {
-        this[field_name] = value;
-        this.updateDataStore(field_name, value);
-      },
-      updateFromInput: function(event) {
-        var field_name = e.target.attributes.field_name.value;
-        var value = e.target.value;
-        this.updateAndSave(field_name, value);
-      },
-      handleTaskEnter: function() {
-        var t = {
-          "title": this.next_task,
-          "done": false,
-        }
-        this.addTask(t);
-        this.next_task = "";
-      },
-      addTask: function(task) {
-        task.order = this.today_tasks.length;
-        this.today_tasks.push(task)
-        this.updateDataStore('today_tasks', this.today_tasks)
-      },
-      removeTask: function(task) {
-        var new_tasks = [];
-        for (var i=0; i<this.today_tasks.length; i++){
-          if (this.today_tasks[i].title != task.title) {
-            new_tasks.push(this.today_tasks[i])
-          }
-        }
-        this.today_tasks = new_tasks;
-        this.updateDataStore('today_tasks', this.today_tasks)
-      },
-      onSortUpdate: function(event) {
-        console.log("onSortUpdate")
-        new_tasks = []
-        old_tasks = this.today_tasks;
-
-        old_tasks.splice(event.newIndex, 0, old_tasks.splice(event.oldIndex, 1)[0])
-        var t;
-        for (var j = 0; j<old_tasks.length; j++) {
-          t = old_tasks[j];
-          t.order = j;
-          new_tasks.push(t);
-        }
-        this.updateDataStore('today_tasks', new_tasks)
-      },
-      toggleTaskComplete: function(task) {
-        task.complete = !task.complete;
-        this.updateDataStore('today_tasks', this.today_tasks)
-        this.updateDataStore('habits', this.habits)
-        this.updateDataStore('one_thing_tasks', this.one_thing_tasks)
-      },
-      toggleHabitComplete: function(habit) {
-        habit.complete = !habit.complete;
-        this.updateDataStore('habits', this.habits)
-      },
-      startToday: function() {
-        this.startedToday = true;
-        this.updateDataStore('startedToday', this.startedToday)
-      },
-      handleOneThingTaskEnter: function() {
-        var t = {
-          "title": this.next_one_thing_task,
-          "done": false,
-        }
-        this.addOneThingTask(t);
-        this.next_one_thing_task = "";
-      },
-      addOneThingTask: function(task) {
-        task.order = this.one_thing_tasks.length;
-        this.one_thing_tasks.push(task)
-        this.updateDataStore('one_thing_tasks', this.one_thing_tasks)
-      },
-      removeOneThingTask: function(task) {
-        var new_tasks = [];
-        for (var i=0; i<this.one_thing_tasks.length; i++){
-          if (this.one_thing_tasks[i].title != task.title) {
-            new_tasks.push(this.one_thing_tasks[i])
-          }
-        }
-        this.one_thing_tasks = new_tasks;
-        this.updateDataStore('one_thing_tasks', this.one_thing_tasks)
-      },
-      addOtherTasks: function() {
-        this.updateAndSave('oneThingDone', true)
-      },
-      markTaskHappy: function(task) {
-        task.makesMeHappy = !task.makesMeHappy;
-        this.updateDataStore('today_tasks', this.today_tasks)
-        this.updateDataStore('one_thing_tasks', this.one_thing_tasks)
-        this.updateDataStore('habits', this.habits)
-
-      },
-      startLifePlanReview: function() {
-        this.updateAndSave('startedLifePlanReview', true)
-        this.updateAndSave('phase_override', null)
-
-
-      },
-      showMoreHoursMaking: function() {
-        this.updateAndSave('moreHoursMakingShown', true)
-      },
-      setHoursMaking: function(hours) {
-        this.updateAndSave('hoursMaking', hours)
-      },
-      setHoursClarity: function(hours) {
-        this.updateAndSave('hoursClarity', hours)
-      },
-      toggleCountry: function(country_code) {
-        this.updateAndSave("adventured_in_" + country_code, !this["adventured_in_" + country_code])
-      },
-      }
-    })
-  })();
-</script>
 {% endblock %}
 {% block css %}{{block.super}}
-<style type="text/css">
-.hour_block {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  margin: 0 2px;
-  border: 1px solid #DDD;
-}
-.adventure_checkin .adventure_flag {
-  opacity: 0.3;
-}
-.adventure_checkin .adventure_flag.active {
-  opacity: 1;
-}
-.chip.active {
-  background: #17bcd1;
-}
-.chip i {
-  margin-right: 5px;
-    margin-top: 3px;
-}
-.top_nav {
-  color: #AAA;
-  cursor: pointer;
-}
-.top_nav .active {
-  color: #454545;
-}
-.top_nav .override {
-  color: #1eecff;
-}
-.top_nav .material-icons {
-  font-size: 3em;
-  padding-top: 10px;
-}
-.date {
-  font-size: 2.4em;
-  padding: 20px 0;
-  font-weight: 300;
-}
-.spoons_rating {
-  font-size: 2em;
-  color: #888;
-}
-.spoons_rating i {
-  margin-right: 10px;
-}
-.remove_x {
-  text-transform: uppercase;
-  color: #EEE;
-  font-size: 0.75em;
-}
-.prompt {
-  color: #454545;
-}
-.task {
-  cursor: pointer;
-}
-.happyTask i {
-  color: #0ece20;
-  font-size: 1.5em;
-}
-.toggleable_button.selected {
-  background-color: #26c6da !important;
-  color: #FFF;
-}
-.toggleable_button {
-  text-transform: none;
-}
-.finished_day img {
-  max-width: 80%;
-}
-@media screen and (max-width: 640px) {
-  .date {
-    padding: 26px 0;
-    font-size: 1.5em;
-  }
-}
-</style>
+<link rel="stylesheet" type="text/css" href="{% static "products/css/base.less"|compile %}" >
 {% endblock %}
+
+
 {% block content %}
   <div class="today " id="app">
     {% verbatim %}
