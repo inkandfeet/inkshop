@@ -234,9 +234,10 @@ COMPRESS_CSS_FILTERS = (
 )
 
 COMPRESS_JS_FILTERS = (
-    # 'compressor.filters.jsmin.SlimItFilter',
+    'compressor.filters.jsmin.SlimItFilter',
 )
 COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = False
 HTML_MINIFY = True
 
 # Password validation

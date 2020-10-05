@@ -8,10 +8,14 @@ from django.conf import settings
 from django.core.mail import mail_admins
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
+from django.http import HttpResponse, Http404, HttpResponseNotModified
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
+from django.template import Context
+from django.template import Template as DjangoTemplate
+from django.utils.html import mark_safe
 
 from annoying.decorators import render_to, ajax_request
 from utils.factory import Factory
@@ -31,6 +35,7 @@ def check_login(request):
             "auth": False,
     }
 
+
 @render_to("products/home.html")
 @login_required
 def home(request):
@@ -38,6 +43,7 @@ def home(request):
     me = Person.objects.get(pk=request.user.pk)
     products = Product.objects.filter()
     return locals()
+
 
 @render_to("products/productpurchase.html")
 @login_required
@@ -49,6 +55,7 @@ def productpurchase(request, hashid):
         return redirect(reverse('logout'))
 
     return locals()
+
 
 @render_to("products/start_journey.html")
 @login_required
@@ -75,11 +82,38 @@ def journey(request, hashid):
         return redirect(reverse('logout'))
 
     # TODO: Add auth assertion
+    return locals()
+
+
+@render_to("products/confirm_delete_journey.html")
+@login_required
+def confirm_delete_journey(request, hashid):
+    o = Organization.get()
+    me = Person.objects.get(pk=request.user.pk)
+    journey = Journey.objects.get(hashid=hashid)
+    if journey.productpurchase.purchase.person != me:
+        return redirect(reverse('logout'))
+
+    return locals()
+
+@login_required
+@render_to("products/journey_deleted.html")
+def delete_journey(request, hashid):
+    o = Organization.get()
+    me = Person.objects.get(pk=request.user.pk)
+    try:
+        journey = Journey.objects.get(hashid=hashid)
+        if journey.productpurchase.purchase.person != me:
+            return redirect(reverse('logout'))
+        course_hashid = "%s" % journey.productpurchase.hashid
+        journey.delete()
+    except:
+        pass
 
     return locals()
 
 
-@render_to("products/day.html")
+# @render_to("products/day.html")
 @login_required
 def day(request, hashid):
     consumer_str = Factory.rand_str(length=20, include_emoji=False)
@@ -93,7 +127,27 @@ def day(request, hashid):
         day.journey.hashid,
         day.hashid,
     )
-    return locals()
+    person_store_url = "/ws/p/%s" % (
+        me.hashid,
+    )
+
+
+    from django.template.response import TemplateResponse
+
+    return TemplateResponse(request, 'products/%s/day-%s.html' % (
+            day.journey.productpurchase.product.slug,
+            day.day_number,
+        ), locals()
+    )
+
+    # For when we're wiring it up to the backend.
+    # c = Context(locals())
+    # content_template = DjangoTemplate(day.productday.template)
+    # content = mark_safe(content_template.render(c).encode("utf-8").decode())
+   
+    # response = HttpResponse(content)
+    # response['Content-Length'] = len(content)
+    # return response
 
 
 @render_to("products/today.html")

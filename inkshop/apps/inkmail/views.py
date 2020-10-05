@@ -233,13 +233,13 @@ def delete_account(request, delete_key):
     om = OutgoingMessage.objects.get(delete_hash=delete_key)
     # if om.subscription:
     #     om.subscription.unsubscribe()
-    om.person.delete()
     HistoricalEvent.log(
         person=om.person,
         event_type="delete_account",
         subscription=om.subscription,
         outgoingmessage=om,
     )
+    om.person.delete()
 
     return locals()
 

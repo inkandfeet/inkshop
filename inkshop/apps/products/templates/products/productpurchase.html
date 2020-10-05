@@ -9,8 +9,14 @@
 {% for j in pp.journeys %}
   <h3><a href="{% url 'products:journey' j.hashid %}">{{j}}</a></h3>
   {% for day in j.days %}
-    <li><a href="{% url 'products:day' day.hashid %}">Day {{day.day_number}}</a></li>
+  	{% if day.available %}
+    <li><a class="day_{{day.day_number}} link" href="{% url 'products:day' day.hashid %}">Day {{day.day_number}}</a></li>
+    {% else %}
+    <li><span>Day {{day.day_number}}</span></li>
+    {% endif %}
+    {# {{ day.last_user_action}} #}
   {% endfor %}
+  <a class="delete_journey" href="{% url 'products:confirm_delete_journey' j.hashid %}">Delete</a>
 {% endfor %}
 <a href="{% url 'products:start_journey' pp.hashid %}">Start New Journey</a>
 

@@ -5,6 +5,6 @@
 <h1>My Courses</h1>
 
 {% for product in me.products %}
-  <a href="{% url 'products:productpurchase' product.hashid %}">{{product.product.name}}</a>
+  <a class="course" href="{% url 'products:productpurchase' product.hashid %}">{{product.product.name}}</a>
 {% endfor %}
 {% endblock %}

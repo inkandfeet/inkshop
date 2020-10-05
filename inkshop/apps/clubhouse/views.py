@@ -23,8 +23,8 @@ from inkmail.models import Organization
 from inkmail.forms import ScheduledNewsletterMessageForm, MessageForm, OutgoingMessageForm
 from inkmail.forms import NewsletterForm, SubscriptionForm, OrganizationForm
 from inkmail.helpers import queue_message, queue_newsletter_message
-from products.models import Product, ProductPurchase, Purchase, Journey
-from products.forms import ProductForm, ProductPurchaseForm, PurchaseForm, JourneyForm
+from products.models import Product, ProductPurchase, Purchase, Journey, ProductDay
+from products.forms import ProductForm, ProductPurchaseForm, PurchaseForm, JourneyForm, ProductDayForm
 from clubhouse.models import StaffMember
 from website.models import Template, Page, Post, Resource, Link
 from website.forms import TemplateForm, PageForm, PostForm, ResourceForm, LinkForm
@@ -677,3 +677,54 @@ def delete_journey(request, hashid):
 
         return redirect(reverse('clubhouse:journeys', host='clubhouse'))
     return locals()
+
+
+
+@login_required
+def create_productday(request):
+    # o = Organization.get()
+    p = ProductDay.objects.create()
+    return redirect(reverse('clubhouse:productday', kwargs={"hashid": p.hashid, }, host='clubhouse'))
+
+
+@render_to("clubhouse/productdays.html")
+@login_required
+def productdays(request):
+    o = Organization.get()
+    productday_name = "productdays"
+    productdays = ProductDay.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/productday.html")
+@login_required
+def productday(request, hashid):
+    o = Organization.get()
+    productday_name = "productdays"
+    productday = ProductDay.objects.get(hashid=hashid)
+    links = Link.objects.all()
+    saved = False
+    if request.method == "POST":
+        form = ProductDayForm(request.POST, request.FILES, instance=productday)
+        if form.is_valid():
+            form.save()
+            saved = True
+            productday = ProductDay.objects.get(hashid=hashid)
+            form = ProductDayForm(instance=productday)
+    else:
+        form = ProductDayForm(instance=productday)
+    return locals()
+
+
+@render_to("clubhouse/productday_delete.html")
+@login_required
+def delete_productday(request, hashid):
+    o = Organization.get()
+    productday = ProductDay.objects.get(hashid=hashid)
+    if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
+        productday.delete()
+
+        return redirect(reverse('clubhouse:productdays', host='clubhouse'))
+    return locals()
+
+

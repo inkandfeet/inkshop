@@ -56,3 +56,19 @@ import/*
 inkshop/import/*
 couchdb_data/*
 letsencrypt/acme.json
+inkshop/inkshop/apps/utils/static/common/fonts/*
+
+# Exclude specific products and media.
+inkshop/apps/products/static/products/
+inkshop/apps/products/templates/products/
+inkshop/apps/website/templates/website/pages
+inkshop/apps/website/templates/website/posts
+inkshop/apps/utils/static/common/fonts
+cypress/integration/products/
+cypress/integration/website/pages/
+cypress/integration/website/posts/
+cypress/support/products.js
+cypress/support/products/
+bin/setup_dev_users.py
+cypress.json
+todo.md

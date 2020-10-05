@@ -21,7 +21,7 @@
             spoons: null,
             find_myself: null,
             like_to: null,
-            socketConnected: true,
+            socketIsConnected: true,
             today_tasks: [],
             next_task: "",
             notes_and_ideas: "",
@@ -56,10 +56,10 @@
 
 
 {% block content %}
-  <div class="today " id="app">
+  <div class="today " id="inkshopApp">
     {% verbatim %}
 
-    <div class="wrapper" v-if="socketConnected">
+    <div class="wrapper" v-if="socketIsConnected">
       <div class="row top_nav">
         <div class="col s6 ">
           <div class="date">{{ today_formatted }}</div>

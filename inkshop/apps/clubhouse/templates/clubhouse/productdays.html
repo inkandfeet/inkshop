@@ -1,0 +1,11 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>All productdays</h1>
+    <p>&hearts;</p>
+    <a href="{% url 'clubhouse:create_productday' %}">Create New</a>
+    <ul>
+    {% for p in productdays %}
+    <li>    <a href="{% url 'clubhouse:productday' p.hashid %}">{{ p }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

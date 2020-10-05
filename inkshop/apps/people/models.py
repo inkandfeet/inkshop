@@ -54,6 +54,9 @@ class Person(AbstractBaseUser, HasJWTBaseModel, HashidBaseModel):
 
     personal_contact = models.BooleanField(default=False)
 
+    encrypted_data = models.TextField(blank=True, null=True,)
+    # hashed_data = models.CharField(unique=True, max_length=4096, blank=True, null=True, verbose_name="Email")
+
     objects = UserManager()
 
     def __str__(self):
@@ -133,6 +136,16 @@ class Person(AbstractBaseUser, HasJWTBaseModel, HashidBaseModel):
                 message=bouncing_message,
                 raw_mailgun_data=raw_mailgun_data,
             )
+    @property
+    def data(self):
+        if not hasattr(self, "_decrypted_data"):
+            self._decrypted_data = decrypt(self.encrypted_data)
+        return self._decrypted_data
+
+    @data.setter
+    def data(self, value):
+        self.encrypted_data = encrypt(value)
+        # self.hashed_email = lookup_hash(value)
 
     def gdpr_dump(self):
         raise NotImplementedError("Haven't implemented GPDR dump yet")
@@ -143,3 +156,4 @@ class Person(AbstractBaseUser, HasJWTBaseModel, HashidBaseModel):
     def products(self):
         from products.models import ProductPurchase
         return ProductPurchase.objects.filter(purchase__person=self).all()
+

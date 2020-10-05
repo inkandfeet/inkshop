@@ -20,7 +20,7 @@ django-ipware
 django-localflavor
 django-redis-cache
 django-storages
-django-static-precompiler
+django-static-precompiler[watch]
 Django
 extraction
 Faker
