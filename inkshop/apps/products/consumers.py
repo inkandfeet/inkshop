@@ -4,55 +4,11 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import WebsocketConsumer
 from channels.auth import get_user
 import channels.layers
-from django.contrib.auth.signals import user_logged_in, user_logged_out 
-from django.dispatch import receiver 
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.dispatch import receiver
 from django.utils import timezone
 from products.models import JourneyDay
 from people.models import Person
-
-
-# class ChatConsumer(WebsocketConsumer):
-#     def connect(self):
-#         self.room_name = self.scope['url_route']['kwargs']['room_name']
-#         self.room_group_name = 'chat_%s' % self.room_name
-
-#         # Join room group
-#         async_to_sync(self.channel_layer.group_add)(
-#             self.room_group_name,
-#             self.channel_name
-#         )
-
-#         self.accept()
-
-#     def disconnect(self, close_code):
-#         # Leave room group
-#         async_to_sync(self.channel_layer.group_discard)(
-#             self.room_group_name,
-#             self.channel_name
-#         )
-
-#     # Receive message from WebSocket
-#     def receive(self, text_data):
-#         text_data_json = json.loads(text_data)
-#         message = text_data_json['message']
-
-#         # Send message to room group
-#         async_to_sync(self.channel_layer.group_send)(
-#             self.room_group_name,
-#             {
-#                 'type': 'chat_message',
-#                 'message': message
-#             }
-#         )
-
-#     # Receive message from room group
-#     def chat_message(self, event):
-#         message = event['message']
-
-#         # Send message to WebSocket
-#         self.send(text_data=json.dumps({
-#             'message': message
-#         }))
 
 
 class JourneyDayConsumer(WebsocketConsumer):
@@ -76,44 +32,25 @@ class JourneyDayConsumer(WebsocketConsumer):
             self.channel_name
         )
 
-
     # Receive message from WebSocket
     def receive(self, text_data):
         self.user = async_to_sync(get_user)(self.scope)
-        # print(self.user)
-        # print(self.user.is_authenticated)
-        # print(self.user.is_anonymous)
         text_data_json = json.loads(text_data)
         data = text_data_json['data']
         if not self.user.is_anonymous:
-            # print("logged in")
-            # Send message to room group
-            # print(data)
-            # print("alive" in data)
             if "alive" in data and data["alive"]:
                 return
 
             # Store in DB
-            # print(self.user)
             d = None
             try:
                 d = JourneyDay.objects.get(hashid=self.day_hashid)
-                # print(d.journey.productpurchase.purchase.person)
-                # print(d.journey.productpurchase.purchase.person == self.user)
             except:
                 pass
-            # print("d")
-            # print(d)
-            # TODO: get this all fixed up.
+
             if d and d.journey.productpurchase.purchase.person == self.user:
-                # , journey__productpurchase__person=self.user
-                # print("Valid user for this journeyday")
-                # print("hjourneyday")
-                # print(d)
-                # print(d.hashid)
                 d.data = json.dumps(data)
                 d.last_user_action = timezone.now()
-                # print(d.data)
                 d.save()
 
                 async_to_sync(self.channel_layer.group_send)(
@@ -124,11 +61,8 @@ class JourneyDayConsumer(WebsocketConsumer):
                     }
                 )
 
-                return 
+                return
 
-        
-        # print("unauthorized")
-        # print(data)
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
@@ -180,54 +114,26 @@ class PersonConsumer(WebsocketConsumer):
             self.channel_name
         )
 
-
     # Receive message from WebSocket
     def receive(self, text_data):
         self.user = async_to_sync(get_user)(self.scope)
-        # print(self.user)
-        # print(self.user.is_authenticated)
-        # print(self.user.is_anonymous)
-        # print(text_data)
         text_data_json = json.loads(text_data)
         data = text_data_json['data']
-        
+
         if not self.user.is_anonymous:
-            # print("logged in")
-            # Send message to room group
-            # print(data)
-            # print("alive" in data)
             if "alive" in data and data["alive"]:
                 return
-
-            # Store in DB
-            # print(self.user)
-            # print("self.person_hashid")
-            # print(self.person_hashid)
-            # print(self.user)
-            # print(self.user.hashid)
 
             p = None
             try:
                 p = Person.objects.get(hashid=self.person_hashid)
-                # print(d.journey.productpurchase.purchase.person)
-                # print(d.journey.productpurchase.purchase.person == self.user)
             except:
                 import traceback
-                traceback.print_exc();
+                traceback.print_exc()
                 pass
-            # print("p")
-            # print(p)
-            # print("d")
-            # print(d)
-            # TODO: get this all fixed up.
+
             if p and p == self.user:
-                # , journey__productpurchase__person=self.user
-                # print("Valid user for this journeyday")
-                # print("hjourneyday")
-                # print(d)
-                # print(d.hashid)
                 p.data = json.dumps(data)
-                # print(p.data)
                 p.save()
 
                 async_to_sync(self.channel_layer.group_send)(
@@ -238,11 +144,8 @@ class PersonConsumer(WebsocketConsumer):
                     }
                 )
 
-                return 
+                return
 
-        
-        # print("unauthorized")
-        # print(data)
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {

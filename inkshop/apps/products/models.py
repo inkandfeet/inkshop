@@ -84,6 +84,7 @@ class ProductPurchase(HashidBaseModel):
     def journeys(self):
         return Journey.objects.filter(productpurchase=self).all().order_by("-created_at")
 
+
 class Journey(HashidBaseModel):
     productpurchase = models.ForeignKey(ProductPurchase, null=True, on_delete=models.SET_NULL, blank=True)
     start_date = models.DateField(blank=True, default=timezone.now, null=True)
@@ -146,23 +147,21 @@ class JourneyDay(HashidBaseModel):
     def productday(self):
         return self.journey.product.productday_set.all().filter(day_number=self.day_number)[0]
 
-
     @cached_property
     def visible(self):
         if not self.journey.product.has_epilogue or self.day_number < self.journey.days.count():
             return True
-        if self.journey.days.get(day_number=self.day_number-1).last_user_action:
+        if self.journey.days.get(day_number=self.day_number - 1).last_user_action:
             return True
 
         return False
 
     @cached_property
     def available(self):
-        if self.day_number == 1 or self.journey.days.get(day_number=self.day_number-1).last_user_action:
+        if self.day_number == 1 or self.journey.days.get(day_number=self.day_number - 1).last_user_action:
             return True
 
         return False
-
 
     @cached_property
     def is_epilogue(self):
@@ -174,9 +173,9 @@ class JourneyDay(HashidBaseModel):
 @receiver(post_save, sender=Journey)
 def create_journey_days(sender, instance, created, **kwargs):
     """Create a matching profile whenever a user object is created."""
-    if created: 
+    if created:
         for i in range(0, instance.product.number_of_days):
             JourneyDay.objects.create(
-                day_number=i+1,
+                day_number=i + 1,
                 journey=instance,
             )

@@ -4,7 +4,6 @@ from products.models import Product, ProductPurchase, Purchase, Journey, Product
 from django.forms import modelformset_factory
 
 
-
 class ProductDayForm(ModelForm):
     class Meta:
         model = ProductDay

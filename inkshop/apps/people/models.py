@@ -136,6 +136,7 @@ class Person(AbstractBaseUser, HasJWTBaseModel, HashidBaseModel):
                 message=bouncing_message,
                 raw_mailgun_data=raw_mailgun_data,
             )
+
     @property
     def data(self):
         if not hasattr(self, "_decrypted_data"):
@@ -156,4 +157,3 @@ class Person(AbstractBaseUser, HasJWTBaseModel, HashidBaseModel):
     def products(self):
         from products.models import ProductPurchase
         return ProductPurchase.objects.filter(purchase__person=self).all()
-

@@ -679,7 +679,6 @@ def delete_journey(request, hashid):
     return locals()
 
 
-
 @login_required
 def create_productday(request):
     # o = Organization.get()
@@ -726,5 +725,3 @@ def delete_productday(request, hashid):
 
         return redirect(reverse('clubhouse:productdays', host='clubhouse'))
     return locals()
-
-

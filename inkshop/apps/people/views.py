@@ -79,7 +79,6 @@ def user_authenticate(request):
     return resp
 
 
-
 @ajax_request
 @csrf_exempt
 def change_password(request):
