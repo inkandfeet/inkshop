@@ -6,7 +6,7 @@ window.inkshop.urls = window.inkshop.urls || {}
 
 
 inkshop.auth.logout = function() {
-  console.log("Logging out..")
+  // console.log("Logging out..")
   localStorage.removeItem('inkshop_logged_in');
   document.location = document.location + "";
 }
@@ -36,7 +36,7 @@ inkshop.sockets.ensureFirstConnect = function() {
   if (!app.daySocketHasConnected) {
     app.daySocketHasConnected = true;
     setTimeout(function(){
-      console.log("app.userEventHappened({'foreign': true});")
+      // console.log("app.userEventHappened({'foreign': true});")
       app.userEventHappened({'foreign': true});
       // document.getElementById("inkshopDayPage" + inkshop.data.day.currentPage).scrollIntoView();
     }, 400);
@@ -56,12 +56,8 @@ inkshop.sockets.initializeDaySocket = function() {
       if (message.type == "unauthorized" && message.data.consumerguid == inkshop.constants.consumerguid) {
         inkshop.auth.logout();
       }
-      // console.log(message)
-      // console.log(message.data.consumerguid)
-      // console.log(inkshop.constants.consumerguid)
-      // console.log(message.data.consumerguid != inkshop.constants.consumerguid)
       if (message && message.data && message.data.consumerguid != inkshop.constants.consumerguid) {
-        console.log(message.type)
+        // console.log(message.type)
 
         for (k in data) {
           if (k != "consumerguid") {
@@ -174,25 +170,3 @@ inkshop.methods.startConfetti = function() {
 inkshop.methods.stopConfetti = function() {
   confetti.stop();
 }
-
-// inkshop.state.lastUserScrollAt = inkshop.state.lastUserScrollAt || 0;
-// inkshop.state.lastUserScrollPosition = inkshop.state.lastUserScrollPosition || 0;
-// inkshop.state.lastUserStateScrollPosition = inkshop.state.lastUserStateScrollPosition || 0;
-// inkshop.state.scrolling = false;
-
-// inkshop.state.saveScroll = function(pos) {
-//   inkshop.state.lastUserScrollAt = new Date();
-//   inkshop.state.lastUserScrollPosition = pos;
-//   inkshop.state.lastUserStateScrollPosition = inkshop.state.stateBasedCurrentScrollPosition;
-// }
-
-// window.addEventListener('scroll', function(e) {
-//   pos = window.scrollY;
-//   if (!inkshop.state.scrolling) {
-//     window.requestAnimationFrame(function() {
-//       inkshop.state.saveScroll(pos);
-//       inkshop.state.scrolling = false;
-//     });
-//     inkshop.state.scrolling = true;
-//   }
-// });
