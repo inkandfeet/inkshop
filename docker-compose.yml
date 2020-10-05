@@ -3,7 +3,6 @@ version: "3.2"
 services:  
   traefik:
     image: "traefik:v2.2"
-    container_name: "traefik"
     command:
       #- "--log.level=DEBUG"
       - "--api.insecure=true"
@@ -12,7 +11,7 @@ services:
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.myresolver.acme.email=postmaster@${INKSHOP_DOMAIN}"
+      - "--certificatesresolvers.myresolver.acme.email=postmaster@inkandfeet.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
@@ -36,7 +35,6 @@ services:
 
   redis:
     image: redis:6.0-alpine
-    container_name: inkshop_redis
     # restart: unless-stopped
 
   inkshop:
