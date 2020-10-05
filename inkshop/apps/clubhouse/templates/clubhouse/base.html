@@ -20,6 +20,12 @@
         <a class="{% if page_name == 'organization' %}current{% endif %}" href="{% url 'clubhouse:organization' %}" >Organization</a>
         <a class="{% if page_name == 'logout' %}current{% endif %}" href="{% url 'logout' %}" >Logout</a>
     </div>
+        <br/>
+        <a class="{% if page_name == 'products' %}current{% endif %}" href="{% url 'clubhouse:products' %}" >Products</a>
+        <a class="{% if page_name == 'productdays' %}current{% endif %}" href="{% url 'clubhouse:productdays' %}" >ProductDays</a>
+        <a class="{% if page_name == 'productpurchases' %}current{% endif %}" href="{% url 'clubhouse:productpurchases' %}" >ProductPurchases</a>
+        <a class="{% if page_name == 'purchases' %}current{% endif %}" href="{% url 'clubhouse:purchases' %}" >Purchases</a>
+        <a class="{% if page_name == 'journeys' %}current{% endif %}" href="{% url 'clubhouse:journeys' %}" >Journeys</a>
 </div>
 
 {% endblock %}

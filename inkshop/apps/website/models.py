@@ -33,13 +33,7 @@ from utils.encryption import file_hash
 
 markdown = mistune.Markdown()
 
-try:
-    # Amazingly, if the app for this is down, it crashes everything.
-    from fake_useragent import UserAgent
-    ua = UserAgent()
-    ua_chrome = ua.chrome
-except:
-    ua_chrome = "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11"
+ua_chrome = "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11"
 
 
 class Template(HashidBaseModel):

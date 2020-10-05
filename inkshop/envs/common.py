@@ -5,6 +5,10 @@ import re
 import sys
 from os.path import abspath, join, dirname
 from sys import path
+try:
+    from urllib.parse import urlparse
+except:
+    from urlparse import urlparse
 
 from .configure import *
 
@@ -45,6 +49,7 @@ MAIL_DOMAIN = "mail.%s" % INKSHOP_DOMAIN
 DRAFT_DOMAIN = "draft.%s" % INKSHOP_DOMAIN
 LOVE_DOMAIN = "love.%s" % INKSHOP_DOMAIN
 DOTS_DOMAIN = "dots.%s" % INKSHOP_DOMAIN
+PRODUCTS_DOMAIN = "courses.%s" % INKSHOP_DOMAIN
 
 ALLOWED_HOSTS = [
     INKSHOP_DOMAIN,
@@ -59,12 +64,15 @@ MAIL_BASE_URL = "https://%s" % MAIL_DOMAIN
 DRAFT_BASE_URL = "https://%s" % DRAFT_DOMAIN
 LOVE_BASE_URL = "https://%s" % LOVE_DOMAIN
 DOTS_BASE_URL = "https://%s" % DOTS_DOMAIN
+PRODUCTS_BASE_URL = "https://%s" % PRODUCTS_DOMAIN
 RESOURCES_URL = "./static/"
 
 APPEND_SLASH = True
+SESSION_COOKIE_SECURE = True
 
 # Application definition
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -75,12 +83,14 @@ INSTALLED_APPS = [
     'compressor',
     'django_celery_beat',
     'django_celery_results',
+    'static_precompiler',
 
     'archives',
     'clubhouse',
     'inkdots',
     'inkmail',
     'people',
+    'products',
     'website',
     'utils',
 ]
@@ -143,6 +153,22 @@ ROOT_URLCONF = 'inkshop.urls'
 ROOT_HOSTCONF = 'inkshop.hosts'
 DEFAULT_HOST = 'root'
 SITE_ID = 1
+
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+BROKER_URL = 'redis://redis:6379/0'
+redis_url = urlparse(BROKER_URL)
+
+# Channels
+ASGI_APPLICATION = 'inkshop.routing.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "CONFIG": {
+            "hosts": [(redis_url.hostname, redis_url.port)],
+        },
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+    },
+}
 
 AUTH_USER_MODEL = 'clubhouse.StaffMember'
 
@@ -208,9 +234,10 @@ COMPRESS_CSS_FILTERS = (
 )
 
 COMPRESS_JS_FILTERS = (
-    # 'compressor.filters.jsmin.SlimItFilter',
+    'compressor.filters.jsmin.SlimItFilter',
 )
 COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = False
 HTML_MINIFY = True
 
 # Password validation
@@ -241,6 +268,8 @@ AUTHENTICATION_BACKENDS = [
 
 CELERY_BROKER_URL = 'redis://redis:6379/0'
 BROKER_URL = 'redis://redis:6379/0'
+redis_url = urlparse(BROKER_URL)
+
 
 CELERYBEAT_SCHEDULE = {}
 CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']

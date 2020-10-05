@@ -53,7 +53,7 @@ STATIC_URL = 'https://%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
 
 FAVICON_URL = "%sfavicon.ico" % STATIC_URL
 
-redis_url = urlparse(os.environ.get('REDIS_URL'))
+redis_url = urlparse(BROKER_URL)
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',

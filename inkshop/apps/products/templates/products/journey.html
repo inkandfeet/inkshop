@@ -1,0 +1,15 @@
+{% extends "products/base.html" %}{% load static %}
+{% block dashboard_nav_class %}class="active"{% endblock %}
+{% block content %}
+
+<h1>{{journey.productpurchase.product.name}} - {{ journey.start_date }}</h1>
+
+<h2>Days</h2>
+
+<ul>
+{% for day in journey.days %}
+    <li><a href="{% url 'products:day' day.hashid %}">Day {{day.day_number}}</a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}

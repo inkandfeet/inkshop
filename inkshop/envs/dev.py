@@ -10,6 +10,9 @@ SESSION_COOKIE_DOMAIN = None
 AWS_STORAGE_BUCKET_NAME = "inkandfeet-inkshop-dev"
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
+# STATIC_PRECOMPILER_USE_CACHE = False
+STATIC_PRECOMPILER_DISABLE_AUTO_COMPILE = True
+
 if "INKSHOP_BASE_URL" in os.environ:
     MEDIA_URL = "%s/media/" % os.environ["INKSHOP_BASE_URL"]
 

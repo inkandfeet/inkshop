@@ -1,0 +1,27 @@
+{% extends 'base.html' %}{% load static %}
+{% block nav %}{% endblock %}
+
+{% block head %}{{ block.super }}{% endblock %}
+
+{% block title %}Logged out.{% endblock %}
+
+{% block content %}
+<script type="text/javascript">
+  localStorage.removeItem('inkshop_logged_in');
+</script>
+  <h1>Logged Out.  Log in again?</h1>
+   <form method="POST">
+      {% csrf_token %}
+        {{form.as_p}}
+
+        {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}" />
+        {% endif %}
+
+      <button type="submit">Log In</button>
+  </form>
+  <div class="col s12 center-align">
+      <a href="{% url 'admin_password_reset' %}">Forgot your password?</a>
+   </div>
+  
+{% endblock %}

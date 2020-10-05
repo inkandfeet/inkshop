@@ -20,11 +20,12 @@ from utils.helpers import reverse
 from django.utils.functional import cached_property
 from django.utils import timezone
 
-from utils.models import HashidBaseModel
+from clubhouse.models import UserManager
+from utils.models import HashidBaseModel, HasJWTBaseModel
 from utils.encryption import encrypt, decrypt, lookup_hash
 
 
-class Person(HashidBaseModel):
+class Person(AbstractBaseUser, HasJWTBaseModel, HashidBaseModel):
     encrypted_first_name = models.CharField(max_length=4096, blank=True, null=True)
     encrypted_last_name = models.CharField(max_length=4096, blank=True, null=True)
     encrypted_email = models.CharField(unique=True, max_length=4096, blank=True, null=True,)
@@ -52,6 +53,14 @@ class Person(HashidBaseModel):
     never_contact_set_at = models.DateTimeField(blank=True, null=True)
 
     personal_contact = models.BooleanField(default=False)
+
+    encrypted_data = models.TextField(blank=True, null=True,)
+    # hashed_data = models.CharField(unique=True, max_length=4096, blank=True, null=True, verbose_name="Email")
+
+    objects = UserManager()
+
+    def __str__(self):
+        return self.hashid
 
     @classmethod
     def get_by_email(cls, email):
@@ -86,6 +95,10 @@ class Person(HashidBaseModel):
         if not hasattr(self, "_decrypted_last_name"):
             self._decrypted_last_name = decrypt(self.encrypted_last_name)
         return self._decrypted_last_name
+
+    @property
+    def full_name(self):
+        return "%s %s" % (self.first_name, self.last_name, )
 
     @last_name.setter
     def last_name(self, value):
@@ -124,8 +137,23 @@ class Person(HashidBaseModel):
                 raw_mailgun_data=raw_mailgun_data,
             )
 
+    @property
+    def data(self):
+        if not hasattr(self, "_decrypted_data"):
+            self._decrypted_data = decrypt(self.encrypted_data)
+        return self._decrypted_data
+
+    @data.setter
+    def data(self, value):
+        self.encrypted_data = encrypt(value)
+        # self.hashed_email = lookup_hash(value)
+
     def gdpr_dump(self):
         raise NotImplementedError("Haven't implemented GPDR dump yet")
 
     def messages_sent(self):
         return self.outgoingmessage_set.order_by("created_at").all()
+
+    def products(self):
+        from products.models import ProductPurchase
+        return ProductPurchase.objects.filter(purchase__person=self).all()

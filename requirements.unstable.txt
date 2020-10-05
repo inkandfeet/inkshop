@@ -1,5 +1,8 @@
+asgiref
 bleach
 boto3
+channels
+channels-redis
 cryptography>=2.3
 csscompressor
 django-annoying
@@ -17,10 +20,10 @@ django-ipware
 django-localflavor
 django-redis-cache
 django-storages
+django-static-precompiler[watch]
 Django
 extraction
 Faker
-fake-useragent
 flake8
 freezegun
 gunicorn
@@ -44,3 +47,4 @@ slimit
 sorl-thumbnail
 tblib
 user_agents
+uvicorn

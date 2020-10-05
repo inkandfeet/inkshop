@@ -81,30 +81,6 @@ def user_authenticate(request):
 
 @ajax_request
 @csrf_exempt
-def firebase_user_create(request):
-    # Authenticates a user, and populates the data for them.
-    resp = {
-        "success": False,
-    }
-
-    # Authenticate and prove that this is coming from firebase.
-    # if "Authorization"
-
-    # Verify body.
-    data = None
-    if request.body:
-        data = json.loads(request.body.decode('utf-8'))
-
-    if data and "email" in data:
-        resp["success"] = True
-
-    # handle_event.delay(event)
-
-    return resp
-
-
-@ajax_request
-@csrf_exempt
 def change_password(request):
 
     resp = {
