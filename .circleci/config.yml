@@ -61,21 +61,21 @@ jobs:
       - run:
           name: Install less
           command: sudo npm i -g less
-      - run:
-           name: Push to Heroku
-           command: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/inkandfeet-inkshop.git master
-      - run:
-           name: Migrate DB
-           command: heroku run "python manage.py migrate --settings=envs.live" --app inkandfeet-inkshop && echo "Migration Complete."
-      - run:
-           name: Compress static
-           command: heroku run "python manage.py compress --settings=envs.live_local && python manage.py compress --settings=envs.live" --app inkandfeet-inkshop
-      - run:
-           name: Collect static
-           command: heroku run "python manage.py collectstatic --settings=envs.live_local --noinput && python manage.py collectstatic --settings=envs.live --noinput" --app inkandfeet-inkshop
-      # - run:
-      #      name: Purge Cloudflare Cache
-      #      command: 'sudo pip install requests; python bin/purge_cloudflare.py mail.inkandfeet.com clubhouse.inkandfeet.com'
+#       - run:
+#            name: Push to Heroku
+#            command: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/YOUR_HEROKU_APP.git master
+#       - run:
+#            name: Migrate DB
+#            command: heroku run "python manage.py migrate --settings=envs.live" --app YOUR_HEROKU_APP && echo "Migration Complete."
+#       - run:
+#            name: Compress static
+#            command: heroku run "python manage.py compress --settings=envs.live_local && python manage.py compress --settings=envs.live" --app YOUR_HEROKU_APP
+#       - run:
+#            name: Collect static
+#            command: heroku run "python manage.py collectstatic --settings=envs.live_local --noinput && python manage.py collectstatic --settings=envs.live --noinput" --app YOUR_HEROKU_APP
+#       - run:
+#            name: Purge Cloudflare Cache
+#            command: 'sudo pip install requests; python bin/purge_cloudflare.py mail.YOURDOMAIN.com clubhouse.YOURDOMAIN.com'
 
 workflows:
   version: 2
