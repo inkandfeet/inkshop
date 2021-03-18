@@ -35,7 +35,7 @@ jwt==0.6.1
 lxml==4.3.3
 mistune==0.8.4
 mock==2.0.0
-pillow==7.1.0
+pillow==8.1.1
 piprot==0.9.10
 polytester==1.2.0
 psycopg2==2.8.2
