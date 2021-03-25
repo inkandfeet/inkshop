@@ -40,7 +40,7 @@ piprot==0.9.10
 polytester==1.2.0
 psycopg2==2.8.2
 pytz==2019.1
-PyYAML==5.1
+PyYAML==5.4
 python-magic==0.4.15
 slimit==0.8.1
 sorl-thumbnail==12.5.0
