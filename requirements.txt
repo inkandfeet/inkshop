@@ -10,7 +10,7 @@ django-compressor==2.2
 django-celery-beat==1.4.0
 django-celery-results==1.0.4
 django-cors-headers==2.5.2
-django-debug-toolbar==1.11
+django-debug-toolbar==1.11.1
 django-extensions==2.1.6
 django-heroku-postgresify==0.4
 django-hosts==3.0
