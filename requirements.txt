@@ -20,7 +20,7 @@ django-localflavor==2.1
 django-redis-cache==2.0.0
 django-static-precompiler[watch]==1.8.2
 django-storages==1.7.1
-django==2.2.13
+django==2.2.21
 extraction==0.3
 Faker==1.0.5
 flake8==3.7.7
