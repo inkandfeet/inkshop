@@ -68,3 +68,10 @@ set_required_key("POSTGRES_USER", "not set")
 set_required_key("POSTGRES_PASSWORD", "not set")
 
 set_required_key("HASHID_SALT", fallback="ULfX^Jm")
+
+set_required_key("STRIPE_PUBLISHABLE_KEY", "not set")
+set_required_key("STRIPE_SECRET_KEY", "not set")
+set_required_key("STRIPE_ENDPOINT_SECRET", "not set")
+set_required_key("GOOGLE_ANALYTICS_ID", "not set")
+set_required_key("GOOGLE_ADS_ID", "not set")
+set_required_key("ROLLBAR_TOKEN", "not set")

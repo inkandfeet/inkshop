@@ -15,6 +15,7 @@ fake = Faker()
 from people.models import Person
 from inkmail.models import Newsletter, Subscription, Message, ScheduledNewsletterMessage, Organization
 from website.models import Template, Page, Post
+from products.models import Product, ProductPurchase, Purchase, ProductDay
 
 
 class DjangoFunctionalFactory:
@@ -544,6 +545,7 @@ class Factory(DjangoFunctionalFactory):
     def message(cls, newsletter=None, *args, **kwargs):
         cls.organization()
         body_text = cls.rand_paragraph()
+        body_text = body_text.replace("\n", "\n\n")
         options = {
             "subject": cls.rand_text(),
             "body_text_unrendered": body_text,
@@ -575,8 +577,16 @@ class Factory(DjangoFunctionalFactory):
         if "newsletter" not in kwargs:
             kwargs["newsletter"] = cls.newsletter()
 
+        if "message_body" in kwargs and kwargs["message_body"]:
+            message = cls.message(body_text_unrendered=kwargs["message_body"])
+        else:
+            message = cls.message()
+
+        if "message_body" in kwargs:
+            del kwargs["message_body"]
+
         options = {
-            "message": cls.message(),
+            "message": message,
             "enabled": True,
             "send_at_date": cls.rand_date(),
             "send_at_hour": cls.rand_int(end=23),
@@ -654,3 +664,51 @@ class Factory(DjangoFunctionalFactory):
         options.update(kwargs)
         p = Post.objects.create(**options)
         return p
+
+    @classmethod
+    def product(cls, *args, **kwargs):
+
+        name = "%s %s" % (cls.rand_tree(), cls.rand_color())
+        options = {
+            "is_course": True,
+            "name": name,
+            "journey_singular_name": "my %s" % name,
+            "journey_plural_name": "my %ss" % name,
+            "has_epilogue": True,
+            "number_of_days": cls.rand_int(start=3, end=15),
+            "purchase_message": cls.message(transactional=True, purchase=True)
+        }
+        options.update(kwargs)
+        p = Product.objects.create(**options)
+        for n in range(1, p.number_of_days + 1):
+            body_text = cls.rand_paragraph()
+            body_text = body_text.replace("\n", "\n\n")
+            body_text = "Day %s : %s" % (n, body_text)
+            ProductDay.objects.create(
+                day_number=n,
+                product=p,
+                pre_day_message=cls.message(
+                    transactional=True,
+                    purchase=True,
+                    body_text_unrendered=body_text
+                )
+            )
+        return p
+
+    @classmethod
+    def productpurchase(cls, *args, **kwargs):
+        if "person" in kwargs:
+            person = kwargs["person"]
+            del kwargs["person"]
+        else:
+            person = cls.person()
+
+        if "product" in kwargs:
+            product = kwargs["product"]
+            del kwargs["product"]
+        else:
+            product = cls.product()
+
+        purchase = Purchase.objects.create(person=person)
+        pp = ProductPurchase.objects.create(product=product, purchase=purchase)
+        return pp

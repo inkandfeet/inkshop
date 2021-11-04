@@ -13,3 +13,13 @@ def json_filter(value):
 @register.filter(name="times")
 def times(number):
     return range(1, number + 1)
+
+
+@register.filter(name='dict_key')
+def dict_key(d, k):
+    if d and (hasattr(d, k) or k in d):
+        if (hasattr(d, k)):
+            return getattr(d, k)
+
+        return d[k]
+    return None

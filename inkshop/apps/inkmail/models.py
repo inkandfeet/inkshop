@@ -12,6 +12,7 @@ from io import BytesIO
 from PIL import Image, ImageOps
 from tempfile import NamedTemporaryFile
 
+from django.core.cache import cache
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
@@ -29,7 +30,6 @@ from people.models import Person
 from utils.models import HashidBaseModel, BaseModel
 from utils.encryption import lookup_hash, encrypt, decrypt, create_unique_hashid
 
-markdown = mistune.Markdown()
 OPT_IN_LINK_EXPIRE_TIME = datetime.timedelta(days=7)
 RETRY_IN_TIME = datetime.timedelta(minutes=2)
 ORG_SINGLETON_KEY = "KLJF83jlaesfkj"
@@ -44,9 +44,15 @@ class Organization(BaseModel):
 
     @classmethod
     def get(cls):
-        if not hasattr(cls, "_singleton"):
+        if hasattr(cls, "_singleton"):
+            return cls._singleton
+        o = cache.get("inkshop.Organization")
+        if o:
+            return o
+        else:
             cls._singleton, _ = cls.objects.get_or_create(singleton_key=ORG_SINGLETON_KEY)
-        return cls._singleton
+            cache.set("inkshop.Organization", cls._singleton)
+            return cls._singleton
 
     def __str__(self):
         return "%s" % (self.name,)
@@ -64,8 +70,12 @@ class Message(HashidBaseModel):
         null=True,
     )
     transactional = models.BooleanField(default=False)
+    purchase = models.BooleanField(default=False)
     transactional_send_reason = models.CharField(max_length=254, blank=True, null=True)
     transactional_no_unsubscribe_reason = models.CharField(max_length=254, blank=True, null=True)
+
+    class Meta:
+        ordering = ("-created_at", )
 
     def __str__(self):
         return "%s: %s" % (self.name, self.subject)
@@ -202,6 +212,7 @@ class Subscription(HashidBaseModel):
     import_source = models.CharField(max_length=254, blank=True, null=True)
     double_opted_in = models.BooleanField(default=False)
     double_opted_in_at = models.DateTimeField(blank=True, null=True)
+    resubscribed_at = models.DateTimeField(blank=True, null=True)
     has_set_never_unsubscribe = models.BooleanField(default=False)
     unsubscribed = models.BooleanField(default=False)
     unsubscribed_at = models.DateTimeField(blank=True, null=True)
@@ -215,8 +226,14 @@ class Subscription(HashidBaseModel):
         if not self.unsubscribed:
             self.unsubscribed = True
             self.unsubscribed_at = timezone.now()
-            self.double_opted_in = False
-            self.double_opted_in_at = None
+            self.resubscribed_at = None
+            self.save()
+
+    def resubscribe(self):
+        if self.unsubscribed:
+            self.unsubscribed = False
+            self.unsubscribed_at = None
+            self.resubscribed_at = timezone.now()
             self.save()
 
     def double_opt_in(self):
@@ -301,6 +318,8 @@ class OutgoingMessage(BaseModel):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE, blank=True, null=True)
+    productpurchase = models.ForeignKey('products.ProductPurchase', on_delete=models.CASCADE, blank=True, null=True)
+    journey_day = models.ForeignKey('products.JourneyDay', on_delete=models.CASCADE, blank=True, null=True)
     scheduled_newsletter_message = models.ForeignKey(ScheduledNewsletterMessage, on_delete=models.CASCADE, blank=True, null=True)
 
     send_at = models.DateTimeField()
@@ -377,6 +396,7 @@ class OutgoingMessage(BaseModel):
         o = Organization.get()
         context = {
             "transactional": self.message.transactional,
+            "purchase": self.message.purchase,
             "organization_address": o.address,
             "organization_name": o.name,
         }
@@ -386,6 +406,7 @@ class OutgoingMessage(BaseModel):
                 "last_name": self.person.last_name,
                 "email": self.person.email,
                 "patron": self.person.patron,
+                "person": self.person,
             })
         if self.subscription:
             context.update({
@@ -397,6 +418,17 @@ class OutgoingMessage(BaseModel):
                 "unsubscribe_link": self.unsubscribe_link,
                 "love_link": self.love_link,
             })
+        if self.productpurchase:
+            context.update({
+                "product": self.productpurchase.product,
+                "purchase": self.productpurchase.purchase,
+                "productpurchase": self.productpurchase,
+            })
+
+        if self.journey_day:
+            context.update({
+                "journey_day": self.journey_day,
+            })
         if self.message.transactional:
             context.update({
                 "transactional_send_reason": self.message.transactional_send_reason,
@@ -405,18 +437,31 @@ class OutgoingMessage(BaseModel):
             })
 
         c = Context(context)
-        t = Template(string_to_render.replace("\\\n", "\n"))
+        string_to_render = string_to_render
+        # if not plain_text:
+        #     print(string_to_render)
+        #     string_to_render = mistune.html(string_to_render)
+        #     print("rendered")
+        #     print(string_to_render)
 
-        parsed_source = t.render(c).encode("utf-8").decode()
+        t = Template(string_to_render)
 
-        if not strip_linebreaks and not plain_text:
-            parsed_source = parsed_source.replace("\r", "\n")
-            parsed_source = parsed_source.replace("\n\n", "<br>\n")
+        rendered_string = t.render(c).encode("utf-8").decode()
+
+        # if not strip_linebreaks and not plain_text:
+        #     rendered_string = rendered_string.replace("\r", "\n")
+        #     rendered_string = rendered_string.replace("\n\n", "<br>\n")
+
+        # if not plain_text:
+        #     rendered_string = mistune.html(rendered_string)
+        # if not plain_text:
+        #     rendered_string = mistune.html(redered_string)
 
         if not plain_text:
-            rendered_string = markdown(parsed_source)
-        else:
-            rendered_string = parsed_source
+            rendered_string = rendered_string.replace("\n\n\n", "\n<br>\n\n")
+            rendered_string = rendered_string.replace("\r\r\r", "\r<br>\r\r")
+            rendered_string = rendered_string.replace("\r\n\r\n\r\n", "\r\n<br>\r\n\r\n")
+            rendered_string = mistune.html(rendered_string)
 
         rendered_string = rendered_string.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
         rendered_string = rendered_string.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
@@ -428,7 +473,8 @@ class OutgoingMessage(BaseModel):
 
         if not strip_linebreaks and not plain_text:
             rendered_string = rendered_string.replace("\r", "\n")
-            rendered_string = rendered_string.replace("\n", "<br>\n")
+            # rendered_string = rendered_string.replace("\n", "<br>\n")
+            # rendered_string = rendered_string.replace("</p><br>\n", "</p>\n")
             # rendered_string = rendered_string.replace("\n", "<br>")
             # rendered_string = linebreaks(rendered_string)
         if not plain_text:
@@ -451,10 +497,14 @@ class OutgoingMessage(BaseModel):
             else:
                 body_source = self.message.body_text_unrendered
         else:
+            # Require transactional text for non-purchase messages.
             if (
-                "transactional_send_reason" not in self.message.body_text_unrendered
-                or "transactional_no_unsubscribe_reason" not in self.message.body_text_unrendered
-                or "delete_account_link" not in self.message.body_text_unrendered
+                not self.message.purchase
+                and (
+                    "transactional_send_reason" not in self.message.body_text_unrendered
+                    or "transactional_no_unsubscribe_reason" not in self.message.body_text_unrendered
+                    or "delete_account_link" not in self.message.body_text_unrendered
+                )
             ):
                 body_source = "%s\n%s" % (self.message.body_text_unrendered, o.transactional_footer)
             else:
@@ -470,9 +520,12 @@ class OutgoingMessage(BaseModel):
                     html_source = self.message.body_html_unrendered
             else:
                 if (
-                    "transactional_send_reason" not in self.message.body_html_unrendered
-                    or "transactional_no_unsubscribe_reason" not in self.message.body_html_unrendered
-                    or "delete_account_link" not in self.message.body_html_unrendered
+                    not self.message.purchase
+                    and (
+                        "transactional_send_reason" not in self.message.body_html_unrendered
+                        or "transactional_no_unsubscribe_reason" not in self.message.body_html_unrendered
+                        or "delete_account_link" not in self.message.body_html_unrendered
+                    )
                 ):
                     html_source = "%s\n%s" % (self.message.body_html_unrendered, o.transactional_footer)
                 else:
@@ -480,7 +533,7 @@ class OutgoingMessage(BaseModel):
         else:
             html_source = body_source
 
-        html_body = self.render_email_string(html_source)
+        html_body = self.render_email_string(html_source, plain_text=False)
 
         return subject, text_body, html_body
 
@@ -536,9 +589,12 @@ class OutgoingMessage(BaseModel):
                 # Final checks to make sure unsubscribe and CAN_SPAM compliance
                 if self.message.transactional:
                     if (
-                        self.message.transactional_send_reason not in body
-                        or self.message.transactional_no_unsubscribe_reason not in body
-                        or self.delete_account_link not in body
+                        not self.message.purchase
+                        and (
+                            self.message.transactional_send_reason not in body
+                            or self.message.transactional_no_unsubscribe_reason not in body
+                            or self.delete_account_link not in body
+                        )
                     ):
                         self.should_retry = False
                         self.send_success = False

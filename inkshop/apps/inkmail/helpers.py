@@ -69,7 +69,16 @@ def queue_newsletter_message(scheduled_newsletter_message_hashid, at=None):
         logging.warn("Message not enabled or has already been sent.")
 
 
-def queue_transactional_message(message, person, at=None, scheduled_newsletter_message=None, subscription=None):
+def queue_transactional_message(
+    message,
+    person,
+    at=None,
+    scheduled_newsletter_message=None,
+    subscription=None,
+    productpurchase=None,
+    journey_day=None,
+    send_immediately=True
+):
     """Sends a message to a particular subscriber"""
     from inkmail.models import OutgoingMessage  # Avoid circular imports
 
@@ -79,10 +88,15 @@ def queue_transactional_message(message, person, at=None, scheduled_newsletter_m
     if not message.transactional:
         raise Exception("Attempting to queue a non-transactional message in the transactional queue.")
 
-    OutgoingMessage.objects.create(
+    om = OutgoingMessage.objects.create(
         person=person,
         message=message,
         scheduled_newsletter_message=scheduled_newsletter_message,
         subscription=subscription,
-        send_at=at
+        productpurchase=productpurchase,
+        journey_day=journey_day,
+        send_at=at,
     )
+    if send_immediately:
+        om.send()
+    return om

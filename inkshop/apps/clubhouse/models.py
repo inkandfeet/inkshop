@@ -47,7 +47,7 @@ class StaffMember(AbstractBaseUser, HasJWTBaseModel):
     encrypted_email = models.CharField(unique=True, max_length=1024, blank=True, null=True, verbose_name="Email")
     hashed_first_name = models.CharField(max_length=254, blank=True, null=True)
     hashed_last_name = models.CharField(max_length=254, blank=True, null=True)
-    hashed_email = models.CharField(unique=True, max_length=1024, blank=True, null=True,)
+    hashed_email = models.CharField(unique=True, max_length=1024, blank=True, null=True, verbose_name="email")
     email_verified = models.BooleanField(default=False)
     time_zone = models.CharField(max_length=254, blank=True, null=True,)
 
@@ -71,6 +71,10 @@ class StaffMember(AbstractBaseUser, HasJWTBaseModel):
     def email(self, value):
         self.encrypted_email = encrypt(value)
         self.hashed_email = lookup_hash(value)
+
+    @property
+    def is_staff(self):
+        return True
 
     @property
     def first_name(self):

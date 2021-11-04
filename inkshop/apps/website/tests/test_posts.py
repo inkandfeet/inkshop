@@ -17,6 +17,9 @@ from utils.encryption import normalize_lower_and_encrypt, normalize_and_encrypt,
 import mock
 import unittest
 
+t = get_template("inkdots/_page_dots.html")
+inkdots_template = t.render({})
+
 
 class TestPostTemplateRendering(MockRequestsTestCase):
 
@@ -67,10 +70,9 @@ class TestPostTemplateRendering(MockRequestsTestCase):
 
     <script>
         window.inkshop = window.inkshop || {};
-        window.inkshop.page_url = "";
-        window.inkshop.site_data_url = "";
         window.inkshop.site_data;
     </script>
+    %(inkdots)s
 </head>
 
 <body >
@@ -90,5 +92,6 @@ class TestPostTemplateRendering(MockRequestsTestCase):
             "js": self.post.template.js,
             "html_extra_classes": self.post.template.html_extra_classes,
             "body_override": self.post.template.body_override,
+            "inkdots": inkdots_template,
         }
         self.assertEquals(rendered, expected_render)

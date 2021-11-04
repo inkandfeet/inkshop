@@ -26,13 +26,13 @@ class DataDictMixin(object):
                 fields.append(f.name)
         return fields
 
-    def get_data_dict(self, instance=None):
+    def get_data_dict(self, instance=None, exclude=[]):
         data = {}
         if not instance:
             instance = self
         for f in instance.__class__.get_field_names():
-            if hasattr(getattr(instance, f).__class__, "get_field_names"):
-                val = self.get_data_dict(instance=getattr(instance, f))
+            if f not in exclude and hasattr(getattr(instance, f).__class__, "get_field_names"):
+                val = self.get_data_dict(instance=getattr(instance, f), exclude=exclude)
             else:
                 val = getattr(instance, f)
             data[f] = val

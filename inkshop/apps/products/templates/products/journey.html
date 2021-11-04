@@ -1,15 +1,27 @@
-{% extends "products/base.html" %}{% load static %}
-{% block dashboard_nav_class %}class="active"{% endblock %}
+{% extends "products/7-day-sprint/purchase_base.html" %}{% load static inkshop_helpers  compile_static %}
+
 {% block content %}
+<div id="content">
+  <div class="course_pages " id="inkshopApp">
+    <div class="inkshopPage active error">
 
-<h1>{{journey.productpurchase.product.name}} - {{ journey.start_date }}</h1>
+      	<h1>{{journey.productpurchase.product.name}} - {{journey.productpurchase.product.journey_singular_name|default:"Journey"}} starting {{ journey.start_date }}</h1>
 
-<h2>Days</h2>
+      	<h2>{{journey.productpurchase.product.journey_singular_name|default:"Journey"}} Days</h2>
+	
+		<div class="days">	
+	    {% for day in journey.days %}
 
-<ul>
-{% for day in journey.days %}
-    <li><a href="{% url 'products:day' day.hashid %}">Day {{day.day_number}}</a></li>
-{% endfor %}
-</ul>
-
+	    {% if day.available %}
+	    	<div class="day available {% if day.complete %}complete{% endif %}">
+	      		<a class="day_{{day.day_number}} link" href="{% url 'products:day' day.hashid %}">Day {{day.day_number}}</a></li>
+	      	</div>
+	      {% else %}
+	      <li><span>Day {{day.day_number}}</span></li>
+	      {% endif %}
+	      {# {{ day.last_user_action}} #}
+	    {% endfor %}
+    </div>
+  </div>
+</div>
 {% endblock %}

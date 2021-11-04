@@ -43,7 +43,7 @@ psycopg2
 pytz
 python-magic
 PyYAML>=4.2b1
-slimit
+stripe
 sorl-thumbnail
 tblib
 user_agents

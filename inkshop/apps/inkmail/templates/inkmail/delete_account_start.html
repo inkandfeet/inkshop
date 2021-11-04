@@ -1,5 +1,5 @@
-{% extends "base.html" %}
-{% block title %}You've been unsubscribed.  Be well!{% endblock %}
+{% extends "base.html" %}{% load static %}{% load inkshop_helpers %}{% load compile_static compress %}
+{% block title %}Want to delete your account?{% endblock %}
 {% block css %}
     <style type="text/css">
         html {
@@ -7,14 +7,8 @@
             font-weight: 200;
             text-align: center;
         }
-        body {
-            background: url("https://inkandfeet.com/cf/img/wood-background-1eb2bc89440a74570722d0eb6b2d07134-inkmd.jpg") no-repeat center center fixed;
-            -webkit-background-size: cover;
-            -moz-background-size: cover;
-            -o-background-size: cover;
-            background-size: cover;
-        }
         .giant_heart {
+            text-align: center;
             margin-top: 10px;
             font-size: 6em;
         }
@@ -30,16 +24,15 @@
             margin: 0 auto;
         }
         .thanks {
+            text-align: left;
             margin: 80px auto 20px auto;
-            max-width: 600px;
-            padding: 40px 20px;
+            width: 90%;
+            max-width: 800px;
+            padding: 40px 4%;
             border-radius: 4px;
             border: 1px solid #AAA;
             background: #FFF;
-            border: 1px solid transparent;
-            border-bottom-color: rgba(255,255,255,.97);
-            border-right-color: rgba(255,255,255,.97);
-            box-shadow: 1px 3px 3px rgba(0,0,0,.3);
+            
         }
         h2 {
             font-size: 40px;
@@ -69,20 +62,47 @@
             }
         }
     </style>
+{% compress css %}
+<link rel="stylesheet" type="text/css" href="{% static 'products/css/base.less'|compile %}" >
+<link rel="stylesheet" type="text/css" href="{% static 'products/7-day-sprint/css/base.less'|compile %}" >
+<link rel="stylesheet" type="text/css" href="{% static 'products/no-bullshit-guide-to-depression/css/base.less'|compile %}" >
+{% endcompress %}
+<style type="text/css">
+  {% include "common/css/fonts.css" %}
+</style>
+
 {% endblock %}
 {% block content %}
     <div class="thanks">
 
         <div class="giant_heart">👋</div>
 
-        <h2>Your account and all data associated with it has been deleted.</h2>
+        <h1>Want to entirely delete your account?</h1>
 
+        <p>Can do. You can delete your account by pressing "Yes, delete" below.</p>
 
-        <p>Take care of yourself, and thanks for coming along on part of the journey! :) </p>
+        <h3>Before you delete, please understand the consequences.</h3>
 
-        <p>-Steven</p>
-        <!-- <p>&hearts;</p> -->
+        <ul>
+          <li><b>You will lose access to any courses and books you've purchased</b>.  If you want to use them in the future, you'll need to purchase them again. (This is because we delete all records about you - including your purchases - when your account is deleted.)</li>
+          <li>Any information you've entered into any of your courses will be deleted.</li>
+          <li>You will be unsusbscribed from any mailing lists we have.</li>
+          <li><b>Account deletion is immediate and permanent.  There is no undo.</b>  This protects your privacy, by ensuring none of your data remains on our systems.  But it means we can't get it back if you change your mind.</li>
+          <li>If there is data you want to save, please first use the data export feature on your <a href="{% url 'products:account' %}">account page.</a></li> 
+        </ul>
+        <form method="POST" action=".">
+          {% csrf_token %}
+
+          <h3>Delete your account?</h3>
+          <div class="endcap_button left">
+            <button type="submit" name="submit" data-cy="do_delete" class="toggleable_button delete" value="yes">Yes, delete</button> &nbsp; &nbsp;
+            <a href="{% url 'products:account' %}" data-cy="go_back" class="toggleable_button contrast" value="yes">No, Go Back!</a>
+          </div>
+        </form>
+
+        </div>
     </div>
+  </div>
 {% endblock %}
 <html>
 <head> 

@@ -133,3 +133,9 @@ def resource(request, resource_slug):
 
     CACHED_RESOURCES[resource_slug] = response
     return response
+
+
+@render_to("products/privacy.html")
+def privacy(request):
+    o = Organization.get()
+    return locals()

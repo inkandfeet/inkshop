@@ -50,6 +50,11 @@ class JourneyDayConsumer(WebsocketConsumer):
 
             if d and d.journey.productpurchase.purchase.person == self.user:
                 d.data = json.dumps(data)
+                if not d.first_user_action:
+                    d.first_user_action = timezone.now()
+                if "finishedToday" in data and data["finishedToday"] is True:
+                    d.completed = True
+                    d.completed_at = timezone.now()
                 d.last_user_action = timezone.now()
                 d.save()
 

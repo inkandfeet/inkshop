@@ -36,20 +36,24 @@ class HistoricalEvent(models.Model):
         from people.models import Person
         instance_data = {}
         event_data = {}
+        excludes = [
+            "person", "message", "subscription", "newsletter", "outgoingmessage", "purchase", "subscription", "newsletter",
+            "productpurchase", "purchases", "gdpr_dump", "products", "purchases", "subscriptions", "emails", "messages_sent"
+        ]
 
         for k, v in kwargs.items():
             if k == "person" and isinstance(v, Person):
                 instance_data["event_creator_type"] = "person"
                 instance_data["event_creator_pk"] = kwargs["person"].pk
-                event_data["person"] = kwargs["person"].get_data_dict()
+                event_data["person"] = kwargs["person"].get_data_dict(exclude=excludes)
             elif k == "message" and isinstance(v, Message):
-                event_data["message"] = kwargs["message"].get_data_dict()
+                event_data["message"] = kwargs["message"].get_data_dict(exclude=excludes)
             elif k == "subscription" and isinstance(v, Subscription):
-                event_data["subscription"] = kwargs["subscription"].get_data_dict()
+                event_data["subscription"] = kwargs["subscription"].get_data_dict(exclude=excludes)
             elif k == "newsletter" and isinstance(v, Newsletter):
-                event_data["newsletter"] = kwargs["newsletter"].get_data_dict()
+                event_data["newsletter"] = kwargs["newsletter"].get_data_dict(exclude=excludes)
             elif k == "outgoingmessage" and isinstance(v, OutgoingMessage):
-                event_data["outgoingmessage"] = kwargs["outgoingmessage"].get_data_dict()
+                event_data["outgoingmessage"] = kwargs["outgoingmessage"].get_data_dict(exclude=excludes)
             elif k == "event_type":
                 instance_data["event_type"] = v
             else:

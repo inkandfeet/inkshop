@@ -8,7 +8,9 @@ from django.conf import settings
 from django.core.mail import mail_admins
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.utils import timezone
+from utils.helpers import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from annoying.decorators import render_to, ajax_request
@@ -107,8 +109,16 @@ def subscribe(request):
         else:
             return HttpResponse(status=422)
     else:
-        send_subscription_confirmation.delay(s.pk)
+        s.opt_in_link
         HistoricalEvent.log(person=p, event_type="subscribed", newsletter=n, subscription=s)
+        if s.double_opted_in is False:
+            send_subscription_confirmation.delay(s.pk)
+        else:
+            if request.is_ajax():
+                ajax_response["message"] = "Resubscribed.  You're all set!"
+            else:
+                message = "Resubscribed.  You're all set!"
+                resubscribed = True
 
     if request.is_ajax():
         return HttpResponse(json.dumps(ajax_response), content_type="application/json", status=200)
@@ -211,6 +221,21 @@ def transfer_subscription(request, transfer_code):
     return locals()
 
 
+@render_to("inkmail/resubscribed.html")
+def resubscribe(request, resubscribe_key):
+    o = Organization.get()
+    om = OutgoingMessage.objects.get(unsubscribe_hash=resubscribe_key)
+    if om.subscription:
+        om.subscription.resubscribe()
+        HistoricalEvent.log(
+            person=om.person,
+            event_type="resubscribe",
+            subscription=om.subscription,
+            outgoingmessage=om,
+        )
+    return locals()
+
+
 @render_to("inkmail/unsubscribed.html")
 def unsubscribe(request, unsubscribe_key):
     o = Organization.get()
@@ -230,17 +255,30 @@ def unsubscribe(request, unsubscribe_key):
 @render_to("inkmail/delete_account_start.html")
 def delete_account(request, delete_key):
     o = Organization.get()
-    om = OutgoingMessage.objects.get(delete_hash=delete_key)
-    # if om.subscription:
-    #     om.subscription.unsubscribe()
-    HistoricalEvent.log(
-        person=om.person,
-        event_type="delete_account",
-        subscription=om.subscription,
-        outgoingmessage=om,
-    )
-    om.person.delete()
+    try:
+        om = OutgoingMessage.objects.get(delete_hash=delete_key)
+        person = om.person
 
+        if request.POST.get("submit") == "yes":
+            # if om.subscription:
+            #     om.subscription.unsubscribe()
+            HistoricalEvent.log(
+                person=om.person,
+                event_type="delete_account",
+                subscription=om.subscription,
+                outgoingmessage=om,
+            )
+            om.person.delete()
+            return redirect(reverse('inkmail:delete_account_done'))
+
+        return locals()
+    except:
+        return redirect(reverse('inkmail:delete_account_done'))
+
+
+@render_to("inkmail/delete_account_complete.html")
+def delete_account_done(request):
+    o = Organization.get()
     return locals()
 
 

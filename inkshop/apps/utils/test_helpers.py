@@ -95,8 +95,9 @@ class MailTestCase(MockRequestsTestCase):
         self.body = om.render_email_string(self.test_message.body_text_unrendered)
         process_outgoing_message_queue()
 
-    def send_newsletter_message(self):
+    def send_newsletter_message(self, message_body=None):
         self.scheduled_newsletter_message = Factory.scheduled_newsletter_message(
+            message_body=message_body,
             newsletter=self.newsletter,
             send_at_date=self.now(),
             send_at_hour=self.now().hour,

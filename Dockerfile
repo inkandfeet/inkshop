@@ -23,8 +23,9 @@ RUN pip3 install --upgrade pip
 # Set up reqs
 ADD requirements.unstable.txt /project/requirements.unstable.txt
 ADD requirements.txt /project/requirements.txt
-# RUN pip3 install -r /project/requirements.unstable.txt  #  && pip uninstall pycrypto && pip install pycryptodome  # Aug 11 2020
-RUN pip3 install -r /project/requirements.txt  # Oct 5 2020
+# RUN pip3 install -r /project/requirements.unstable.txt  #  && pip3 uninstall pycrypto && pip3 install pycryptodome  # Aug 11 2020
+RUN pip3 install -r /project/requirements.txt --use-feature=fast-deps --use-deprecated=legacy-resolver  # Nov 2 2021
+#  --use-feature=fast-deps --use-deprecated=legacy-resolver # Oct 5 2020
 
 # pip3 freeze -r requirements.unstable.txt > requirements.txt
 # Remove pygobject

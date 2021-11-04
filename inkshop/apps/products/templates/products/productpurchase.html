@@ -1,23 +1,30 @@
-{% extends "products/base.html" %}{% load static %}
-{% block dashboard_nav_class %}class="active"{% endblock %}
+{% extends "products/7-day-sprint/purchase_base.html" %}{% load static inkshop_helpers  compile_static %}
+
 {% block content %}
+<div id="content">
+  <div class="course_pages" id="inkshopApp">
+    <div class="inkshopPage active error">
 
-<h1>{{pp.product.name}}</h1>
+      <h1>{{pp.product.name }}s</h1>
 
-<h2>Journeys</h2>
+      <!-- <h2>My {{pp.product.journey_plural_name|default:"Journeys"}}</h2> -->
 
-{% for j in pp.journeys %}
-  <h3><a href="{% url 'products:journey' j.hashid %}">{{j}}</a></h3>
-  {% for day in j.days %}
-  	{% if day.available %}
-    <li><a class="day_{{day.day_number}} link" href="{% url 'products:day' day.hashid %}">Day {{day.day_number}}</a></li>
-    {% else %}
-    <li><span>Day {{day.day_number}}</span></li>
-    {% endif %}
-    {# {{ day.last_user_action}} #}
-  {% endfor %}
-  <a class="delete_journey" href="{% url 'products:confirm_delete_journey' j.hashid %}">Delete</a>
-{% endfor %}
-<a href="{% url 'products:start_journey' pp.hashid %}">Start New Journey</a>
-
+      {% for journey in pp.journeys %}
+        {% include "products/_journey_line.html" %}
+        {% if forloop.last %}
+        <div class="endcap_button left">
+          <a class="button toggleable_button muted"  data-cy="new_journey" href="{% url 'products:start_journey' pp.hashid %}">Start Another {{pp.product.journey_singular_name|default:"Journey"}}</a>
+        </div>
+        {% endif %}
+      {% empty %}
+        <div class="empty">
+          <p>Ready to start a {{pp.product.journey_singular_name|lower|default:"journeys"}} today?  Click the big button below!</p>
+        </div>
+        <div class="endcap_button left">
+          <a data-cy="new_journey" class="button toggleable_button" href="{% url 'products:start_journey' pp.hashid %}">Start a New {{pp.product.journey_singular_name|default:"Journey"}}</a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
 {% endblock %}

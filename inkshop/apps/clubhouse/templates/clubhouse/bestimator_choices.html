@@ -1,0 +1,11 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>All Bestimator Experiment Choices</h1>
+    <p>&hearts;</p>
+    <a href="{% url 'clubhouse:create_bestimator_choice' %}">Create New</a>
+    <ul>
+    {% for p in bestimator_choices %}
+    <li>    <a href="{% url 'clubhouse:bestimator_choice' p.hashid %}">{{ p }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

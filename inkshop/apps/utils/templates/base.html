@@ -7,8 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title>{% block title %}{{ title }}{% endblock %}</title>
-    <meta name="description" content="{% block description %}{{ description }}{% endblock %}">{% if organization and organization.favicon %}
-    <link rel="shortcut icon" href="{{ RESOURCES_URL }}{{organization.favicon.name}}">{% endif %}
+    <meta name="description" content="{% block description %}{{ description }}{% endblock %}">{% block favicon %}{% if organization and organization.favicon %}
+    <link rel="shortcut icon" href="{{ RESOURCES_URL }}{{organization.favicon.name}}">{% endif %}{% endblock %}
 {% endblock %}
 
 {% block meta %}{{block.super}}{% endblock %}
@@ -19,10 +19,9 @@
 {% block extra_head %}{% endblock %}
     {% block head_js %}<script>
         window.inkshop = window.inkshop || {};
-        window.inkshop.page_url = "{{ url }}";
-        window.inkshop.site_data_url = "{{site_data_url}}";
         window.inkshop.site_data;
     </script>{% endblock %}
+    {% block inkdots_js %}{% include "inkdots/_page_dots.html" %}{% endblock %}
 </head>
 
 <body {% block body_extra %}{% endblock %}>

@@ -68,6 +68,11 @@
 {% block content %}
     <div class="thanks">
 
+        {% if resubscribed %}
+        <h2>All set.</h2>
+        <div class="giant_heart">💌</div>
+        <p>You're subscribed, and ready to go.  Have a great day!</p>
+        {% else %}
         <h2>Almost there.</h2>
 
         <div class="giant_heart">💌</div>
@@ -78,6 +83,7 @@
 
         <p>-Steven</p>
         <!-- <p>&hearts;</p> -->
+        {% endif %}
 
     </div>
 {% endblock %}

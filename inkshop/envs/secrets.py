@@ -1,0 +1,1 @@
+STRIPE_ENDPOINT_SECRET = "ajsdflalsjflajslfjlkasjlkjalskjf"

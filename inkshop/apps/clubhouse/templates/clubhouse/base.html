@@ -26,6 +26,8 @@
         <a class="{% if page_name == 'productpurchases' %}current{% endif %}" href="{% url 'clubhouse:productpurchases' %}" >ProductPurchases</a>
         <a class="{% if page_name == 'purchases' %}current{% endif %}" href="{% url 'clubhouse:purchases' %}" >Purchases</a>
         <a class="{% if page_name == 'journeys' %}current{% endif %}" href="{% url 'clubhouse:journeys' %}" >Journeys</a>
+        <a class="{% if page_name == 'bestimators' %}current{% endif %}" href="{% url 'clubhouse:bestimators' %}" >Bestimator Expermiments</a>
+        <a class="{% if page_name == 'bestimator_choice' %}current{% endif %}" href="{% url 'clubhouse:bestimator_choices' %}" >Bestimator Choices</a>
 </div>
 
 {% endblock %}
@@ -33,5 +35,5 @@
     <h1>Welcome to the clubhouse. :) </h1> 
     <h1>Loved!!</h1>
     <p>&hearts;</p>
-    <img src="adorable.gif"/>
+    <!-- <img src="adorable.gif"/> -->
 {% endblock %}

@@ -1,0 +1,46 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>Bestimator {{bestimator}}</h1>
+    <p>&hearts;</p>
+    {% if saved %}Saved{% endif %}
+    <form method="POST" enctype="multipart/form-data" action=".">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit">
+    </form>
+    <a href="{% url 'clubhouse:delete_bestimator' bestimator.hashid %}">Delete bestimator</a>
+
+    <h1>Results</h1>
+    <div class="choice_results" style="display: flex;">
+    {% for c in bestimator.choices %}
+    <div style=" max-width: 30%; margin: 0 1%">
+	    <h2>{{ c.name }}</h2>
+	    <p>Responses: {{ c.num_answers  }} </p>
+	    <div class="results">
+	    	😁 <div style="display: inline-block; vertical-align: middle; width: {% widthratio c.percent_feels_grin 1 2 %}px; background: #ccc; height: 20px; margin-right: 20px;" ></div>{{ c.percent_feels_grin | floatformat:0  }}% <br/>
+	    	🤣 <div style="display: inline-block; vertical-align: middle; width: {% widthratio c.percent_feels_laugh_cry 1 2 %}px; background: #ccc; height: 20px; margin-right: 20px;" ></div>{{ c.percent_feels_laugh_cry | floatformat:0  }}% <br/>
+	    	😍 <div style="display: inline-block; vertical-align: middle; width: {% widthratio c.percent_feels_love 1 2 %}px; background: #ccc; height: 20px; margin-right: 20px;" ></div>{{ c.percent_feels_love | floatformat:0  }}% <br/>
+	    	🤔 <div style="display: inline-block; vertical-align: middle; width: {% widthratio c.percent_feels_hmm 1 2 %}px; background: #ccc; height: 20px; margin-right: 20px;" ></div>{{ c.percent_feels_hmm | floatformat:0  }}% <br/>
+	    	😅 <div style="display: inline-block; vertical-align: middle; width: {% widthratio c.percent_feels_embarrased 1 2 %}px; background: #ccc; height: 20px; margin-right: 20px;" ></div>{{ c.percent_feels_embarrased | floatformat:0  }}% <br/>
+	    	😳 <div style="display: inline-block; vertical-align: middle; width: {% widthratio c.percent_feels_shocked 1 2 %}px; background: #ccc; height: 20px; margin-right: 20px;" ></div>{{ c.percent_feels_shocked | floatformat:0  }}% <br/>
+	    	🤢 <div style="display: inline-block; vertical-align: middle; width: {% widthratio c.percent_feels_sick 1 2 %}px; background: #ccc; height: 20px; margin-right: 20px;" ></div>{{ c.percent_feels_sick | floatformat:0  }}% <br/>
+	    	😡 <div style="display: inline-block; vertical-align: middle; width: {% widthratio c.percent_feels_angry 1 2 %}px; background: #ccc; height: 20px; margin-right: 20px;" ></div>{{ c.percent_feels_angry | floatformat:0  }}% <br/>
+	    	💵 <div style="display: inline-block; vertical-align: middle; width: {% widthratio c.percent_buy_clicked 1 2 %}px; background: #ccc; height: 20px; margin-right: 20px;" ></div>{{ c.percent_buy_clicked | floatformat:0  }}%<br/>
+	    </div>
+
+	    <p><b>Feel authentic and honest?</b>  Yes: {{ c.num_authentic_yes }} No: {{ c.num_authentic_no }}</p>
+
+	    <p><b>Feel like good value?</b>  Yes: {{ c.num_good_value_yes }} No: {{ c.num_good_value_no }}</p>
+
+	    <p><b>Does it make you interested in buying?</b> &nbsp;  Yes: {{ c.num_want_to_buy_yes }}  &nbsp;No: {{ c.num_want_to_buy_no }}  &nbsp; &nbsp; Percent: {{ c.percent_want_to_buy | floatformat:0 }}%</p>
+	    
+	    <p><b>Other comments:</b></p>
+	    <ul>
+	    	{% for a in c.answers_with_comments %}
+	    		<li>{{ a.other_comments}}</li>
+	    	{% endfor %}
+	    </ul>
+	  </div>
+    {% endfor %}
+   </div>
+{% endblock %}

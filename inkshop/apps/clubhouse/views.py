@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.mail import mail_admins
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.db import IntegrityError
 from django.utils import timezone
 from django.shortcuts import redirect
@@ -24,7 +25,9 @@ from inkmail.forms import ScheduledNewsletterMessageForm, MessageForm, OutgoingM
 from inkmail.forms import NewsletterForm, SubscriptionForm, OrganizationForm
 from inkmail.helpers import queue_message, queue_newsletter_message
 from products.models import Product, ProductPurchase, Purchase, Journey, ProductDay
+from products.models import BestimatorExperiment, BestimatorExperimentChoice
 from products.forms import ProductForm, ProductPurchaseForm, PurchaseForm, JourneyForm, ProductDayForm
+from products.forms import BestimatorExperimentForm, BestimatorExperimentChoiceForm
 from clubhouse.models import StaffMember
 from website.models import Template, Page, Post, Resource, Link
 from website.forms import TemplateForm, PageForm, PostForm, ResourceForm, LinkForm
@@ -32,14 +35,14 @@ from utils.encryption import lookup_hash
 
 
 @render_to("clubhouse/dashboard.html")
-@login_required
+@staff_member_required(login_url='login')
 def dashboard(request):
     o = Organization.get()
     page_name = "dashboard"
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_message(request):
     # o = Organization.get()
     m = Message.objects.create()
@@ -47,7 +50,7 @@ def create_message(request):
 
 
 @render_to("clubhouse/messages.html")
-@login_required
+@staff_member_required(login_url='login')
 def messages(request):
     o = Organization.get()
     page_name = "messages"
@@ -56,7 +59,7 @@ def messages(request):
 
 
 @render_to("clubhouse/message.html")
-@login_required
+@staff_member_required(login_url='login')
 def message(request, hashid):
     o = Organization.get()
     page_name = "messages"
@@ -75,7 +78,7 @@ def message(request, hashid):
 
 
 @render_to("clubhouse/people.html")
-@login_required
+@staff_member_required(login_url='login')
 def people(request):
     o = Organization.get()
     page_name = "people"
@@ -88,7 +91,7 @@ def people(request):
 
 
 @render_to("clubhouse/person.html")
-@login_required
+@staff_member_required(login_url='login')
 def person(request, hashid):
     o = Organization.get()
     page_name = "people"
@@ -97,7 +100,7 @@ def person(request, hashid):
 
 
 @render_to("clubhouse/patrons.html")
-@login_required
+@staff_member_required(login_url='login')
 def patrons(request):
     o = Organization.get()
     page_name = "patrons"
@@ -122,7 +125,7 @@ def patrons(request):
 
 
 @render_to("clubhouse/subscriptions.html")
-@login_required
+@staff_member_required(login_url='login')
 def subscriptions(request):
     o = Organization.get()
     page_name = "subscriptions"
@@ -131,7 +134,7 @@ def subscriptions(request):
 
 
 @render_to("clubhouse/subscription.html")
-@login_required
+@staff_member_required(login_url='login')
 def subscription(request, hashid):
     o = Organization.get()
     page_name = "subscriptions"
@@ -140,7 +143,7 @@ def subscription(request, hashid):
 
 
 @render_to("clubhouse/newsletters.html")
-@login_required
+@staff_member_required(login_url='login')
 def newsletters(request):
     o = Organization.get()
     page_name = "newsletters"
@@ -149,7 +152,7 @@ def newsletters(request):
 
 
 @render_to("clubhouse/newsletter.html")
-@login_required
+@staff_member_required(login_url='login')
 def newsletter(request, hashid):
     o = Organization.get()
     page_name = "newsletters"
@@ -167,7 +170,7 @@ def newsletter(request, hashid):
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_newsletter(request):
     # o = Organization.get()
     n = Newsletter.objects.create()
@@ -175,7 +178,7 @@ def create_newsletter(request):
 
 
 @render_to("clubhouse/organization.html")
-@login_required
+@staff_member_required(login_url='login')
 def organization(request):
     o = Organization.get()
     page_name = "organization"
@@ -193,7 +196,7 @@ def organization(request):
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_scheduled_newsletter_message(request):
     # o = Organization.get()
     snm = ScheduledNewsletterMessage.objects.create()
@@ -201,7 +204,7 @@ def create_scheduled_newsletter_message(request):
 
 
 @render_to("clubhouse/scheduled_newsletter_messages.html")
-@login_required
+@staff_member_required(login_url='login')
 def scheduled_newsletter_messages(request):
     o = Organization.get()
     page_name = "scheduled_newsletter_messages"
@@ -210,7 +213,7 @@ def scheduled_newsletter_messages(request):
 
 
 @render_to("clubhouse/scheduled_newsletter_message.html")
-@login_required
+@staff_member_required(login_url='login')
 def scheduled_newsletter_message(request, hashid):
     o = Organization.get()
     now = timezone.now()
@@ -229,7 +232,7 @@ def scheduled_newsletter_message(request, hashid):
 
 
 @render_to("clubhouse/scheduled_newsletter_message_confirm_queue.html")
-@login_required
+@staff_member_required(login_url='login')
 def scheduled_newsletter_message_confirm_queue(request, hashid):
     o = Organization.get()
     page_name = "scheduled_newsletter_messages"
@@ -238,7 +241,7 @@ def scheduled_newsletter_message_confirm_queue(request, hashid):
 
 
 @render_to("clubhouse/scheduled_newsletter_message_queued.html")
-@login_required
+@staff_member_required(login_url='login')
 def scheduled_newsletter_message_queued(request, hashid):
     o = Organization.get()
     page_name = "scheduled_newsletter_messages"
@@ -248,7 +251,7 @@ def scheduled_newsletter_message_queued(request, hashid):
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_template(request):
     # o = Organization.get()
     t = Template.objects.create()
@@ -256,7 +259,7 @@ def create_template(request):
 
 
 @render_to("clubhouse/templates.html")
-@login_required
+@staff_member_required(login_url='login')
 def templates(request):
     o = Organization.get()
     page_name = "templates"
@@ -265,7 +268,7 @@ def templates(request):
 
 
 @render_to("clubhouse/template.html")
-@login_required
+@staff_member_required(login_url='login')
 def template(request, hashid):
     o = Organization.get()
     page_name = "templates"
@@ -284,7 +287,7 @@ def template(request, hashid):
 
 
 @render_to("clubhouse/template_delete.html")
-@login_required
+@staff_member_required(login_url='login')
 def delete_template(request, hashid):
     o = Organization.get()
     template = Template.objects.get(hashid=hashid)
@@ -295,7 +298,7 @@ def delete_template(request, hashid):
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_page(request):
     # o = Organization.get()
     p = Page.objects.create()
@@ -303,7 +306,7 @@ def create_page(request):
 
 
 @render_to("clubhouse/pages.html")
-@login_required
+@staff_member_required(login_url='login')
 def pages(request):
     o = Organization.get()
     page_name = "pages"
@@ -312,7 +315,7 @@ def pages(request):
 
 
 @render_to("clubhouse/page.html")
-@login_required
+@staff_member_required(login_url='login')
 def page(request, hashid):
     o = Organization.get()
     page_name = "pages"
@@ -332,7 +335,7 @@ def page(request, hashid):
 
 
 @render_to("clubhouse/page_delete.html")
-@login_required
+@staff_member_required(login_url='login')
 def delete_page(request, hashid):
     o = Organization.get()
     page = Page.objects.get(hashid=hashid)
@@ -343,7 +346,7 @@ def delete_page(request, hashid):
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_post(request):
     # o = Organization.get()
     p = Post.objects.create()
@@ -351,19 +354,19 @@ def create_post(request):
 
 
 @render_to("clubhouse/posts.html")
-@login_required
+@staff_member_required(login_url='login')
 def posts(request):
     o = Organization.get()
-    post_name = "posts"
+    page_name = "posts"
     posts = Post.objects.all()
     return locals()
 
 
 @render_to("clubhouse/post.html")
-@login_required
+@staff_member_required(login_url='login')
 def post(request, hashid):
     o = Organization.get()
-    post_name = "posts"
+    page_name = "posts"
     post = Post.objects.get(hashid=hashid)
     links = Link.objects.all()
     saved = False
@@ -380,7 +383,7 @@ def post(request, hashid):
 
 
 @render_to("clubhouse/post_delete.html")
-@login_required
+@staff_member_required(login_url='login')
 def delete_post(request, hashid):
     o = Organization.get()
     post = Post.objects.get(hashid=hashid)
@@ -391,7 +394,7 @@ def delete_post(request, hashid):
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_resource(request):
     # o = Organization.get()
     p = Resource.objects.create()
@@ -399,19 +402,19 @@ def create_resource(request):
 
 
 @render_to("clubhouse/resources.html")
-@login_required
+@staff_member_required(login_url='login')
 def resources(request):
     o = Organization.get()
-    resource_name = "resources"
+    page_name = "resources"
     resources = Resource.objects.all()
     return locals()
 
 
 @render_to("clubhouse/resource.html")
-@login_required
+@staff_member_required(login_url='login')
 def resource(request, hashid):
     o = Organization.get()
-    resource_name = "resources"
+    page_name = "resources"
     resource = Resource.objects.get(hashid=hashid)
     saved = False
     if request.method == "POST":
@@ -427,7 +430,7 @@ def resource(request, hashid):
 
 
 @render_to("clubhouse/resource_delete.html")
-@login_required
+@staff_member_required(login_url='login')
 def delete_resource(request, hashid):
     o = Organization.get()
     resource = Resource.objects.get(hashid=hashid)
@@ -438,7 +441,7 @@ def delete_resource(request, hashid):
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_link(request):
     # o = Organization.get()
     l = Link.objects.create()
@@ -447,19 +450,19 @@ def create_link(request):
 
 
 @render_to("clubhouse/links.html")
-@login_required
+@staff_member_required(login_url='login')
 def links(request):
     o = Organization.get()
-    link_name = "links"
+    page_name = "links"
     links = Link.objects.all()
     return locals()
 
 
 @render_to("clubhouse/link.html")
-@login_required
+@staff_member_required(login_url='login')
 def link(request, hashid):
     o = Organization.get()
-    link_name = "links"
+    page_name = "links"
     link = Link.objects.get(hashid=hashid)
     saved = False
     if request.method == "POST":
@@ -476,7 +479,7 @@ def link(request, hashid):
 
 
 @render_to("clubhouse/link_delete.html")
-@login_required
+@staff_member_required(login_url='login')
 def delete_link(request, hashid):
     o = Organization.get()
     link = Link.objects.get(hashid=hashid)
@@ -487,7 +490,7 @@ def delete_link(request, hashid):
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_product(request):
     # o = Organization.get()
     p = Product.objects.create()
@@ -495,19 +498,19 @@ def create_product(request):
 
 
 @render_to("clubhouse/products.html")
-@login_required
+@staff_member_required(login_url='login')
 def products(request):
     o = Organization.get()
-    product_name = "products"
+    page_name = "products"
     products = Product.objects.all()
     return locals()
 
 
 @render_to("clubhouse/product.html")
-@login_required
+@staff_member_required(login_url='login')
 def product(request, hashid):
     o = Organization.get()
-    product_name = "products"
+    page_name = "products"
     product = Product.objects.get(hashid=hashid)
     links = Link.objects.all()
     saved = False
@@ -524,7 +527,7 @@ def product(request, hashid):
 
 
 @render_to("clubhouse/product_delete.html")
-@login_required
+@staff_member_required(login_url='login')
 def delete_product(request, hashid):
     o = Organization.get()
     product = Product.objects.get(hashid=hashid)
@@ -535,7 +538,7 @@ def delete_product(request, hashid):
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_productpurchase(request):
     # o = Organization.get()
     p = ProductPurchase.objects.create()
@@ -543,19 +546,19 @@ def create_productpurchase(request):
 
 
 @render_to("clubhouse/productpurchases.html")
-@login_required
+@staff_member_required(login_url='login')
 def productpurchases(request):
     o = Organization.get()
-    productpurchase_name = "productpurchases"
-    productpurchases = ProductPurchase.objects.all()
+    page_name = "productpurchases"
+    productpurchases = ProductPurchase.objects.all().order_by("-created_at")
     return locals()
 
 
 @render_to("clubhouse/productpurchase.html")
-@login_required
+@staff_member_required(login_url='login')
 def productpurchase(request, hashid):
     o = Organization.get()
-    productpurchase_name = "productpurchases"
+    page_name = "productpurchases"
     productpurchase = ProductPurchase.objects.get(hashid=hashid)
     links = Link.objects.all()
     saved = False
@@ -572,7 +575,7 @@ def productpurchase(request, hashid):
 
 
 @render_to("clubhouse/productpurchase_delete.html")
-@login_required
+@staff_member_required(login_url='login')
 def delete_productpurchase(request, hashid):
     o = Organization.get()
     productpurchase = ProductPurchase.objects.get(hashid=hashid)
@@ -583,7 +586,7 @@ def delete_productpurchase(request, hashid):
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_purchase(request):
     # o = Organization.get()
     p = Purchase.objects.create()
@@ -591,19 +594,19 @@ def create_purchase(request):
 
 
 @render_to("clubhouse/purchases.html")
-@login_required
+@staff_member_required(login_url='login')
 def purchases(request):
     o = Organization.get()
-    purchase_name = "purchases"
-    purchases = Purchase.objects.all()
+    page_name = "purchases"
+    purchases = Purchase.objects.all().order_by("-created_at")
     return locals()
 
 
 @render_to("clubhouse/purchase.html")
-@login_required
+@staff_member_required(login_url='login')
 def purchase(request, hashid):
     o = Organization.get()
-    purchase_name = "purchases"
+    page_name = "purchases"
     purchase = Purchase.objects.get(hashid=hashid)
     links = Link.objects.all()
     saved = False
@@ -620,7 +623,7 @@ def purchase(request, hashid):
 
 
 @render_to("clubhouse/purchase_delete.html")
-@login_required
+@staff_member_required(login_url='login')
 def delete_purchase(request, hashid):
     o = Organization.get()
     purchase = Purchase.objects.get(hashid=hashid)
@@ -631,7 +634,7 @@ def delete_purchase(request, hashid):
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_journey(request):
     # o = Organization.get()
     p = Journey.objects.create()
@@ -639,19 +642,19 @@ def create_journey(request):
 
 
 @render_to("clubhouse/journeys.html")
-@login_required
+@staff_member_required(login_url='login')
 def journeys(request):
     o = Organization.get()
-    journey_name = "journeys"
+    page_name = "journeys"
     journeys = Journey.objects.all()
     return locals()
 
 
 @render_to("clubhouse/journey.html")
-@login_required
+@staff_member_required(login_url='login')
 def journey(request, hashid):
     o = Organization.get()
-    journey_name = "journeys"
+    page_name = "journeys"
     journey = Journey.objects.get(hashid=hashid)
     links = Link.objects.all()
     saved = False
@@ -668,7 +671,7 @@ def journey(request, hashid):
 
 
 @render_to("clubhouse/journey_delete.html")
-@login_required
+@staff_member_required(login_url='login')
 def delete_journey(request, hashid):
     o = Organization.get()
     journey = Journey.objects.get(hashid=hashid)
@@ -679,7 +682,7 @@ def delete_journey(request, hashid):
     return locals()
 
 
-@login_required
+@staff_member_required(login_url='login')
 def create_productday(request):
     # o = Organization.get()
     p = ProductDay.objects.create()
@@ -687,19 +690,19 @@ def create_productday(request):
 
 
 @render_to("clubhouse/productdays.html")
-@login_required
+@staff_member_required(login_url='login')
 def productdays(request):
     o = Organization.get()
-    productday_name = "productdays"
+    page_name = "productdays"
     productdays = ProductDay.objects.all()
     return locals()
 
 
 @render_to("clubhouse/productday.html")
-@login_required
+@staff_member_required(login_url='login')
 def productday(request, hashid):
     o = Organization.get()
-    productday_name = "productdays"
+    page_name = "productdays"
     productday = ProductDay.objects.get(hashid=hashid)
     links = Link.objects.all()
     saved = False
@@ -716,7 +719,7 @@ def productday(request, hashid):
 
 
 @render_to("clubhouse/productday_delete.html")
-@login_required
+@staff_member_required(login_url='login')
 def delete_productday(request, hashid):
     o = Organization.get()
     productday = ProductDay.objects.get(hashid=hashid)
@@ -724,4 +727,99 @@ def delete_productday(request, hashid):
         productday.delete()
 
         return redirect(reverse('clubhouse:productdays', host='clubhouse'))
+    return locals()
+
+
+@staff_member_required(login_url='login')
+def create_bestimator(request):
+    # o = Organization.get()
+    p = BestimatorExperiment.objects.create()
+    return redirect(reverse('clubhouse:bestimator', kwargs={"hashid": p.hashid, }, host='clubhouse'))
+
+
+@render_to("clubhouse/bestimators.html")
+@staff_member_required(login_url='login')
+def bestimators(request):
+    o = Organization.get()
+    page_name = "bestimators"
+    bestimators = BestimatorExperiment.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/bestimator.html")
+@staff_member_required(login_url='login')
+def bestimator(request, hashid):
+    o = Organization.get()
+    page_name = "bestimators"
+    bestimator = BestimatorExperiment.objects.get(hashid=hashid)
+    saved = False
+    if request.method == "POST":
+        form = BestimatorExperimentForm(request.POST, request.FILES, instance=bestimator)
+        if form.is_valid():
+            form.save()
+            saved = True
+            bestimator = BestimatorExperiment.objects.get(hashid=hashid)
+            form = BestimatorExperimentForm(instance=bestimator)
+    else:
+        form = BestimatorExperimentForm(instance=bestimator)
+    return locals()
+
+
+@render_to("clubhouse/bestimator_delete.html")
+@staff_member_required(login_url='login')
+def delete_bestimator(request, hashid):
+    o = Organization.get()
+    bestimator = BestimatorExperiment.objects.get(hashid=hashid)
+    if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
+        bestimator.delete()
+
+        return redirect(reverse('clubhouse:bestimators', host='clubhouse'))
+    return locals()
+
+
+@staff_member_required(login_url='login')
+def create_bestimator_choice(request):
+    # o = Organization.get()
+    p = BestimatorExperimentChoice.objects.create()
+    return redirect(reverse('clubhouse:bestimator_choice', kwargs={"hashid": p.hashid, }, host='clubhouse'))
+
+
+@render_to("clubhouse/bestimator_choices.html")
+@staff_member_required(login_url='login')
+def bestimator_choices(request):
+    o = Organization.get()
+    page_name = "bestimator_choices"
+    bestimator_choices = BestimatorExperimentChoice.objects.all()
+    return locals()
+
+
+@render_to("clubhouse/bestimator_choice.html")
+@staff_member_required(login_url='login')
+def bestimator_choice(request, hashid):
+    o = Organization.get()
+    page_name = "bestimator_choices"
+    bestimator_choice = BestimatorExperimentChoice.objects.get(hashid=hashid)
+    links = Link.objects.all()
+    saved = False
+    if request.method == "POST":
+        form = BestimatorExperimentChoiceForm(request.POST, request.FILES, instance=bestimator_choice)
+        if form.is_valid():
+            form.save()
+            saved = True
+            bestimator_choice = BestimatorExperimentChoice.objects.get(hashid=hashid)
+            form = BestimatorExperimentChoiceForm(instance=bestimator_choice)
+    else:
+        form = BestimatorExperimentChoiceForm(instance=bestimator_choice)
+    return locals()
+
+
+@render_to("clubhouse/bestimator_choice_delete.html")
+@staff_member_required(login_url='login')
+def delete_bestimator_choice(request, hashid):
+    o = Organization.get()
+    bestimator_choice = BestimatorExperimentChoice.objects.get(hashid=hashid)
+    if request.method == "POST" and "delete" in request.POST and request.POST["delete"] == "DO_DELETE":
+        bestimator_choice.delete()
+
+        return redirect(reverse('clubhouse:bestimator_choices', host='clubhouse'))
     return locals()

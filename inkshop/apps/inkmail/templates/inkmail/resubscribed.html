@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}You've been unsubscribed.  Be well!{% endblock %}
+{% block css %}
+    <style type="text/css">
+        html {
+            font-family: Sans-serif;
+            font-weight: 200;
+            text-align: center;
+        }
+        body {
+            background: url("https://inkandfeet.com/cf/img/wood-background-1eb2bc89440a74570722d0eb6b2d07134-inkmd.jpg") no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+        .giant_heart {
+            margin-top: 10px;
+            font-size: 6em;
+        }
+        .reward_image {
+            max-width: 80%;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .reward_image img {
+            text-align: center;
+            display: block;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        .thanks {
+            margin: 80px auto 20px auto;
+            max-width: 600px;
+            padding: 40px 20px;
+            border-radius: 4px;
+            border: 1px solid #AAA;
+            background: #FFF;
+            border: 1px solid transparent;
+            border-bottom-color: rgba(255,255,255,.97);
+            border-right-color: rgba(255,255,255,.97);
+            box-shadow: 1px 3px 3px rgba(0,0,0,.3);
+        }
+        h2 {
+            font-size: 40px;
+        }
+        p {
+            text-align: left;
+            width: 80%;
+            margin-left: 10%;
+        }
+        @media (max-width: 480px) {
+            .giant_heart {
+                margin-top: 20px;
+                /*font-size: 4em;*/
+            }
+            h2 {
+                margin-top: 10px;
+            }
+            .thanks {
+                padding: 4px;
+            }
+            p {
+                width: 90%;
+                margin-right: 5%;
+            }
+            .reward_image {
+                width: 90%;
+            }
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="thanks">
+
+        <div class="giant_heart">😁</div>
+
+        <h2>Welcome back!</h2>
+
+        <p>It's like nothing ever happened.  You're resubscribed, and all set.</p>
+
+        <p>-Steven</p>
+
+        <!-- <p>&hearts;</p> -->
+    </div>
+{% endblock %}

@@ -21,9 +21,9 @@ def do_purge():
         "X-Auth-Email": email,
         "Content-Type": "application/json",
     }
-    url = "https://api.cloudflare.com/client/v4/zones/"
     if len(domains) > 0:
         for d in domains:
+            url = "https://api.cloudflare.com/client/v4/zones/"
             params = {
                 "name": d.replace("https://", "").replace("http://", ""),
                 "status": "active",
@@ -56,12 +56,13 @@ def do_purge():
                     print(r.json())
                     raise Exception("Error purging cache: %s" % r.json()["errors"][0]["message"])
             else:
+                print(r.json())
                 print("Either there isn't a record at cloudflare with domain %s, or there are several." % d)
                 raise Exception("Cache not purged.")
             print("%s purged" % d)
         print("Cache purged.")
     else:
-        print("No domains specified. Try `python purge_cloudflare.py example.com` or similar")
+        print("No domains specified. Try `python3 purge_cloudflare.py example.com` or similar")
 
 
 if __name__ == '__main__':

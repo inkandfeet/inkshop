@@ -1,24 +1,31 @@
-{% extends 'base.html' %}{% load static %}
+{% extends "products/common/login_base.html" %}{% load static inkshop_helpers  compile_static %}
+
+{% block title %}Log in to Ink & Feet Courses.{% endblock %}
+{% block description %}Access your courses and purchases, and manage your account.{% endblock %}
+
 {% block nav %}{% endblock %}
-
-{% block head %}{{ block.super }}{% endblock %}
-
-{% block title %}Login{% endblock %}
-
 {% block content %}
-  <h1>Log in</h1>
-   <form method="POST">
-      {% csrf_token %}
-        {{form.as_p}}
+<div id="content">
+  <div class="no_nav public_purchase login" id="inkshopApp">
+    <div class="inkshopPage active error">
+      <h2 class="center">Welcome back!</h2>
+    
+      <img class="hero" src="{% static 'products/7-day-sprint/img/eek-happy.png' %}"/>
+      <form method="POST">
+            {% csrf_token %}
+            {{form.as_p}}
 
-        {% if request.GET.next %}
-        <input type="hidden" name="next" value="{{ request.GET.next }}" />
-        {% endif %}
-
-      <button type="submit">Log In</button>
-  </form>
-  <div class="col s12 center-align">
-      <a href="{% url 'admin_password_reset' %}">Forgot your password?</a>
-   </div>
-  
+            {% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}" />
+            {% endif %}
+            <div class="endcap_button">
+              <button type="submit">Log In</button>
+            </div>
+      </form>
+      <div class="center">
+          <a href="{% url 'password_reset' %}">Forgot your password?</a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

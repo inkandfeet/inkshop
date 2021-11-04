@@ -5,7 +5,7 @@ from django.conf import settings
 from django.views.static import serve
 
 urlpatterns = [
-    url(r'^$', include(('dots.urls', 'dots'), namespace="dots")),
+    url(r'^', include(('inkdots.urls', 'inkdots'), namespace="inkdots")),
 ]
 
 

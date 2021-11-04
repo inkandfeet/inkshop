@@ -1,0 +1,13 @@
+{% extends "clubhouse/base.html" %}{% load static %}
+{% block content %}
+    <h1>Bestimator Choice {{bestimator_choice}}</h1>
+    <p>&hearts;</p>
+    {% if saved %}Saved{% endif %}
+    <form method="POST" enctype="multipart/form-data" action=".">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit">
+    </form>
+
+    <a href="{% url 'clubhouse:delete_bestimator_choice' bestimator_choice.hashid %}">Delete bestimator_choice</a>
+{% endblock %}

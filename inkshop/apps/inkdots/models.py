@@ -1,27 +1,15 @@
-import datetime
 import hashlib
-import logging
-import random
+import json
 import time
-import uuid
-from base64 import b64encode
-from io import BytesIO
-from PIL import Image, ImageOps
-from tempfile import NamedTemporaryFile
 
 from django.db import models
-from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from utils.helpers import reverse
-from django.utils.functional import cached_property
-from django.utils import timezone
-
-from people.models import Person
 from utils.models import BaseModel
+
+EVENT_SALT = "19mca9zj93qjliAJdlkj"
 
 
 class Action(BaseModel):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    person = models.ForeignKey('people.Person', on_delete=models.CASCADE)
     action_type = models.CharField(max_length=254)
     action_target = models.CharField(max_length=254)
     target_message = models.ForeignKey('inkmail.Message', blank=True, null=True, on_delete=models.SET_NULL)
@@ -29,7 +17,7 @@ class Action(BaseModel):
 
 
 class MessageHeart(BaseModel):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    person = models.ForeignKey('people.Person', on_delete=models.CASCADE)
     message = models.ForeignKey('inkmail.Message', blank=True, null=True, on_delete=models.SET_NULL)
 
 
@@ -49,7 +37,7 @@ class Device(BaseModel):
 
 
 class PageHeart(BaseModel):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE, blank=True, null=True)
+    person = models.ForeignKey('people.Person', on_delete=models.CASCADE, blank=True, null=True)
     device = models.ForeignKey(Device, on_delete=models.CASCADE, blank=True, null=True)
     page = models.ForeignKey('website.Page', blank=True, null=True, on_delete=models.SET_NULL)
 
@@ -58,3 +46,33 @@ class PageView(BaseModel):
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
     page = models.ForeignKey('website.Page', blank=True, null=True, on_delete=models.SET_NULL)
     url = models.TextField(blank=True, null=True)
+
+
+class Event(BaseModel):
+    event_type = models.CharField(max_length=254)
+    base_url = models.CharField(max_length=512)
+    querystring = models.TextField()
+    full_url = models.TextField()
+    data = models.TextField(blank=True, null=True)
+    request_ip = models.CharField(max_length=50)
+    request_ua = models.CharField(max_length=512)
+    hashid = models.CharField(max_length=512, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.hashid:
+            self.hashid = hashlib.md5(("%s%s" % (self.request_ip, self.request_ua)).encode('utf-8')).hexdigest()[:511]
+        super(Event, self).save(*args, **kwargs)
+
+    def to_json(self):
+        return json.dumps({
+            "created_at": self.created_at.timestamp() * 1000,
+            "created_at_friendly": "%s" % self.created_at,
+            "event_type": self.event_type,
+            "base_url": self.base_url,
+            "querystring": self.querystring,
+            "full_url": self.full_url,
+            "data": self.data,
+            "request_ip": self.request_ip,
+            "request_ua": self.request_ua,
+            "hashid": self.hashid,
+        })

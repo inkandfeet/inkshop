@@ -31,7 +31,6 @@ from inkmail.models import Organization
 from utils.models import HashidBaseModel
 from utils.encryption import file_hash
 
-markdown = mistune.Markdown()
 
 ua_chrome = "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11"
 
@@ -248,7 +247,7 @@ class Post(HashidBaseModel):
         })
 
         c = Context(context)
-        rendered_string = markdown(self.raw_markdown)
+        rendered_string = mistune.html(self.raw_markdown)
         rendered_string = rendered_string.replace(u"’", '&rsquo;').replace(u"“", '&ldquo;')
         rendered_string = rendered_string.replace(u"”", '&rdquo;').replace(u"’", "&rsquo;")
 

@@ -1,0 +1,220 @@
+{% load cache compress %}
+<script>
+  window.ink = window.ink || {};
+  window.ink.fn = window.ink.fn || {};
+  window.ink.page_url = "{{ PAGE_URL }}";
+  window.ink.event_url = "{{ DOTS_URL }}";
+</script>
+{% cache 3600 page_dots %}
+{% compress js %}
+<script>
+  var getUrlParameter = function getUrlParameter(sParam) {
+      var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+          sURLVariables = sPageURL.split('&'),
+          sParameterName,
+          i;
+
+      for (i = 0; i < sURLVariables.length; i++) {
+          sParameterName = sURLVariables[i].split('=');
+
+          if (sParameterName[0] === sParam) {
+              return sParameterName[1] === undefined ? true : sParameterName[1];
+          }
+      }
+  };
+  var removeParameter = function(url, parameter) {
+    var urlparts= url.split('?');
+
+    if (urlparts.length>=2)
+    {
+        var urlBase=urlparts.shift(); //get first part, and remove from array
+        var queryString=urlparts.join("?"); //join it back up
+
+        var prefix = encodeURIComponent(parameter)+'=';
+        var pars = queryString.split(/[&;]/g);
+        for (var i= pars.length; i-->0;)               //reverse iteration as may be destructive
+            if (pars[i].lastIndexOf(prefix, 0)!==-1)   //idiom for string.startsWith
+                pars.splice(i, 1);
+        url = urlBase+'?'+pars.join('&');
+    }
+    if ((url.substring(url.length-1)) == "?") {
+      url = url.substring(0, url.length-1);
+    }
+    return url;
+  };
+
+  setTimeout(function() {
+          // window.ink.initTimeout = null;
+          window.ink.background = false;
+          document.addEventListener("visibilitychange", function() {
+            if (document.visibilityState === 'visible') {
+              window.ink.background = false;
+            } else {
+              window.ink.background = true;
+            }
+          });
+          
+          window.ink.event = function(type, data) {
+              if (!data) {
+                  data = {};
+              }
+              if (window.ink.dev_mode) {
+                  console.log("event");
+                  console.log(type);
+                  console.log(data);
+                  console.log(window.ink.uid);
+                  console.log(window.ink.page_url);
+              } else {
+                  if (window.ink.background) {
+                      navigator.sendBeacon(window.ink.event_url, 
+                        JSON.stringify({
+                          'url': document.location.href,
+                          'event_type': type,
+                          'data': data,
+                         })
+                      );
+                  } else {
+                      fetch(window.ink.event_url, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          'url': document.location.href,
+                          'event_type': type,
+                          'data': data,
+                        }),
+                      })
+                      .then(response => response.json())
+                      .then(data => {
+                        // console.log('Success:', data);
+                      });
+                  }
+              }
+          };
+          ink.event('page_view');
+          document.querySelectorAll('.external').forEach(item => {
+            item.addEventListener('click', function(ele){
+                if (ele.target.getAttribute('href')) {
+                    target = ele.target;
+                } else {
+                    target = ele.target.parentElement;
+                }
+                ink.event('external', {
+                    'target': target.getAttribute('href')
+                });
+            })
+          });
+          document.querySelectorAll('a').forEach(item => {
+            item.addEventListener('click', function(ele){
+              if (ele.target.getAttribute('href')) {
+                  target = ele.target;
+              } else {
+                  target = ele.target.parentElement;
+              }
+              ink.event('click', {
+                  'target': target.getAttribute('href')
+              });
+            })
+          });
+          document.querySelectorAll('button').forEach(item => {
+            item.addEventListener('click', function(ele){
+              var target = ele.target;
+              ink.event('button_click', {
+                  'target': target.textContent || target.innerText
+              });
+            })
+          });
+          document.querySelectorAll('.toggleable_button').forEach(item => {
+            item.addEventListener('click', function(ele){
+              var target = ele.target;
+              ink.event('toggleable_button_click', {
+                  'target': target.textContent || target.innerText
+              });
+            })
+          });
+          window.ink.loaded = false;
+          window.ink.init = function() {
+              var clean_uri;
+              if (window.ink.initTimeout) {
+                  clearInterval(window.ink.initTimeout);
+              }
+              if (getUrlParameter('cke') && getUrlParameter('cke') !== "") {
+                  window.ink.list_email = getUrlParameter('cke');
+                  clean_uri = removeParameter(window.location.toString(), 'cke');
+                  window.history.replaceState({}, document.title, clean_uri);
+              }
+
+              if (getUrlParameter('fb')) {
+                  // Store FB referrals for tracking.
+                  // Legacy, use UTM in the future.
+                  window.ink.fb_referral = getUrlParameter('fb');
+                  window.ink.event("facebook_referral", {"page_name": window.ink.fb_referral});
+                  clean_uri = removeParameter(window.location.toString(), 'fb');
+                  window.history.replaceState({}, document.title, clean_uri);
+              } else {
+                  // ?utm_campaign=s01_01&utm_medium=cpc&utm_source=facebook
+                  // CK links to my site: ?cke=
+
+                  if (getUrlParameter('utm_source')) {
+                      var ele = document.querySelector("#utm_campaign");
+                      var campaign;
+                      if (ele && getUrlParameter('utm_campaign')) {
+                          ele.value = getUrlParameter('utm_campaign');
+                          campaign = getUrlParameter('utm_campaign');
+                      }
+                      ele = document.querySelector("#utm_medium");
+                      if (ele && getUrlParameter('utm_medium')) {
+                          ele.value = getUrlParameter('utm_medium');
+                      }
+                      ele = document.querySelector("#utm_source");
+                      if (ele && getUrlParameter('utm_source')) {
+                          ele.value = getUrlParameter('utm_source');
+                      }
+                      ele = document.querySelector("#utm_term");
+                      if (ele && getUrlParameter('utm_term')) {
+                          ele.value = getUrlParameter('utm_term');
+                      }
+                      ele = document.querySelector("#utm_content");
+                      if (ele && getUrlParameter('utm_content')) {
+                          ele.value = getUrlParameter('utm_content');
+                          if (campaign && campaign.indexOf("s") === 0) {
+                              window.ink.fb_referral = campaign + "_" + getUrlParameter('utm_content');
+                          } else {
+                              window.ink.fb_referral = getUrlParameter('utm_campaign');
+                          }
+                      } else {
+                          window.ink.fb_referral = getUrlParameter('utm_campaign');
+                      }
+
+                      if (getUrlParameter('utm_campaign') && !getUrlParameter("utm_content") && campaign.indexOf("_") != -1) {
+                          ele.value = campaign.split("_")[1];
+                          var camp_ele = document.querySelector("#utm_campaign");
+                          camp_ele.value = campaign.split("_")[0];
+
+                          window.ink.event("utm_referral", {
+                              "utm_source": getUrlParameter('utm_source'),
+                              "utm_campaign": campaign.split("_")[0] || "",
+                              "utm_medium": getUrlParameter('utm_medium') || "",
+                              "utm_term": getUrlParameter('utm_term') || "",
+                              "utm_content": campaign.split("_")[1] || "",
+                          });
+                      } else {
+                          window.ink.event("utm_referral", {
+                              "utm_source": getUrlParameter('utm_source'),
+                              "utm_campaign": getUrlParameter('utm_campaign') || "",
+                              "utm_medium": getUrlParameter('utm_medium') || "",
+                              "utm_term": getUrlParameter('utm_term') || "",
+                              "utm_content": getUrlParameter('utm_content') || "",
+                          });
+                      }
+                  }
+              }
+              window.ink.referral_checked = true;
+          };
+
+}, 200);
+
+</script>
+{% endcompress %}
+{% endcache %}

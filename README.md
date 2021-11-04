@@ -1,4 +1,3 @@
-
 # Inkshop is about people.
 
 It's an all-in-one system for businesses and organizations that do things the right way.  Batteries are included - manage your website, mailing list, store, and reporting all in one.  It's free.
@@ -99,6 +98,11 @@ docker network create inkshop
 docker-compose run db bash
 $ createdb inkshop -h db -U $POSTGRES_USER
 
+# Set up testing frameworks
+npm i -g cypress @4tw/cypress-drag-drop
+
+npm i 
+
 # Load your initial data
 docker-compose run inkshop python3 manage.py migrate
 docker-compose run inkshop python3 manage.py load_initial_data
@@ -122,6 +126,22 @@ Development:
 ```bash
 docker-compose run inkshop pt --autoreload
 ```
+
+## Running e2e tests
+
+Cypress (all e2e tests besides purchase)
+
+```bash
+# npx run cypress
+cypress open
+```
+
+Puppeteer (purchase e2e tests with Stripe's test servers)
+```bash
+node tests/puppeteer/purchase_sprint.js
+node tests/puppeteer/purchase_nobullshit.js
+```
+
 
 
 ## Migrating from other services.

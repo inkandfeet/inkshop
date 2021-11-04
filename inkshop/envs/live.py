@@ -11,6 +11,7 @@ from .common import *
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 IS_LIVE = True
+SECURE_SSL_REDIRECT = True
 
 SESSION_COOKIE_DOMAIN = INKSHOP_DOMAIN
 SESSION_COOKIE_NAME = "%s_id" % INKSHOP_NAMESPACE
@@ -34,15 +35,18 @@ EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 # https://devcenter.heroku.com/articles/securing-heroku-redis
 if "REDIS_URL_STUNNEL" in os.environ:
     STUNNELED_URL = os.environ["REDIS_URL_STUNNEL"]
+    ENV_REDIS_URL = os.environ["REDIS_URL_STUNNEL"]
 else:
     base_redis_url_parts = os.environ["REDIS_URL"].split(":")
     stunnel_port = int(base_redis_url_parts[-1]) + 1
     base_redis_url_parts[-1] = str(stunnel_port)
 
     STUNNELED_URL = ":".join(base_redis_url_parts)
+    ENV_REDIS_URL = os.environ["REDIS_URL"]
 
 BROKER_URL = STUNNELED_URL
 CELERY_BROKER_URL = STUNNELED_URL
+
 
 # AWS_S3_CALLING_FORMAT = 'boto.s3.connection.OrdinaryCallingFormat'
 AWS_DEFAULT_ACL = "public-read"
@@ -64,18 +68,33 @@ CACHES = {
         }
     }
 }
+CHANNEL_LAYERS = {
+    "default": {
+        "CONFIG": {
+            "hosts": [ENV_REDIS_URL, ],
+        },
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+    },
+}
 
 
 DATABASES = None
 DATABASES = postgresify()
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'utils.storage.InkshopS3Storage'
 STATICFILES_STORAGE = DEFAULT_FILE_STORAGE
 COMPRESS_STORAGE = STATICFILES_STORAGE
-COMPRESS_URL = STATIC_URL
+COMPRESS_URL = "https://%s/" % AWS_STORAGE_BUCKET_NAME
+
 RESOURCES_URL = "https://%s/static/" % INKSHOP_DOMAIN
 
 COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = True
+# COMPRESS_OFFLINE = True
+LOGIN_URL = "login"
+
+COMPRESS_PRECOMPILERS = (
+    ('text/less', '/app/node_modules/.bin/lessc {infile} {outfile}'),
+)
 
 LOGGING = {
     'version': 1,

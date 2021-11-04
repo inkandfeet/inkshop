@@ -9,5 +9,12 @@
         <input type="submit">
     </form>
 
+    {% for f in product.feedback %}
+    <div>
+    {{ f.person }} at {{ f.created_at }}: 
+    {{ f.data }}
+	</div>
+    {% endfor %}
+
     <a href="{% url 'clubhouse:delete_product' product.hashid %}">Delete Product</a>
 {% endblock %}

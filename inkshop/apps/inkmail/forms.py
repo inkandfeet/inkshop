@@ -31,6 +31,7 @@ class MessageForm(ModelForm):
             "body_text_unrendered",
             "body_html_unrendered",
             "reward_image",
+            "purchase",
             "transactional",
             "transactional_send_reason",
             "transactional_no_unsubscribe_reason",

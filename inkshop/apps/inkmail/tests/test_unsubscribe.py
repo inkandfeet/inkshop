@@ -33,6 +33,7 @@ class TestUnsubscribeBasics(MailTestCase):
         self.assertEquals(OutgoingMessage.objects.count(), 1)
         om = OutgoingMessage.objects.all()[0]
         self.assertIn(om.unsubscribe_link, m.body)
+        self.assertIn('href="%s"' % (om.unsubscribe_link, ), m.alternatives[0][0])
 
     def test_unsubscribe_link_included_in_every_message_send(self):
         self.assertEquals(len(mail.outbox), 0)
@@ -162,8 +163,80 @@ class TestUnsubscribeResubscribe(MailTestCase):
         # Fetch updated subscription
         self.subscription = Subscription.objects.get(pk=self.subscription.pk)
         self.assertEquals(self.subscription.unsubscribed, True)
-        self.assertEquals(self.subscription.double_opted_in, False)
-        self.assertEquals(self.subscription.double_opted_in_at, None)
+        # self.assertEquals(self.subscription.double_opted_in, False)
+        # self.assertEquals(self.subscription.double_opted_in_at, None)
+        self.assertBasicallyEqualTimes(self.subscription.unsubscribed_at, self.now())
+
+        # Re-subscribe
+        response = self.post(
+            reverse(
+                'inkmail:subscribe',
+            ),
+            {
+                'first_name': self.person.first_name,
+                'email': self.person.email,
+                'newsletter': self.newsletter.internal_name,
+                'subscription_url': Factory.rand_url(),
+            },
+        )
+        self.assertEquals(response.status_code, 200)
+        self.subscription = Subscription.objects.get(pk=self.subscription.pk)
+        self.assertEquals(self.subscription.unsubscribed, False)
+        self.assertEquals(self.subscription.unsubscribed_at, None)
+
+        process_outgoing_message_queue()
+
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(Subscription.objects.count(), 1)
+        # s = Subscription.objects.all()[0]
+        # self.assertIn(s.opt_in_link, mail.outbox[1].body)
+
+        # Re-double-opt-in
+        # self.get(self.subscription.opt_in_link)
+
+        self.subscription = Subscription.objects.get(pk=self.subscription.pk)
+        self.assertEquals(self.subscription.unsubscribed, False)
+        self.assertEquals(self.subscription.unsubscribed_at, None)
+        self.assertEquals(self.subscription.double_opted_in, True)
+        self.assertBasicallyEqualTimes(self.subscription.double_opted_in_at, self.now())
+
+        process_outgoing_message_queue()
+
+        # Welcome email re-sent
+        self.assertEquals(len(mail.outbox), 1)
+
+        # Send newsletter, make sure it sent.
+        self.send_newsletter_message()
+        process_outgoing_message_queue()
+        self.assertEquals(len(mail.outbox), 2)
+
+    def test_unsubscribe_resubscribe_non_opted_in_requires_opt_in_then_allows_messages_sent(self):
+        self.assertEquals(len(mail.outbox), 0)
+        self.create_subscribed_person()
+        self.assertEquals(self.subscription.unsubscribed, False)
+        self.assertEquals(self.subscription.unsubscribed_at, None)
+        self.send_newsletter_message()
+
+        self.assertEquals(len(mail.outbox), 1)
+        m = mail.outbox[0]
+        self.assertEquals(OutgoingMessage.objects.count(), 1)
+        om = OutgoingMessage.objects.all()[0]
+
+        # Unsubscribe
+        self.assertIn(om.unsubscribe_link, m.body)
+        self.get(om.unsubscribe_link)
+
+        # Fetch updated subscription
+        self.subscription = Subscription.objects.get(pk=self.subscription.pk)
+        self.assertEquals(self.subscription.unsubscribed, True)
+
+        # Re-opt them out manually
+        self.subscription.double_opted_in = False
+        self.subscription.double_opted_in_at = None
+        self.subscription.save()
+
+        # self.assertEquals(self.subscription.double_opted_in, False)
+        # self.assertEquals(self.subscription.double_opted_in_at, None)
         self.assertBasicallyEqualTimes(self.subscription.unsubscribed_at, self.now())
 
         # Re-subscribe
@@ -229,6 +302,11 @@ class TestUnsubscribeResubscribe(MailTestCase):
         self.subscription = Subscription.objects.get(pk=self.subscription.pk)
         self.assertEquals(self.subscription.unsubscribed, True)
         self.assertBasicallyEqualTimes(self.subscription.unsubscribed_at, self.now())
+
+        # Re-opt them out manually
+        self.subscription.double_opted_in = False
+        self.subscription.double_opted_in_at = None
+        self.subscription.save()
 
         # Re-subscribe
         name = Factory.rand_name()
@@ -378,3 +456,44 @@ class TestUnsubscribeResubscribe(MailTestCase):
             newsletter=self.newsletter,
             subscription=s,
         )
+
+
+@override_settings(DISABLE_ENCRYPTION_FOR_TESTS=False)
+class TestUnsubscribeResubscribeLink(MailTestCase):
+
+    def test_unsubscribe_resubscribe_allows_messages_sent(self):
+        self.assertEquals(len(mail.outbox), 0)
+        self.create_subscribed_person()
+
+        # Double-opt-in
+        self.get(self.subscription.opt_in_link)
+
+        self.assertEquals(self.subscription.unsubscribed, False)
+        self.assertEquals(self.subscription.unsubscribed_at, None)
+        self.send_newsletter_message()
+
+        self.assertEquals(len(mail.outbox), 1)
+        m = mail.outbox[0]
+        self.assertEquals(OutgoingMessage.objects.count(), 1)
+        om = OutgoingMessage.objects.all()[0]
+
+        # Unsubscribe
+        self.assertIn(om.unsubscribe_link, m.body)
+        self.get(om.unsubscribe_link)
+
+        # Fetch updated subscription
+        self.subscription = Subscription.objects.get(pk=self.subscription.pk)
+        self.assertEquals(self.subscription.unsubscribed, True)
+        self.assertEquals(self.subscription.double_opted_in, True)
+        self.assertBasicallyEqualTimes(self.subscription.unsubscribed_at, self.now())
+
+        self.get(om.unsubscribe_link.replace("unsubscribe", "resubscribe"))
+        self.subscription = Subscription.objects.get(pk=self.subscription.pk)
+        self.assertBasicallyEqualTimes(self.subscription.resubscribed_at, self.now())
+        self.assertEquals(self.subscription.unsubscribed, False)
+        self.assertEquals(self.subscription.double_opted_in, True)
+
+        # Send newsletter, make sure it sent.
+        self.send_newsletter_message()
+        process_outgoing_message_queue()
+        self.assertEquals(len(mail.outbox), 2)

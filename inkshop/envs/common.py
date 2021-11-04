@@ -50,6 +50,7 @@ DRAFT_DOMAIN = "draft.%s" % INKSHOP_DOMAIN
 LOVE_DOMAIN = "love.%s" % INKSHOP_DOMAIN
 DOTS_DOMAIN = "dots.%s" % INKSHOP_DOMAIN
 PRODUCTS_DOMAIN = "courses.%s" % INKSHOP_DOMAIN
+SHOP_DOMAIN = "shop.%s" % INKSHOP_DOMAIN
 
 ALLOWED_HOSTS = [
     INKSHOP_DOMAIN,
@@ -58,6 +59,8 @@ ALLOWED_HOSTS = [
     DRAFT_DOMAIN,
     LOVE_DOMAIN,
     DOTS_DOMAIN,
+    PRODUCTS_DOMAIN,
+    SHOP_DOMAIN,
 ]
 CLUBHOUSE_BASE_URL = "https://%s" % CLUBHOUSE_DOMAIN
 MAIL_BASE_URL = "https://%s" % MAIL_DOMAIN
@@ -69,6 +72,7 @@ RESOURCES_URL = "./static/"
 
 APPEND_SLASH = True
 SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = False
 
 # Application definition
 INSTALLED_APPS = [
@@ -83,7 +87,9 @@ INSTALLED_APPS = [
     'compressor',
     'django_celery_beat',
     'django_celery_results',
+    'django_extensions',
     'static_precompiler',
+    'debug_toolbar',
 
     'archives',
     'clubhouse',
@@ -119,6 +125,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'inkshop.wsgi.application'
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CACHES = {
     'default': {
@@ -133,15 +141,20 @@ CACHES = {
 MIDDLEWARE = (
     'corsheaders.middleware.CorsMiddleware',
     'django_hosts.middleware.HostsRequestMiddleware',
+    # 'django.middleware.cache.UpdateCacheMiddleware',
+    'inkdots.middleware.InkDotsMiddleware',
+    # 'htmlmin.middleware.HtmlMinifyMiddleware',
+    # 'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.common.BrokenLinkEmailsMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'htmlmin.middleware.HtmlMinifyMiddleware',
-    'htmlmin.middleware.MarkRequestMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
+    # 'htmlmin.middleware.MarkRequestMiddleware',
     'django_hosts.middleware.HostsResponseMiddleware',
 )
 IGNORABLE_404_URLS = [
@@ -170,7 +183,7 @@ CHANNEL_LAYERS = {
     },
 }
 
-AUTH_USER_MODEL = 'clubhouse.StaffMember'
+AUTH_USER_MODEL = 'people.Person'
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 SESSION_SAVE_EVERY_REQUEST = True
@@ -234,10 +247,11 @@ COMPRESS_CSS_FILTERS = (
 )
 
 COMPRESS_JS_FILTERS = (
-    'compressor.filters.jsmin.SlimItFilter',
+    'compressor.filters.jsmin.JSMinFilter',
 )
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = False
+COMPRESS_CSS_HASHING_METHOD = 'content'
 HTML_MINIFY = True
 
 # Password validation
@@ -257,10 +271,12 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+AUTH_PASSWORD_VALIDATORS = []
 AUTHENTICATION_BACKENDS = [
     'utils.backends.EncryptedEmailBackend',
 ]
-
+LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "/accounts/login"
 
 # Background Workers
 # CELERY_BROKER_URL = 'amqp://rabbitmq:rabbitmq@rabbitmq:5672'

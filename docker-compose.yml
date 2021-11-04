@@ -1,27 +1,37 @@
 version: "3.2"
 
 services:  
-  traefik:
-    image: "traefik:v2.2"
-    command:
-      #- "--log.level=DEBUG"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.myresolver.acme.email=postmaster@inkandfeet.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+  ngrok:
+    image: shkoliar/ngrok:latest
     ports:
-      - "80:80"
-      - "443:443"
-      - "8443:8443"
-      - "8080:8080"
-    volumes:
-      - "./letsencrypt:/letsencrypt"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    restart: unless-stopped
+      - 4551:4551
+    links:
+      - inkshop
+    environment:
+      - DOMAIN=inkshop
+      - PORT=8120
+      - PARAMS=http -subdomain=inkandfeet -region=us -authtoken ${NGROK_AUTH_TOKEN} inkshop:8120  
+  # traefik:
+  #   image: "traefik:v2.2"
+  #   command:
+  #     #- "--log.level=DEBUG"
+  #     - "--api.insecure=true"
+  #     - "--providers.docker=true"
+  #     - "--providers.docker.exposedbydefault=false"
+  #     - "--entrypoints.websecure.address=:443"
+  #     - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+  #     #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+  #     - "--certificatesresolvers.myresolver.acme.email=postmaster@inkandfeet.com"
+  #     - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #     - "8443:8443"
+  #     - "8080:8080"
+  #   volumes:
+  #     - "./letsencrypt:/letsencrypt"
+  #     - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  #   restart: unless-stopped
 
   db:
     image: postgres
@@ -58,6 +68,9 @@ services:
       - "traefik.http.routers.inkshop.rule=Host(`${INKSHOP_DOMAIN}`)"
       - "traefik.http.routers.inkshop.entrypoints=websecure"
       - "traefik.http.routers.inkshop.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.test-redirectscheme.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.test-redirectscheme.redirectscheme.permanent=true"
+
     env_file:
       - ".env"
     command: bash -c 'service nginx start; cd /project; PYTHONIOENCODING="utf-8" python3 manage.py collectstatic --noinput --settings=inkshop.envs.dev; honcho start -f Procfile.dev'
@@ -70,10 +83,10 @@ networks:
     external:
       name: inkshop
 
-volumes:
-  traefik:
-    driver_opts:
-      type: none
-      device: /root/server-docker-images/data/traefik
-      o: bind
-  
+# volumes:
+  # traefik:
+  #   driver_opts:
+  #     type: none
+  #     device: /root/server-docker-images/data/traefik
+  #     o: bind
+  # 

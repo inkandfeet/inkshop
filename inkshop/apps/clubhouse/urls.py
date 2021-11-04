@@ -36,6 +36,17 @@ urlpatterns = [
     url(r'^journeys/new/$', views.create_journey, name='create_journey'),
     url(r'^journey/(?P<hashid>[0-9A-Za-z_\-]+)/delete/$', views.delete_journey, name='delete_journey'),
     url(r'^journey/(?P<hashid>[0-9A-Za-z_\-]+)/$', views.journey, name='journey'),
+    url(r'^bestimators/$', views.bestimators, name='bestimators'),
+    url(r'^bestimators/new/$', views.create_bestimator, name='create_bestimator'),
+    url(r'^bestimator/(?P<hashid>[0-9A-Za-z_\-]+)/delete/$', views.delete_bestimator, name='delete_bestimator'),
+    url(r'^bestimator/(?P<hashid>[0-9A-Za-z_\-]+)/$', views.bestimator, name='bestimator'),
+    url(r'^bestimator-choices/$', views.bestimator_choices, name='bestimator_choices'),
+    url(r'^bestimator-choices/new/$', views.create_bestimator_choice, name='create_bestimator_choice'),
+    url(
+        r'^bestimator-choice/(?P<hashid>[0-9A-Za-z_\-]+)/delete/$',
+        views.delete_bestimator_choice, name='delete_bestimator_choice'
+    ),
+    url(r'^bestimator-choice/(?P<hashid>[0-9A-Za-z_\-]+)/$', views.bestimator_choice, name='bestimator_choice'),
     url(r'^patrons/$', views.patrons, name='patrons'),
     url(r'^templates/$', views.templates, name='templates'),
     url(r'^templates/new/$', views.create_template, name='create_template'),

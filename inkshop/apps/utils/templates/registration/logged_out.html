@@ -1,27 +1,24 @@
-{% extends 'base.html' %}{% load static %}
+{% extends "products/7-day-sprint/purchase_base.html" %}{% load static inkshop_helpers  compile_static %}
+
+
 {% block nav %}{% endblock %}
-
-{% block head %}{{ block.super }}{% endblock %}
-
-{% block title %}Logged out.{% endblock %}
-
 {% block content %}
 <script type="text/javascript">
   localStorage.removeItem('inkshop_logged_in');
 </script>
-  <h1>Logged Out.  Log in again?</h1>
-   <form method="POST">
-      {% csrf_token %}
-        {{form.as_p}}
-
-        {% if request.GET.next %}
-        <input type="hidden" name="next" value="{{ request.GET.next }}" />
-        {% endif %}
-
-      <button type="submit">Log In</button>
-  </form>
-  <div class="col s12 center-align">
-      <a href="{% url 'admin_password_reset' %}">Forgot your password?</a>
-   </div>
-  
+<div id="content">
+  <div class="no_nav public_purchase logged_out" id="inkshopApp">
+    <div class="inkshopPage active error">
+      <h2 class="center">You're logged out.  Have a great day!</h2>
+    
+      <img class="hero" src="{% static 'products/7-day-sprint/img/walkerton-600.png' %}"/>
+      <div class="center">
+        <p>You have have been logged out successfully.</p>
+        <p>If you'd like to log back in, <a href="{% url 'login' %}">click here</a>.</p>
+      </div>
+    
+          
+    </div>
+  </div>
+</div>
 {% endblock %}

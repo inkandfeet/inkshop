@@ -5,13 +5,14 @@ from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf import settings
 from django.views.static import serve
+from utils.auth import InkshopPasswordResetView
 
 
 urlpatterns = [
     url(r'^', include(('inkmail.urls', 'inkmail'), namespace="inkmail")),
     url(r'^mail/', include(('inkmail.urls', 'inkmail'), namespace="inkmail_scoped")),
 
-    url(r'^admin/password_reset/$', auth_views.PasswordResetView, name='admin_password_reset'),
+    url(r'^admin/password_reset/$', InkshopPasswordResetView, name='admin_password_reset'),
     url(r'^admin/password_reset/done/$', auth_views.PasswordResetDoneView, name='password_reset_done'),
 
     url(r'^accounts/login/$', auth_views.LoginView.as_view(), {'template_name': 'login.html', }, name='login'),
