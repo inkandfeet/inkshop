@@ -131,5 +131,5 @@ pyxdg==0.25
 s3transfer==0.3.7
 txaio==21.2.1
 uvloop==0.15.2
-websockets==8.1
+websockets==9.1
 zope.interface==5.4.0
