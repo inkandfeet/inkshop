@@ -5,8 +5,6 @@ from ipware import get_client_ip
 def is_debug(context):
     if "ngrok" in settings.INKSHOP_DOMAIN:
         dots_url = "https://%s/dots/event/" % settings.INKSHOP_DOMAIN
-    else:
-        dots_url = "https://dots.inkandfeet.com/event/"
 
     return {
         'IS_DEBUG': settings.DEBUG,
