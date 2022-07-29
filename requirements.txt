@@ -33,7 +33,7 @@ ipython==7.4.0
 kombu==4.6.11
 jwt
 lxml==4.6.3
-mistune==2.0.0a4
+mistune==2.0.3
 mock==2.0.0
 Pillow==8.1.1
 piprot==0.9.10
