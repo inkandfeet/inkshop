@@ -57,7 +57,7 @@ beautifulsoup4==4.7.1
 billiard==3.6.3.0
 bleach==3.3.0
 celery==4.4.5
-certifi==2019.3.9
+certifi==2022.12.7
 chardet==3.0.4
 clint==0.4.1
 decorator==4.4.0
